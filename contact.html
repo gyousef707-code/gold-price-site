@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>اتصل بنا | سعر الذهب اليوم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Cairo:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="icons/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0A0E16">
+<link rel="stylesheet" href="styles.css">
+<style>
+  .page{padding:44px 0 60px;}
+  .page h1{font-family:'Tajawal',sans-serif;font-weight:900;font-size:30px;margin-bottom:14px;}
+  .page > p{color:var(--ivory-dim);font-size:15px;max-width:60ch;margin-bottom:28px;}
+  .contact-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:24px;max-width:480px;}
+  .contact-row{font-size:14px;color:var(--ivory-dim);margin-bottom:10px;}
+  .contact-row a{color:var(--gold-bright);font-weight:600;}
+</style>
+</head>
+<body>
+<header>
+  <div class="container nav-row">
+    <a href="index.html" class="logo"><span class="bar"></span> سعر الذهب اليوم</a>
+    <nav id="mainNav">
+      <ul>
+        <li><a href="index.html">الرئيسية</a></li>
+        <li><a href="about.html">من نحن</a></li>
+        <li><a href="contact.html" class="active">اتصل بنا</a></li>
+      </ul>
+    </nav>
+    <button class="menu-btn" id="menuBtn" aria-label="فتح القائمة">☰</button>
+  </div>
+</header>
+
+<div class="container page">
+  <span class="eyebrow" style="text-align:right">اتصل بنا</span>
+  <h1>تواصل معانا</h1>
+  <p>لأي استفسار أو ملاحظة على دقة الأسعار، ابعتلنا.</p>
+  <div class="contact-card">
+    <div class="contact-row">✉️ <a href="mailto:contact@example.com">contact@example.com</a></div>
+    <p style="font-size:12px;color:var(--ivory-dim);margin-top:14px;">⚠️ غيّر البريد ده لبريدك الحقيقي قبل النشر.</p>
+  </div>
+</div>
+
+<footer>
+  <div class="container footer-row">
+    <span>© 2026 سعر الذهب اليوم. جميع الحقوق محفوظة.</span>
+    <span><a href="about.html">من نحن</a> · <a href="privacy.html">سياسة الخصوصية</a></span>
+  </div>
+</footer>
+<script>
+  document.getElementById('menuBtn').addEventListener('click', function(){
+    document.getElementById('mainNav').classList.toggle('open');
+  });
+</script>
+</body>
+</html>

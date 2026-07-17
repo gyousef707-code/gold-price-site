@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سعر الذهب اليوم | أسعار لحظية بالجنيه والدولار</title>
+<meta name="description" content="سعر الذهب لحظة بلحظة بكل العيارات بالجنيه المصري والدولار">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Cairo:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="icons/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0A0E16">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <div class="container nav-row">
+    <a href="index.html" class="logo"><span class="bar"></span> سعر الذهب اليوم</a>
+    <nav id="mainNav">
+      <ul>
+        <li><a href="index.html" class="active">الرئيسية</a></li>
+        <li><a href="about.html">من نحن</a></li>
+        <li><a href="contact.html">اتصل بنا</a></li>
+      </ul>
+    </nav>
+    <button class="menu-btn" id="menuBtn" aria-label="فتح القائمة">☰</button>
+  </div>
+</header>
+
+<div class="date-banner">
+  <div class="container">
+    <div class="date-banner-title">أسعار الذهب اليوم في مصر</div>
+    <div class="date-banner-sub" id="dateNow">جاري التحميل...</div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="container">
+    <span class="eyebrow">سعر جرام الذهب عيار 21 الآن (إرشادي)</span>
+
+    <div class="quick-cards" id="quickCards">
+      <div class="quick-card">
+        <div class="icon-badge gold">
+          <svg viewBox="0 0 24 24"><rect x="3" y="15" width="18" height="5" rx="1.2"/><rect x="5" y="9.5" width="14" height="5" rx="1.2"/><rect x="7" y="4" width="10" height="5" rx="1.2"/></svg>
+        </div>
+        <div class="qc-label">عيار 21</div><div class="qc-value num" id="qc21">—</div><div class="qc-unit">جنيه/جرام</div>
+      </div>
+      <div class="quick-card">
+        <div class="icon-badge gold">
+          <svg viewBox="0 0 24 24"><rect x="3" y="15" width="18" height="5" rx="1.2"/><rect x="5" y="9.5" width="14" height="5" rx="1.2"/><rect x="7" y="4" width="10" height="5" rx="1.2"/></svg>
+        </div>
+        <div class="qc-label">عيار 24</div><div class="qc-value num" id="qc24">—</div><div class="qc-unit">جنيه/جرام</div>
+      </div>
+      <div class="quick-card highlight">
+        <div class="icon-badge coin">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.3c0-1.2 1.1-2 2.5-2s2.5.8 2.5 1.9c0 2.6-5 1.3-5 3.9 0 1.1 1.1 1.9 2.5 1.9s2.5-.8 2.5-2" fill="none" stroke="#151020" stroke-width="1.3" stroke-linecap="round"/></svg>
+        </div>
+        <div class="qc-label">جنيه الذهب</div><div class="qc-value num" id="qcPound">—</div><div class="qc-unit">8 جرام عيار 21</div>
+      </div>
+      <div class="quick-card">
+        <div class="icon-badge gold">
+          <svg viewBox="0 0 24 24"><rect x="3" y="15" width="18" height="5" rx="1.2"/><rect x="5" y="9.5" width="14" height="5" rx="1.2"/><rect x="7" y="4" width="10" height="5" rx="1.2"/></svg>
+        </div>
+        <div class="qc-label">الأونصة</div><div class="qc-value num" id="qcOunce">—</div><div class="qc-unit">جنيه مصري</div>
+      </div>
+    </div>
+
+    <div class="hero-grid">
+      <div class="plate">
+        <div class="plate-label">جنيه مصري</div>
+        <div class="plate-price num" id="mainPrice">—</div>
+        <div class="plate-unit">للجرام الواحد</div>
+        <div class="plate-change" id="priceChange">—</div>
+        <div class="plate-updated" id="lastUpdated">جاري التحميل...</div>
+      </div>
+
+      <div class="price-table-wrap">
+        <table class="price-table" id="priceTable">
+          <thead>
+            <tr><th>العيار / الوحدة</th><th>السعر بالجنيه المصري</th></tr>
+          </thead>
+          <tbody id="priceTableBody">
+            <tr><td>ذهب عيار 24</td><td class="num">—</td></tr>
+            <tr><td>ذهب عيار 22</td><td class="num">—</td></tr>
+            <tr class="highlight-row"><td>ذهب عيار 21</td><td class="num">—</td></tr>
+            <tr><td>ذهب عيار 18</td><td class="num">—</td></tr>
+            <tr><td>ذهب عيار 14</td><td class="num">—</td></tr>
+            <tr><td>ذهب عيار 10</td><td class="num">—</td></tr>
+            <tr><td>جنيه الذهب (8 جرام عيار 21)</td><td class="num">—</td></tr>
+            <tr><td>أونصة الذهب</td><td class="num">—</td></tr>
+          </tbody>
+        </table>
+        <p class="table-note">الأسعار إرشادية مبنية على السعر العالمي محوّل للجنيه — سعر الصاغة الفعلي قد يختلف بهامش المصنعية وربح المحل.</p>
+      </div>
+    </div>
+
+    <div class="usd-strip">
+      <div class="usd-strip-label">
+        <div class="icon-badge gold small"><svg viewBox="0 0 24 24"><rect x="3" y="15" width="18" height="5" rx="1.2"/><rect x="5" y="9.5" width="14" height="5" rx="1.2"/><rect x="7" y="4" width="10" height="5" rx="1.2"/></svg></div>
+        <span>أونصة الذهب (دولار)</span>
+      </div>
+      <strong id="usdOunce" class="num">—</strong>
+    </div>
+    <div class="usd-strip">
+      <div class="usd-strip-label">
+        <div class="icon-badge dollar small"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.3c0-1.2 1.1-2 2.5-2s2.5.8 2.5 1.9c0 2.6-5 1.3-5 3.9 0 1.1 1.1 1.9 2.5 1.9s2.5-.8 2.5-2" fill="none" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+        <span>سعر الدولار الرسمي في البنوك</span>
+      </div>
+      <strong id="usdBankRate" class="num">—</strong>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head"><h2>حركة سعر الذهب آخر 30 يوم (عيار 21)</h2></div>
+    <div class="chart-wrap">
+      <svg id="priceChart" viewBox="0 0 600 200" preserveAspectRatio="none"></svg>
+      <p class="table-note" id="chartNote">جاري تحميل بيانات الرسم البياني...</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="section-head"><h2>شارت الذهب العالمي المباشر (دولار)</h2></div>
+    <div class="chart-wrap" style="padding:0;overflow:hidden;">
+      <!-- TradingView Widget — رسمي ومجاني، بيدي شارت حي فعلي ورابط رجوع لـ TradingView.com -->
+      <div class="tradingview-widget-container">
+        <div class="tradingview-widget-container__widget"></div>
+      </div>
+      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js" async>
+      {
+        "symbols": [["OANDA:XAUUSD|1D"]],
+        "chartOnly": false,
+        "width": "100%",
+        "height": 320,
+        "locale": "ar",
+        "colorTheme": "dark",
+        "isTransparent": true,
+        "autosize": true,
+        "showVolume": false
+      }
+      </script>
+    </div>
+  </div>
+</section>
+
+
+<div class="container" style="padding-top:8px;">
+  <div class="ad-slot" style="height:90px;"><span>مساحة إعلانية — Leaderboard 728×90</span></div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head"><h2>إيه اللي بيحرك سعر الذهب؟</h2></div>
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>سعر الأونصة العالمي</h3>
+        <p>الذهب بيتسعّر عالمياً بالدولار للأونصة، وأي تغيّر فيه بينعكس على السعر المحلي فوراً.</p>
+      </div>
+      <div class="info-card">
+        <h3>سعر صرف الدولار</h3>
+        <p>لأن السعر العالمي بالدولار، أي تغيّر في سعر الصرف المحلي بيأثر مباشرة على سعر الجرام بالجنيه.</p>
+      </div>
+      <div class="info-card">
+        <h3>الطلب المحلي والمواسم</h3>
+        <p>مواسم الزواج والأعياد بتزوّد الطلب على الذهب محلياً، وده بيأثر على هامش السعر عند الصاغة.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="ad-slot" style="height:120px;"><span>مساحة إعلانية — In-feed native</span></div>
+</div>
+
+<footer>
+  <div class="container footer-row">
+    <span>© 2026 سعر الذهب اليوم. جميع الحقوق محفوظة.</span>
+    <span><a href="about.html">من نحن</a> · <a href="contact.html">اتصل بنا</a> · <a href="privacy.html">سياسة الخصوصية</a></span>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('menuBtn').addEventListener('click', function(){
+    document.getElementById('mainNav').classList.toggle('open');
+  });
+</script>
+<script src="script.js"></script>
+</body>
+</html>
