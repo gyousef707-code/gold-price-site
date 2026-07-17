@@ -20,10 +20,10 @@ export default async function handler(req, res) {
   startDate.setDate(startDate.getDate() - 29); // آخر 30 يوم
 
   // كل الطلبات base=USD (الوحيد المسموح في الباقة المجانية)
-  const latestUrl = https://api.metalpriceapi.com/v1/latest?api_key=${API_KEY}&base=USD&currencies=EGP,XAU;
-  const timeframeUrl = https://api.metalpriceapi.com/v1/timeframe?api_key=${API_KEY}&start_date=${fmtDate(
+  const latestUrl = `https://api.metalpriceapi.com/v1/latest?api_key=${API_KEY}&base=USD&currencies=EGP,XAU`;
+  const timeframeUrl = `https://api.metalpriceapi.com/v1/timeframe?api_key=${API_KEY}&start_date=${fmtDate(
     startDate
-  )}&end_date=${fmtDate(endDate)}&base=USD&currencies=EGP,XAU;
+  )}&end_date=${fmtDate(endDate)}&base=USD&currencies=EGP,XAU`;
 
   try {
     const [latestRes, timeframeRes] = await Promise.all([fetch(latestUrl), fetch(timeframeUrl)]);
