@@ -9,7 +9,7 @@ function renderDateNow() {
   const now = new Date();
   const dateStr = now.toLocaleDateString("ar-EG-u-nu-latn", { weekday: "long", year: "numeric", month: "2-digit", day: "2-digit" });
   const timeStr = now.toLocaleTimeString("ar-EG-u-nu-latn", { hour: "2-digit", minute: "2-digit" });
-  document.getElementById("dateNow").textContent = التاريخ الآن ${dateStr} — الساعة ${timeStr};
+  document.getElementById("dateNow").textContent = `التاريخ الآن ${dateStr} — الساعة ${timeStr}`;
 }
 
 async function loadGoldPrice() {
@@ -26,10 +26,10 @@ async function loadGoldPrice() {
     const changePct = egp.chp || 0;
     const changeEl = document.getElementById("priceChange");
     if (changePct >= 0) {
-      changeEl.textContent = ▲ ${changePct.toFixed(2)}% منذ إغلاق أمس;
+      changeEl.textContent = `▲ ${changePct.toFixed(2)}% منذ إغلاق أمس`;
       changeEl.className = "plate-change up";
     } else {
-      changeEl.textContent = ▼ ${Math.abs(changePct).toFixed(2)}% منذ إغلاق أمس;
+      changeEl.textContent = `▼ ${Math.abs(changePct).toFixed(2)}% منذ إغلاق أمس`;
       changeEl.className = "plate-change down";
     }
 
@@ -94,16 +94,17 @@ function drawChart(history) {
   const max = Math.max(...values);
   const range = max - min || 1;
   const w = 600, h = 200, pad = 10;
+
   const points = history.map((p, i) => {
     const x = pad + (i / (history.length - 1)) * (w - pad * 2);
     const y = h - pad - ((p.gram21 - min) / range) * (h - pad * 2);
-    return ${x.toFixed(1)},${y.toFixed(1)};
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
   });
 
   const linePath = "M" + points.join(" L");
-  const areaPath = linePath +  L${w - pad},${h - pad} L${pad},${h - pad} Z;
+  const areaPath = linePath + ` L${w - pad},${h - pad} L${pad},${h - pad} Z`;
 
-  svg.innerHTML = 
+  svg.innerHTML = `
     <defs>
       <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0%" stop-color="#D9B679" stop-opacity="0.35"/>
@@ -112,7 +113,7 @@ function drawChart(history) {
     </defs>
     <path d="${areaPath}" fill="url(#areaFill)" stroke="none"/>
     <path d="${linePath}" fill="none" stroke="#D9B679" stroke-width="2"/>
-  ;
+  `;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
