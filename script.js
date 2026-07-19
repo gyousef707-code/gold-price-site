@@ -1,15 +1,66 @@
 function fmtEGP(n) {
   return new Intl.NumberFormat("ar-EG-u-nu-latn", { maximumFractionDigits: 0 }).format(n);
 }
+function fmtRate(n) {
+  return new Intl.NumberFormat("ar-EG-u-nu-latn", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+}
 function fmtUSD(n) {
   return new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(n);
 }
+
+// نخزن آخر سعر أونصة بالدولار وآخر سعر دولار/جنيه معروفين، عشان نحسب بيهم سعر الجرام
+// بأحدث بيانات متاحة بدل ما نعتمد على تحويل GoldAPI الداخلي اللي ممكن يكون متأخر شوية عن السوق المصري.
+let latestUsdOunce = null; // سعر الأونصة بالدولار (من GoldAPI)
+let latestUsdEgpRate = null; // سعر الدولار بالجنيه (من MetalpriceAPI، أحدث تحديثاً)
+let latestChangePct = 0;
+let latestTimestamp = null;
 
 function renderDateNow() {
   const now = new Date();
   const dateStr = now.toLocaleDateString("ar-EG-u-nu-latn", { weekday: "long", year: "numeric", month: "2-digit", day: "2-digit" });
   const timeStr = now.toLocaleTimeString("ar-EG-u-nu-latn", { hour: "2-digit", minute: "2-digit" });
   document.getElementById("dateNow").textContent = `التاريخ الآن ${dateStr} — الساعة ${timeStr}`;
+}
+
+// بيحسب ويعرض كل أسعار الجرام والعيارات بناءً على أحدث سعر أونصة وأحدث سعر دولار متاحين
+function renderPrices() {
+  if (!latestUsdOunce || !latestUsdEgpRate) return; // لسه مفيش بيانات كفاية
+
+  const gram24 = (latestUsdOunce / 31.1035) * latestUsdEgpRate;
+  const purity = { 24: 1, 22: 0.9167, 21: 0.875, 18: 0.75, 14: 0.5833, 10: 0.4167 };
+  const gram21 = gram24 * purity[21];
+  const goldPound = gram21 * 8;
+
+  document.getElementById("mainPrice").textContent = fmtEGP(gram21) + " ج.م";
+
+  const changeEl = document.getElementById("priceChange");
+  if (latestChangePct >= 0) {
+    changeEl.textContent = `▲ ${latestChangePct.toFixed(2)}% منذ إغلاق أمس`;
+    changeEl.className = "plate-change up";
+  } else {
+    changeEl.textContent = `▼ ${Math.abs(latestChangePct).toFixed(2)}% منذ إغلاق أمس`;
+    changeEl.className = "plate-change down";
+  }
+
+  if (latestTimestamp) {
+    document.getElementById("lastUpdated").textContent =
+      "آخر تحديث: " + new Date(latestTimestamp * 1000).toLocaleTimeString("ar-EG-u-nu-latn", { hour: "2-digit", minute: "2-digit" });
+  }
+
+  const rows = document.querySelectorAll("#priceTableBody tr td:last-child");
+  rows[0].textContent = fmtEGP(gram24 * purity[24]) + " ج.م";
+  rows[1].textContent = fmtEGP(gram24 * purity[22]) + " ج.م";
+  rows[2].textContent = fmtEGP(gram21) + " ج.م";
+  rows[3].textContent = fmtEGP(gram24 * purity[18]) + " ج.م";
+  rows[4].textContent = fmtEGP(gram24 * purity[14]) + " ج.م";
+  rows[5].textContent = fmtEGP(gram24 * purity[10]) + " ج.م";
+  rows[6].textContent = fmtEGP(goldPound) + " ج.م";
+  rows[7].textContent = fmtEGP(gram24) + " ج.م";
+
+  document.getElementById("qc21").textContent = fmtEGP(gram21);
+  document.getElementById("qc24").textContent = fmtEGP(gram24 * purity[24]);
+  document.getElementById("qcPound").textContent = fmtEGP(goldPound);
+  document.getElementById("qcOunce").textContent = fmtEGP(gram24);
 }
 
 async function loadGoldPrice() {
@@ -21,39 +72,14 @@ async function loadGoldPrice() {
     const egp = data.egp;
     const usd = data.usd;
 
-    document.getElementById("mainPrice").textContent = fmtEGP(egp.price_gram_21k) + " ج.م";
-
-    const changePct = egp.chp || 0;
-    const changeEl = document.getElementById("priceChange");
-    if (changePct >= 0) {
-      changeEl.textContent = `▲ ${changePct.toFixed(2)}% منذ إغلاق أمس`;
-      changeEl.className = "plate-change up";
-    } else {
-      changeEl.textContent = `▼ ${Math.abs(changePct).toFixed(2)}% منذ إغلاق أمس`;
-      changeEl.className = "plate-change down";
-    }
-
-    document.getElementById("lastUpdated").textContent =
-      "آخر تحديث: " + new Date(egp.timestamp * 1000).toLocaleTimeString("ar-EG-u-nu-latn", { hour: "2-digit", minute: "2-digit" });
-
-    const goldPound = egp.price_gram_21k * 8; // جنيه الذهب المصري التقليدي = 8 جرام عيار 21
-    const rows = document.querySelectorAll("#priceTableBody tr td:last-child");
-    rows[0].textContent = fmtEGP(egp.price_gram_24k) + " ج.م";
-    rows[1].textContent = fmtEGP(egp.price_gram_22k) + " ج.م";
-    rows[2].textContent = fmtEGP(egp.price_gram_21k) + " ج.م";
-    rows[3].textContent = fmtEGP(egp.price_gram_18k) + " ج.م";
-    rows[4].textContent = fmtEGP(egp.price_gram_14k) + " ج.م";
-    rows[5].textContent = fmtEGP(egp.price_gram_10k) + " ج.م";
-    rows[6].textContent = fmtEGP(goldPound) + " ج.م";
-    rows[7].textContent = fmtEGP(egp.price) + " ج.م";
+    latestUsdOunce = usd.price;
+    latestChangePct = egp.chp || 0;
+    latestTimestamp = egp.timestamp;
+    // لو مفيش سعر دولار أحدث لسه، نستخدم سعر GoldAPI الداخلي مؤقتاً كبداية
+    if (!latestUsdEgpRate) latestUsdEgpRate = egp.price_gram_24k / (usd.price / 31.1035);
 
     document.getElementById("usdOunce").textContent = "$" + fmtUSD(usd.price);
-
-    // كروت أبرز الأسعار
-    document.getElementById("qc21").textContent = fmtEGP(egp.price_gram_21k);
-    document.getElementById("qc24").textContent = fmtEGP(egp.price_gram_24k);
-    document.getElementById("qcPound").textContent = fmtEGP(goldPound);
-    document.getElementById("qcOunce").textContent = fmtEGP(egp.price);
+    renderPrices();
   } catch (err) {
     document.getElementById("mainPrice").textContent = "تعذّر التحميل";
     document.getElementById("lastUpdated").textContent =
@@ -69,7 +95,9 @@ async function loadExtras() {
     const data = await res.json();
 
     if (data.usdEgpBankRate) {
-      document.getElementById("usdBankRate").textContent = fmtEGP(data.usdEgpBankRate) + " ج.م";
+      document.getElementById("usdBankRate").textContent = fmtRate(data.usdEgpBankRate) + " ج.م";
+      latestUsdEgpRate = data.usdEgpBankRate; // نستخدم السعر الأحدث ده في حساب سعر الذهب كمان
+      renderPrices();
     }
 
     if (data.history && data.history.length > 1) {
