@@ -1,9 +1,22 @@
 // Vercel Serverless Function — بيجيب سعر الدولار الرسمي وتاريخ سعر الذهب الحقيقي من MetalpriceAPI
-// ملحوظة: الباقة المجانية من MetalpriceAPI بتسمح بالعملة الأساسية USD بس (مش أي عملة تانية زي EGP)،
-// فبنطلب كل حاجة بالدولار كأساس، وبنحسب سعر الجرام بالجنيه بأنفسنا من نسبة الدولار/الذهب.
+// ملحوظتين مهمتين عن الباقة المجانية:
+// 1) الـ base لازم يكون USD بس (مش أي عملة تانية).
+// 2) طلبات الـ timeframe (البيانات التاريخية) لازم تكون بعملة واحدة بس في المرة الواحدة،
+//    فبنعمل نداءين منفصلين (واحد للذهب XAU وواحد للجنيه EGP) وبندمجهم بأنفسنا.
+// كل قسم (سعر الدولار / الرسم البياني) مستقل عن التاني، فلو واحد فشل الباقي لسه بيشتغل.
 
 function fmtDate(d) {
   return d.toISOString().slice(0, 10);
+}
+
+async function safeFetchJson(url) {
+  try {
+    const r = await fetch(url);
+    const j = await r.json();
+    return j;
+  } catch (err) {
+    return { success: false, error: String(err) };
+  }
 }
 
 export default async function handler(req, res) {
@@ -15,46 +28,55 @@ export default async function handler(req, res) {
 
   const today = new Date();
   const endDate = new Date(today);
-  endDate.setDate(endDate.getDate() - 1); // الـ API مش بيقبل تاريخ اليوم كـ end_date
+  endDate.setDate(endDate.getDate() - 1);
   const startDate = new Date(endDate);
-  startDate.setDate(startDate.getDate() - 29); // آخر 30 يوم
+  startDate.setDate(startDate.getDate() - 29);
+  const startStr = fmtDate(startDate);
+  const endStr = fmtDate(endDate);
 
-  // كل الطلبات base=USD (الوحيد المسموح في الباقة المجانية)
-  const latestUrl = `https://api.metalpriceapi.com/v1/latest?api_key=${API_KEY}&base=USD&currencies=EGP,XAU`;
-  const timeframeUrl = `https://api.metalpriceapi.com/v1/timeframe?api_key=${API_KEY}&start_date=${fmtDate(
-    startDate
-  )}&end_date=${fmtDate(endDate)}&base=USD&currencies=EGP,XAU`;
+  const latestUrl = `https://api.metalpriceapi.com/v1/latest?api_key=${API_KEY}&base=USD&currencies=EGP`;
+  const timeframeXauUrl = `https://api.metalpriceapi.com/v1/timeframe?api_key=${API_KEY}&start_date=${startStr}&end_date=${endStr}&base=USD&currencies=XAU`;
+  const timeframeEgpUrl = `https://api.metalpriceapi.com/v1/timeframe?api_key=${API_KEY}&start_date=${startStr}&end_date=${endStr}&base=USD&currencies=EGP`;
 
-  try {
-    const [latestRes, timeframeRes] = await Promise.all([fetch(latestUrl), fetch(timeframeUrl)]);
-    const latest = await latestRes.json();
-    const timeframe = await timeframeRes.json();
+  const [latest, tfXau, tfEgp] = await Promise.all([
+    safeFetchJson(latestUrl),
+    safeFetchJson(timeframeXauUrl),
+    safeFetchJson(timeframeEgpUrl),
+  ]);
 
-    if (!latest.success || !timeframe.success) {
-      return res.status(502).json({ error: "MetalpriceAPI رجّع خطأ", latest, timeframe });
-    }
+  // سعر الدولار الرسمي — مستقل تماماً عن الرسم البياني
+  const usdEgpBankRate = latest.success ? latest.rates?.EGP || null : null;
 
-    const usdEgpBankRate = latest.rates?.EGP || null;
-
-    // نحوّل بيانات الـ timeframe لسلسلة: تاريخ + سعر جرام عيار 21 بالجنيه
-    // USDXAU = سعر أونصة الذهب بالدولار. EGP = سعر الدولار بالجنيه في نفس اليوم.
-    const history = Object.entries(timeframe.rates)
-      .map(([date, r]) => {
-        const xauUsd = r.USDXAU; // سعر الأونصة بالدولار
-        const egpRate = r.EGP; // سعر الدولار بالجنيه في نفس اليوم
+  // الرسم البياني — بندمج بيانات XAU وEGP لكل تاريخ مشترك
+  let history = [];
+  if (tfXau.success && tfEgp.success) {
+    const xauRates = tfXau.rates || {};
+    const egpRates = tfEgp.rates || {};
+    history = Object.keys(xauRates)
+      .map((date) => {
+        const xauUsd = xauRates[date]?.USDXAU;
+        const egpRate = egpRates[date]?.EGP;
         if (!xauUsd || !egpRate) return null;
-        const gramUsd24 = xauUsd / 31.1035;
-        const gram21EGP = gramUsd24 * 0.875 * egpRate;
+        const gram24Usd = xauUsd / 31.1035;
+        const gram21EGP = gram24Usd * 0.875 * egpRate;
         return { date, gram21: gram21EGP };
       })
       .filter(Boolean)
       .sort((a, b) => (a.date > b.date ? 1 : -1));
-
-    // كاش 24 ساعة عشان نحافظ على الكوطة الشهرية (100 طلب بس)
-    res.setHeader("Cache-Control", "s-maxage=86400, stale-while-revalidate=172800");
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    return res.status(200).json({ usdEgpBankRate, history });
-  } catch (err) {
-    return res.status(500).json({ error: "فشل الاتصال بـ MetalpriceAPI", details: String(err) });
   }
+
+  res.setHeader("Cache-Control", "s-maxage=86400, stale-while-revalidate=172800");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  return res.status(200).json({
+    usdEgpBankRate,
+    history,
+    debug: {
+      latestOk: !!latest.success,
+      xauOk: !!tfXau.success,
+      egpOk: !!tfEgp.success,
+      latestError: latest.error || null,
+      xauError: tfXau.error || null,
+      egpError: tfEgp.error || null,
+    },
+  });
 }
