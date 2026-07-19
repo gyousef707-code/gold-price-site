@@ -100,6 +100,10 @@ async function loadExtras() {
       renderPrices();
     }
 
+    if (data.silverGramEGP) {
+      document.getElementById("silverGram").textContent = fmtRate(data.silverGramEGP) + " ج.م";
+    }
+
     if (data.history && data.history.length > 1) {
       drawChart(data.history);
       document.getElementById("chartNote").textContent =
