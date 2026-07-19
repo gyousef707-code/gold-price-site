@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://gold-price-site-chi.vercel.app/sitemap.xml
