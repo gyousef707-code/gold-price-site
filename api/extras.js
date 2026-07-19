@@ -34,7 +34,7 @@ export default async function handler(req, res) {
   const startStr = fmtDate(startDate);
   const endStr = fmtDate(endDate);
 
-  const latestUrl = `https://api.metalpriceapi.com/v1/latest?api_key=${API_KEY}&base=USD&currencies=EGP`;
+  const latestUrl = `https://api.metalpriceapi.com/v1/latest?api_key=${API_KEY}&base=USD&currencies=EGP,XAG`;
   const timeframeXauUrl = `https://api.metalpriceapi.com/v1/timeframe?api_key=${API_KEY}&start_date=${startStr}&end_date=${endStr}&base=USD&currencies=XAU`;
   const timeframeEgpUrl = `https://api.metalpriceapi.com/v1/timeframe?api_key=${API_KEY}&start_date=${startStr}&end_date=${endStr}&base=USD&currencies=EGP`;
 
@@ -46,6 +46,12 @@ export default async function handler(req, res) {
 
   // سعر الدولار الرسمي — مستقل تماماً عن الرسم البياني
   const usdEgpBankRate = latest.success ? latest.rates?.EGP || null : null;
+
+  // سعر الفضة الحقيقي (جرام بالجنيه) — من نفس نداء "latest"
+  let silverGramEGP = null;
+  if (latest.success && latest.rates?.USDXAG && usdEgpBankRate) {
+    silverGramEGP = (latest.rates.USDXAG / 31.1035) * usdEgpBankRate;
+  }
 
   // الرسم البياني — بندمج بيانات XAU وEGP لكل تاريخ مشترك
   let history = [];
@@ -69,6 +75,7 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   return res.status(200).json({
     usdEgpBankRate,
+    silverGramEGP,
     history,
     debug: {
       latestOk: !!latest.success,
