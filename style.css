@@ -42,6 +42,7 @@ body {
     color: var(--text);
     line-height: 1.6;
     overflow-x: hidden;
+    direction: rtl;
 }
 
 /* ===== App Container ===== */
@@ -150,6 +151,7 @@ body {
 /* ===== Content ===== */
 .content {
     padding: 16px;
+    padding-bottom: 100px;
 }
 
 /* ===== Section Title ===== */
@@ -296,12 +298,13 @@ body {
     margin-top: 4px;
 }
 
-/* ===== Cards Grid ===== */
+/* ===== Cards Grid - FIXED ===== */
 .cards-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
     margin-bottom: 16px;
+    width: 100%;
 }
 
 .karat-card {
@@ -315,6 +318,8 @@ body {
     position: relative;
     overflow: hidden;
     outline: none;
+    width: 100%;
+    min-height: 160px;
 }
 
 .karat-card:hover,
@@ -541,6 +546,7 @@ body {
     border: none;
     outline: none;
     font-family: 'Cairo', sans-serif;
+    width: 100%;
 }
 
 .tool-card:hover,
@@ -1007,9 +1013,19 @@ body {
 /* ===== Responsive ===== */
 @media (max-width: 400px) {
     .cards-grid { gap: 10px; }
-    .karat-card { padding: 14px; }
+    .karat-card { padding: 14px; min-height: 150px; }
     .app-title { font-size: 24px; }
     .ounce-price { font-size: 30px; }
+    .pound-card { padding: 20px; }
+    .pound-icon { width: 50px; height: 50px; font-size: 24px; }
+}
+
+@media (max-width: 360px) {
+    .karat-card { padding: 12px; min-height: 140px; }
+    .karat-name { font-size: 14px; }
+    .price-value { font-size: 13px; }
+    .header { padding: 14px 16px 18px; }
+    .content { padding: 12px; }
 }
 
 /* ===== Print ===== */
