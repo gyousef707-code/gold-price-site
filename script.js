@@ -154,4 +154,11 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(loadGoldPrice, 15 * 60 * 1000); // تحديث سعر الذهب كل 15 دقيقة
   setInterval(loadExtras, 6 * 60 * 60 * 1000); // تحديث الدولار والرسم البياني كل 6 ساعات
   setInterval(renderDateNow, 60 * 1000);
+
+  document.querySelectorAll(".karat-row").forEach((el) => {
+    el.addEventListener("click", () => {
+      const unit = el.getAttribute("data-unit");
+      window.location.href = `calculator.html?unit=${unit}`;
+    });
+  });
 });
