@@ -1,443 +1,375 @@
-// ===== Configuration =====
-const CONFIG = {
-    UPDATE_INTERVAL: 30000, // 30 seconds
-    API_BASE: 'https://api.exchangerate-api.com/v4/latest/USD',
-    GOLD_API: 'https://www.goldapi.io/api/XAU/USD',
-    DEFAULT_PRICES: {
-        24: { sell: 4400, buy: 4350 },
-        22: { sell: 4033, buy: 3987 },
-        21: { sell: 3850, buy: 3820 },
-        18: { sell: 3300, buy: 3260 }
-    },
-    KARAT_PURITY: { 24: 0.999, 22: 0.916, 21: 0.875, 18: 0.75 },
-    CURRENCY_RATES: {
-        USD: 1, EUR: 0.92, GBP: 0.79, SAR: 3.75, AED: 3.67, EGP: 49.85
-    },
-    BAR_PREMIUM: 1.15 // 15% premium for bars
-};
-
-// ===== State =====
-let currentTab = 'home';
-let isDarkMode = false;
-let prices = { ...CONFIG.DEFAULT_PRICES };
-
-// ===== DOM Elements =====
-const app = document.getElementById('app');
-const darkModeBtn = document.getElementById('darkModeBtn');
-const refreshBtn = document.getElementById('refreshBtn');
-const calcModal = document.getElementById('calcModal');
-const toast = document.getElementById('toast');
-
-// ===== Initialization =====
-document.addEventListener('DOMContentLoaded', () => {
-    initEventListeners();
-    loadSavedTheme();
-    startAutoUpdate();
-    updateGapDisplay();
-    initTradingView();
-});
-
-// ===== Event Listeners =====
-function initEventListeners() {
-    // Dark mode
-    darkModeBtn.addEventListener('click', toggleDarkMode);
-
-    // Refresh
-    refreshBtn.addEventListener('click', refreshData);
-
-    // Karat cards
-    document.querySelectorAll('.karat-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const karat = card.dataset.karat;
-            showCalculator(karat);
-        });
-        card.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                const karat = card.dataset.karat;
-                showCalculator(karat);
-            }
-        });
-    });
-
-    // Bottom nav
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.addEventListener('click', () => switchTab(item.dataset.tab));
-    });
-
-    // Modal close on overlay click
-    calcModal.addEventListener('click', (e) => {
-        if (e.target === calcModal) closeModal();
-    });
-
-    // Close modal on Escape
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeModal();
-    });
-
-    // Bars calculator
-    document.getElementById('barCompany')?.addEventListener('change', calculateBarPrice);
-    document.getElementById('barWeight')?.addEventListener('change', calculateBarPrice);
-
-    // Currency converter
-    document.getElementById('currencyAmount')?.addEventListener('input', convertCurrency);
-    document.getElementById('currencyFrom')?.addEventListener('change', convertCurrency);
-    document.getElementById('currencyTo')?.addEventListener('change', convertCurrency);
-}
-
-// ===== Dark Mode =====
-function toggleDarkMode() {
-    isDarkMode = !isDarkMode;
-    app.classList.toggle('dark-mode', isDarkMode);
-    darkModeBtn.textContent = isDarkMode ? '☀' : '☾';
-    localStorage.setItem('darkMode', isDarkMode);
-    showToast(isDarkMode ? 'تم تفعيل الوضع الداكن' : 'تم تفعيل الوضع الفاتح');
-}
-
-function loadSavedTheme() {
-    const saved = localStorage.getItem('darkMode');
-    if (saved === 'true') {
-        isDarkMode = true;
-        app.classList.add('dark-mode');
-        darkModeBtn.textContent = '☀';
-    }
-}
-
-// ===== Refresh Data =====
-function refreshData() {
-    refreshBtn.classList.add('spinning');
-    showToast('جاري تحديث البيانات...');
-
-    // Simulate price updates with small random variations
-    const variation = () => (Math.random() - 0.5) * 30;
-
-    setTimeout(() => {
-        prices[24].sell = Math.round(4400 + variation());
-        prices[24].buy = Math.round(4350 + variation());
-        prices[22].sell = Math.round(4033 + variation());
-        prices[22].buy = Math.round(3987 + variation());
-        prices[21].sell = Math.round(3850 + variation());
-        prices[21].buy = Math.round(3820 + variation());
-        prices[18].sell = Math.round(3300 + variation());
-        prices[18].buy = Math.round(3260 + variation());
-
-        updatePriceDisplay();
-        updateOuncePrice();
-        updateGapDisplay();
-
-        refreshBtn.classList.remove('spinning');
-        showToast('تم تحديث البيانات بنجاح ✅');
-    }, 1200);
-}
-
-function updatePriceDisplay() {
-    Object.keys(prices).forEach(karat => {
-        const sellEl = document.getElementById(`sell${karat}`);
-        const buyEl = document.getElementById(`buy${karat}`);
-        if (sellEl) sellEl.textContent = prices[karat].sell.toLocaleString();
-        if (buyEl) buyEl.textContent = prices[karat].buy.toLocaleString();
-    });
-
-    // Update pound price
-    const poundPrice = document.getElementById('poundPrice');
-    const poundBuy = document.getElementById('poundBuy');
-    const poundSell = document.getElementById('poundSell');
-    if (poundPrice) poundPrice.textContent = prices[21].sell.toLocaleString() + ' ج.م';
-    if (poundBuy) poundBuy.textContent = prices[21].buy.toLocaleString();
-    if (poundSell) poundSell.textContent = (prices[21].sell + 30).toLocaleString();
-}
-
-function updateOuncePrice() {
-    const ounceEl = document.getElementById('ouncePrice');
-    const changeEl = document.getElementById('ounceChange');
-    if (!ounceEl) return;
-
-    const base = 2408.50;
-    const change = (Math.random() - 0.5) * 10;
-    const newPrice = base + change;
-    const percent = (change / base * 100).toFixed(2);
-
-    ounceEl.textContent = '$' + newPrice.toFixed(2);
-    if (changeEl) {
-        const isUp = change >= 0;
-        changeEl.textContent = (isUp ? '▲ +' : '▼ ') + Math.abs(percent) + '%';
-        changeEl.style.color = isUp ? '#2ECC71' : '#E74C3C';
-        changeEl.style.background = isUp ? 'rgba(46,204,113,0.2)' : 'rgba(231,76,60,0.2)';
-    }
-}
-
-function updateGapDisplay() {
-    const bankDollar = 49.85;
-    const saghaDollar = 52.10;
-    const gap = saghaDollar - bankDollar;
-    const percent = (gap / bankDollar * 100).toFixed(1);
-
-    const gapValue = document.getElementById('gapValue');
-    const gapPercent = document.getElementById('gapPercent');
-    if (gapValue) gapValue.textContent = (gap >= 0 ? '+' : '') + gap.toFixed(2) + ' ج.م';
-    if (gapPercent) gapPercent.textContent = (gap >= 0 ? '+' : '') + percent + '%';
-}
-
-// ===== Auto Update =====
-function startAutoUpdate() {
-    setInterval(() => {
-        updateOuncePrice();
-    }, CONFIG.UPDATE_INTERVAL);
-}
-
-// ===== Tab Switching =====
-function switchTab(tab) {
-    currentTab = tab;
-
-    // Update nav items
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.toggle('active', item.dataset.tab === tab);
-    });
-
-    // Hide all sections
-    const sections = ['toolsSection', 'silverSection', 'barsSection', 'currencySection', 'settingsSection'];
-    sections.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.add('hidden');
-    });
-
-    // Show selected section or home
-    if (tab === 'home') {
-        document.querySelectorAll('.content > *:not(.hidden)').forEach(el => {
-            if (!sections.some(s => el.id === s)) {
-                el.style.display = '';
-            }
-        });
-        sections.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.classList.add('hidden');
-        });
-    } else if (tab === 'tools') {
-        document.getElementById('toolsSection')?.classList.remove('hidden');
-        hideHomeSections();
-    } else if (tab === 'silver') {
-        document.getElementById('silverSection')?.classList.remove('hidden');
-        hideHomeSections();
-    } else if (tab === 'bars') {
-        document.getElementById('barsSection')?.classList.remove('hidden');
-        hideHomeSections();
-        calculateBarPrice();
-    } else if (tab === 'currency') {
-        document.getElementById('currencySection')?.classList.remove('hidden');
-        hideHomeSections();
-    }
-}
-
-function hideHomeSections() {
-    const homeSections = document.querySelectorAll('.content > h2, .content > .ounce-card, .content > .pound-card, .content > .cards-grid, .content > .dollar-section, .content > .gap-card, .content > .chart-card');
-    homeSections.forEach(el => el.style.display = 'none');
-}
-
-// ===== Calculator =====
-function showCalculator(karat) {
-    document.getElementById('calcKarat').value = karat;
-    openModal();
-}
-
-function openCalculator() {
-    document.getElementById('calcKarat').value = '21';
-    openModal();
-}
-
-function openModal() {
-    calcModal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    document.getElementById('calcWeight').focus();
-}
-
-function closeModal() {
-    calcModal.classList.remove('active');
-    document.body.style.overflow = '';
-    document.getElementById('calcResult').classList.add('hidden');
-    document.getElementById('calcWeight').value = '';
-}
-
-function calculateGold() {
-    const weight = parseFloat(document.getElementById('calcWeight').value);
-    const karat = parseInt(document.getElementById('calcKarat').value);
-
-    if (!weight || weight <= 0) {
-        showToast('أدخل وزن صحيح');
-        document.getElementById('calcWeight').focus();
-        return;
-    }
-
-    const purity = CONFIG.KARAT_PURITY[karat];
-    const pricePerGram = prices[karat].sell;
-    const totalValue = weight * pricePerGram * purity;
-
-    document.getElementById('calcResultValue').textContent = Math.round(totalValue).toLocaleString() + ' ج.م';
-    document.getElementById('calcResult').classList.remove('hidden');
-}
-
-// ===== Silver Calculator =====
-function openSilverCalc() {
-    document.getElementById('calcKarat').innerHTML = `
-        <option value="999">عيار 999 (99.9%)</option>
-        <option value="925" selected>عيار 925 (92.5%)</option>
-        <option value="800">عيار 800 (80.0%)</option>
-    `;
-    document.querySelector('.modal-title').textContent = '🥈 حاسبة الفضة';
-    openModal();
-}
-
-// ===== Wage Calculator =====
-function openWageCalc() {
-    const wage = prompt('أدخل سعر الذهب بالجرام (عيار 21):', '3850');
-    if (!wage) return;
-
-    const weight = prompt('أدخل وزن القطعة بالجرام:', '10');
-    if (!weight) return;
-
-    const wagePerGram = prompt('أدخل المصنعية بالجرام:', '50');
-    if (!wagePerGram) return;
-
-    const goldValue = parseFloat(wage) * parseFloat(weight);
-    const wageValue = parseFloat(wagePerGram) * parseFloat(weight);
-    const total = goldValue + wageValue;
-
-    showToast(`الإجمالي: ${total.toLocaleString()} ج.م`);
-}
-
-// ===== Zakat Calculator =====
-function openZakatCalc() {
-    const goldValue = prompt('أدخل قيمة الذهب بالجنيه:', '100000');
-    if (!goldValue) return;
-
-    const zakat = parseFloat(goldValue) * 0.025;
-    showToast(`الزكاة: ${zakat.toLocaleString()} ج.م (2.5%)`);
-}
-
-// ===== Bar Calculator =====
-function calculateBarPrice() {
-    const company = document.getElementById('barCompany')?.value || 'suisse';
-    const weight = parseFloat(document.getElementById('barWeight')?.value || '100');
-
-    const companyMultipliers = {
-        suisse: 1.0,
-        perth: 1.02,
-        pamp: 1.05,
-        argor: 1.03
-    };
-
-    const basePrice = prices[24].sell * weight;
-    const premium = basePrice * (CONFIG.BAR_PREMIUM - 1);
-    const companyMult = companyMultipliers[company] || 1.0;
-    const total = (basePrice + premium) * companyMult;
-
-    const barsPrice = document.getElementById('barsPrice');
-    if (barsPrice) barsPrice.textContent = Math.round(total).toLocaleString() + ' ج.م';
-}
-
-// ===== Currency Converter =====
-function convertCurrency() {
-    const amount = parseFloat(document.getElementById('currencyAmount')?.value || '0');
-    const from = document.getElementById('currencyFrom')?.value || 'EGP';
-    const to = document.getElementById('currencyTo')?.value || 'USD';
-
-    if (amount <= 0) return;
-
-    const fromRate = CONFIG.CURRENCY_RATES[from] || 1;
-    const toRate = CONFIG.CURRENCY_RATES[to] || 1;
-    const result = (amount / fromRate) * toRate;
-
-    const resultEl = document.getElementById('currencyResult');
-    if (resultEl) resultEl.value = result.toFixed(3);
-}
-
-function swapCurrency() {
-    const from = document.getElementById('currencyFrom');
-    const to = document.getElementById('currencyTo');
-    if (!from || !to) return;
-
-    const temp = from.value;
-    from.value = to.value;
-    to.value = temp;
-    convertCurrency();
-}
-
-// ===== TradingView =====
-function initTradingView() {
-    const chartContainer = document.getElementById('tradingviewChart');
-    if (!chartContainer) return;
-
-    // Create TradingView widget
-    const script = document.createElement('script');
-    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
-    script.async = true;
-    script.innerHTML = JSON.stringify({
-        "autosize": true,
-        "symbol": "OANDA:XAUUSD",
-        "interval": "D",
-        "timezone": "Africa/Cairo",
-        "theme": isDarkMode ? "dark" : "light",
-        "style": "1",
-        "locale": "ar",
-        "enable_publishing": false,
-        "backgroundColor": isDarkMode ? "#1A1A1A" : "#F5F0E8",
-        "gridColor": isDarkMode ? "#2D2D2D" : "#E8E0D0",
-        "hide_top_toolbar": false,
-        "hide_legend": false,
-        "save_image": false,
-        "calendar": false,
-        "hide_volume": true,
-        "support_host": "https://www.tradingview.com"
-    });
-
-    // Clear placeholder and add widget
-    setTimeout(() => {
-        chartContainer.innerHTML = '';
-        chartContainer.style.background = 'transparent';
-        chartContainer.style.border = 'none';
-
-        const widgetDiv = document.createElement('div');
-        widgetDiv.className = 'tradingview-widget-container';
-        widgetDiv.style.height = '100%';
-        widgetDiv.style.width = '100%';
-
-        const widget = document.createElement('div');
-        widget.className = 'tradingview-widget-container__widget';
-        widget.style.height = '100%';
-        widget.style.width = '100%';
-
-        widgetDiv.appendChild(widget);
-        widgetDiv.appendChild(script);
-        chartContainer.appendChild(widgetDiv);
-    }, 1000);
-}
-
-// ===== Toast =====
-function showToast(message) {
-    toast.textContent = message;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2500);
-}
-
-// ===== Rate App =====
-function rateApp() {
-    showToast('شكراً لتقييمك! ⭐⭐⭐⭐⭐');
-}
-
-// ===== Privacy Policy =====
-function showPrivacy() {
-    alert('سياسة الخصوصية:
-
-- لا نقوم بجمع أي بيانات شخصية
-- جميع البيانات محلية على جهازك
-- الأسعار من مصادر موثوقة
-- للاستفسار: gyousef707@gmail.com');
-}
-
-// ===== Service Worker Registration =====
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-            .then(reg => console.log('SW registered:', reg.scope))
-            .catch(err => console.log('SW registration failed:', err));
-    });
-}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#C9A227">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>الصاغة اليوم - أسعار الذهب في مصر</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="icons/icon-96.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144.png">
+    <link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128.png">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container" id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-top">
+                <div class="header-icons">
+                    <button class="header-icon" id="darkModeBtn" title="وضع الظلام" aria-label="تبديل الوضع الداكن">☾</button>
+                    <button class="header-icon" id="refreshBtn" title="تحديث" aria-label="تحديث البيانات">↻</button>
+                </div>
+                <div class="live-badge">
+                    <span class="live-dot"></span>
+                    <span>LIVE</span>
+                </div>
+            </div>
+            <h1 class="app-title">الصاغة اليوم</h1>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="content">
+            <!-- Ounce -->
+            <h2 class="section-title">📈 الأونصة العالمية</h2>
+            <div class="ounce-card">
+                <div class="ounce-header">
+                    <div class="ounce-label">🌍 XAU/USD</div>
+                    <div class="ounce-change" id="ounceChange">▲ +0.45%</div>
+                </div>
+                <div class="ounce-price" id="ouncePrice">$2,408.50</div>
+            </div>
+            
+            <!-- Gold Pound -->
+            <h2 class="section-title">🪙 الجنيه الذهب</h2>
+            <div class="pound-card">
+                <div class="pound-icon">🪙</div>
+                <div class="pound-info">
+                    <div class="pound-name">الجنيه الذهب (عيار 21)</div>
+                    <div class="pound-price" id="poundPrice">3,850 ج.م</div>
+                    <div class="pound-detail">الشراء: <span id="poundBuy">3,820</span> | البيع: <span id="poundSell">3,880</span></div>
+                </div>
+            </div>
+            
+            <!-- Karat Prices -->
+            <h2 class="section-title">💎 أسعار العيارات</h2>
+            <div class="cards-grid">
+                <div class="karat-card featured" data-karat="24" role="button" tabindex="0">
+                    <div class="karat-header">
+                        <div class="karat-icon">💎</div>
+                        <div>
+                            <div class="karat-name">عيار 24</div>
+                            <div class="karat-purity">99.9% نقاء</div>
+                        </div>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">💰 بيع</span>
+                        <span class="price-value sell" id="sell24">4,400</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">📥 شراء</span>
+                        <span class="price-value buy" id="buy24">4,350</span>
+                    </div>
+                </div>
+                
+                <div class="karat-card" data-karat="22" role="button" tabindex="0">
+                    <div class="karat-header">
+                        <div class="karat-icon">💎</div>
+                        <div>
+                            <div class="karat-name">عيار 22</div>
+                            <div class="karat-purity">91.6% نقاء</div>
+                        </div>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">💰 بيع</span>
+                        <span class="price-value sell" id="sell22">4,033</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">📥 شراء</span>
+                        <span class="price-value buy" id="buy22">3,987</span>
+                    </div>
+                </div>
+                
+                <div class="karat-card" data-karat="21" role="button" tabindex="0">
+                    <div class="karat-header">
+                        <div class="karat-icon">💎</div>
+                        <div>
+                            <div class="karat-name">عيار 21</div>
+                            <div class="karat-purity">87.5% نقاء</div>
+                        </div>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">💰 بيع</span>
+                        <span class="price-value sell" id="sell21">3,850</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">📥 شراء</span>
+                        <span class="price-value buy" id="buy21">3,820</span>
+                    </div>
+                </div>
+                
+                <div class="karat-card" data-karat="18" role="button" tabindex="0">
+                    <div class="karat-header">
+                        <div class="karat-icon">💎</div>
+                        <div>
+                            <div class="karat-name">عيار 18</div>
+                            <div class="karat-purity">75.0% نقاء</div>
+                        </div>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">💰 بيع</span>
+                        <span class="price-value sell" id="sell18">3,300</span>
+                    </div>
+                    <div class="price-row">
+                        <span class="price-label">📥 شراء</span>
+                        <span class="price-value buy" id="buy18">3,260</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dollar Section -->
+            <h2 class="section-title">💱 أسعار الدولار</h2>
+            <div class="dollar-section">
+                <div class="dollar-card bank">
+                    <div class="dollar-title">🏦 دولار البنك</div>
+                    <div class="dollar-price" id="bankDollar">49.85</div>
+                </div>
+                <div class="dollar-card sagha">
+                    <div class="dollar-title">🏪 دولار الصاغة</div>
+                    <div class="dollar-price" id="saghaDollar">52.10</div>
+                </div>
+            </div>
+            
+            <div class="gap-card">
+                <div class="gap-title">📊 الفجوة السعرية</div>
+                <div class="gap-value" id="gapValue">+2.25 ج.م</div>
+                <div class="gap-percent" id="gapPercent">+4.5%</div>
+            </div>
+            
+            <!-- Chart -->
+            <h2 class="section-title">📈 الرسم البياني</h2>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">XAU/USD - TradingView</div>
+                    <div class="chart-time">1D</div>
+                </div>
+                <div class="tradingview-widget" id="tradingviewChart">
+                    <div class="tv-logo">📊</div>
+                    <div class="tv-text">TradingView Chart<br><small>جاري تحميل الرسم البياني...</small></div>
+                </div>
+            </div>
+            
+            <!-- Tools Section -->
+            <div id="toolsSection" class="hidden">
+                <h2 class="section-title">🧮 الأدوات</h2>
+                <div class="tools-grid">
+                    <button class="tool-card" onclick="openCalculator()">
+                        <div class="tool-icon">🧮</div>
+                        <div class="tool-name">حاسبة الذهب</div>
+                    </button>
+                    <button class="tool-card" onclick="openSilverCalc()">
+                        <div class="tool-icon">🥈</div>
+                        <div class="tool-name">حاسبة الفضة</div>
+                    </button>
+                    <button class="tool-card" onclick="openWageCalc()">
+                        <div class="tool-icon">⚖️</div>
+                        <div class="tool-name">حاسبة المصنعية</div>
+                    </button>
+                    <button class="tool-card" onclick="openZakatCalc()">
+                        <div class="tool-icon">🕌</div>
+                        <div class="tool-name">حاسبة الزكاة</div>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Silver Section -->
+            <div id="silverSection" class="hidden">
+                <h2 class="section-title">🥈 أسعار الفضة</h2>
+                <div class="silver-card">
+                    <div class="silver-header">
+                        <div class="silver-icon">🥈</div>
+                        <div class="silver-info">
+                            <div class="silver-name">الفضة (عيار 925)</div>
+                            <div class="silver-price" id="silverPrice">45.50 ج.م</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bars Section -->
+            <div id="barsSection" class="hidden">
+                <h2 class="section-title">🏛️ السبائك</h2>
+                <div class="bars-card">
+                    <div class="bars-select">
+                        <label>🏢 اختر الشركة</label>
+                        <select id="barCompany">
+                            <option value="suisse">Credit Suisse</option>
+                            <option value="perth">Perth Mint</option>
+                            <option value="pamp">PAMP Suisse</option>
+                            <option value="argor">Argor-Heraeus</option>
+                        </select>
+                    </div>
+                    <div class="bars-select">
+                        <label>⚖️ الوزن</label>
+                        <select id="barWeight">
+                            <option value="1">1 جرام</option>
+                            <option value="5">5 جرام</option>
+                            <option value="10">10 جرام</option>
+                            <option value="20">20 جرام</option>
+                            <option value="50">50 جرام</option>
+                            <option value="100" selected>100 جرام</option>
+                            <option value="250">250 جرام</option>
+                            <option value="500">500 جرام</option>
+                            <option value="1000">1 كيلو</option>
+                        </select>
+                    </div>
+                    <div class="bars-result" id="barsResult">
+                        <div class="bars-label">السعر التقريبي</div>
+                        <div class="bars-price" id="barsPrice">440,000 ج.م</div>
+                        <div class="bars-detail">شامل المصنعية والضريبة</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Currency Section -->
+            <div id="currencySection" class="hidden">
+                <h2 class="section-title">💱 محول العملات</h2>
+                <div class="currency-card">
+                    <div class="currency-row">
+                        <div class="currency-input">
+                            <label>المبلغ</label>
+                            <input type="number" id="currencyAmount" value="1" min="0" step="0.01">
+                        </div>
+                        <div class="currency-select">
+                            <label>من</label>
+                            <select id="currencyFrom">
+                                <option value="USD">🇺🇸 USD</option>
+                                <option value="EUR">🇪🇺 EUR</option>
+                                <option value="GBP">🇬🇧 GBP</option>
+                                <option value="SAR">🇸🇦 SAR</option>
+                                <option value="AED">🇦🇪 AED</option>
+                                <option value="EGP" selected>🇪🇬 EGP</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="currency-swap" onclick="swapCurrency()">⇅</div>
+                    <div class="currency-row">
+                        <div class="currency-input">
+                            <label>النتيجة</label>
+                            <input type="text" id="currencyResult" readonly value="0.020">
+                        </div>
+                        <div class="currency-select">
+                            <label>إلى</label>
+                            <select id="currencyTo">
+                                <option value="USD" selected>🇺🇸 USD</option>
+                                <option value="EUR">🇪🇺 EUR</option>
+                                <option value="GBP">🇬🇧 GBP</option>
+                                <option value="SAR">🇸🇦 SAR</option>
+                                <option value="AED">🇦🇪 AED</option>
+                                <option value="EGP">🇪🇬 EGP</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="calc-btn" onclick="convertCurrency()">تحويل 💱</button>
+                </div>
+            </div>
+            
+            <!-- Settings Section -->
+            <div id="settingsSection" class="hidden">
+                <h2 class="section-title">⚙️ الإعدادات</h2>
+                <div class="settings-list">
+                    <a href="mailto:gyousef707@gmail.com" class="setting-item">
+                        <div class="setting-icon">📧</div>
+                        <div class="setting-info">
+                            <div class="setting-name">اتصل بنا</div>
+                            <div class="setting-desc">gyousef707@gmail.com</div>
+                        </div>
+                        <div class="setting-arrow">←</div>
+                    </a>
+                    <div class="setting-item" onclick="rateApp()">
+                        <div class="setting-icon">⭐</div>
+                        <div class="setting-info">
+                            <div class="setting-name">قيّم التطبيق</div>
+                            <div class="setting-desc">شاركنا رأيك</div>
+                        </div>
+                        <div class="setting-arrow">←</div>
+                    </div>
+                    <div class="setting-item" onclick="showPrivacy()">
+                        <div class="setting-icon">🔒</div>
+                        <div class="setting-info">
+                            <div class="setting-name">سياسة الخصوصية</div>
+                            <div class="setting-desc">حماية بياناتك</div>
+                        </div>
+                        <div class="setting-arrow">←</div>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-icon">📱</div>
+                        <div class="setting-info">
+                            <div class="setting-name">الإصدار</div>
+                            <div class="setting-desc">1.0.0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Bottom Nav -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-tab="home" aria-label="الرئيسية">
+                <span class="nav-icon">🏠</span>
+                <span>الرئيسية</span>
+            </button>
+            <button class="nav-item" data-tab="tools" aria-label="الأدوات">
+                <span class="nav-icon">🧮</span>
+                <span>الأدوات</span>
+            </button>
+            <button class="nav-item" data-tab="silver" aria-label="الفضة">
+                <span class="nav-icon">🥈</span>
+                <span>الفضة</span>
+            </button>
+            <button class="nav-item" data-tab="bars" aria-label="السبائك">
+                <span class="nav-icon">🏛️</span>
+                <span>السبائك</span>
+            </button>
+            <button class="nav-item" data-tab="currency" aria-label="العملات">
+                <span class="nav-icon">💱</span>
+                <span>العملات</span>
+            </button>
+        </nav>
+        
+        <!-- Calculator Modal -->
+        <div class="modal-overlay" id="calcModal" role="dialog" aria-modal="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">🧮 حاسبة الذهب</h3>
+                    <button class="modal-close" onclick="closeModal()" aria-label="إغلاق">✕</button>
+                </div>
+                <input type="number" class="calc-input" id="calcWeight" placeholder="أدخل الوزن بالجرام" min="0" step="0.01">
+                <select class="calc-select" id="calcKarat">
+                    <option value="24">عيار 24 (99.9%)</option>
+                    <option value="22">عيار 22 (91.6%)</option>
+                    <option value="21" selected>عيار 21 (87.5%)</option>
+                    <option value="18">عيار 18 (75.0%)</option>
+                </select>
+                <button class="calc-btn" onclick="calculateGold()">احسب القيمة 💰</button>
+                <div class="calc-result hidden" id="calcResult">
+                    <div class="calc-result-label">القيمة التقريبية</div>
+                    <div class="calc-result-value" id="calcResultValue">0 ج.م</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Notification Toast -->
+        <div class="toast" id="toast"></div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
