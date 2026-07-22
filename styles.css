@@ -1,280 +1,198 @@
-
 :root {
-    --bg-color: #f8f9fa;
-    --card-bg: #ffffff;
-    --text-color: #212529;
-    --text-muted: #6c757d;
-    --gold-primary: #d4af37;
-    --gold-gradient: linear-gradient(135deg, #e6ca65 0%, #c59b27 100%);
-    --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    --border-color: #eaeaea;
-    --green-color: #198754;
-    --red-color: #dc3545;
+    --gold-primary: #C9A227;
+    --gold-dark: #B8941F;
+    --gold-light: #E8D179;
+    --gold-pale: #F5ECD0;
+    --gold-gradient: linear-gradient(135deg, #D4AF37 0%, #C9A227 50%, #B8941F 100%);
+    --bg-primary: #F8F6F0;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #666666;
+    --text-light: #999999;
+    --green: #22C55E;
+    --red: #EF4444;
+    --navy: #0B0F19;
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
+    --shadow-gold: 0 4px 20px rgba(201,162,39,0.3);
+    --radius: 20px;
+    --radius-sm: 12px;
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Cairo', sans-serif;
+body.dark-mode {
+    --bg-primary: #0F0F0F;
+    --bg-card: #1A1A1A;
+    --text-primary: #F0F0F0;
+    --text-secondary: #A0A0A0;
+    --text-light: #666666;
+    --shadow: 0 4px 20px rgba(0,0,0,0.4);
+    --navy: #0A0A0A;
 }
+body.dark-mode .header { background: #1A1A1A; border-bottom: 1px solid #2a2a2a; }
+body.dark-mode .bottom-nav { background: #1A1A1A; border-top: 1px solid #2a2a2a; }
+body.dark-mode .carat-card.featured { background: linear-gradient(135deg, #1a1505 0%, #2a2008 100%); }
+body.dark-mode .dollar-compare-card { background: #1A1A1A; border-color: #332b0e; }
+body.dark-mode .dollar-compare-card .dc-diff-badge { background: #2a2208; color: var(--gold-light); }
 
+* { margin: 0; padding: 0; box-sizing: border-box; }
 body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    padding-bottom: 80px;
+    font-family: 'Tajawal', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.3s, color 0.3s;
 }
 
-.app-header {
-    background: var(--card-bg);
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+/* شاشة البداية الاحترافية */
+#splash {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--navy); z-index: 99999;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
 }
-
-.header-title {
-    font-size: 1.25rem;
-    font-weight: bold;
-    color: var(--text-color);
-}
-
-.header-actions button {
-    background: none;
-    border: none;
-    font-size: 1.1rem;
-    cursor: pointer;
-    color: var(--text-color);
-}
-
-.app-container {
-    padding: 15px;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-.featured-card {
-    background: var(--gold-gradient);
-    border-radius: 16px;
-    padding: 20px;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3);
-    margin-bottom: 20px;
-}
-
-.featured-icon {
-    font-size: 2.5rem;
-    background: rgba(255,255,255,0.2);
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 15px;
-}
-
-.featured-info h2 {
-    font-size: 1.6rem;
-    margin: 5px 0;
-}
-
-.featured-label {
-    font-size: 0.9rem;
-    opacity: 0.9;
-}
-
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-    font-size: 1.1rem;
-}
-
-.section-header i {
-    color: var(--gold-primary);
-}
-
-.prices-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-}
-
-.price-card {
-    background: var(--card-bg);
-    border-radius: 14px;
-    padding: 15px;
-    box-shadow: var(--card-shadow);
-    border: 1px solid var(--border-color);
-    position: relative;
+#splash.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+#splash .splash-box {
+    width: 130px; height: 130px;
+    background: var(--bg-card);
+    border-radius: 30px;
+    display: flex; align-items: center; justify-content: center;
     overflow: hidden;
+    margin-bottom: 25px;
+    box-shadow: 0 0 50px rgba(212,175,55,0.4);
+    animation: splashPulse 2s ease-in-out infinite;
+}
+#splash .splash-box img {
+    width: 100%; height: 100%; object-fit: cover;
+}
+@keyframes splashPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+#splash h1 {
+    color: var(--gold-primary); font-size: 38px; font-weight: 900;
+    letter-spacing: 2px; text-shadow: 0 0 20px rgba(201,162,39,0.4);
+    margin-bottom: 8px;
+}
+#splash .splash-sub {
+    color: var(--gold-light); font-size: 14px; opacity: 0.85; margin-bottom: 35px;
+}
+#splash .loading-bar {
+    width: 180px; height: 3px; background: rgba(255,255,255,0.15);
+    border-radius: 3px; overflow: hidden;
+}
+#splash .loading-bar::after {
+    content: ''; display: block; width: 0%; height: 100%;
+    background: var(--gold-gradient); border-radius: 3px;
+    animation: loadingAnim 1.8s ease-in-out forwards;
+}
+@keyframes loadingAnim { 0% { width: 0%; } 100% { width: 100%; } }
+
+#app { max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; padding-bottom: 90px; }
+
+/* Header */
+.header {
+    background: var(--bg-card); padding: 14px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.header .logo-text { font-size: 20px; font-weight: 900; color: var(--text-primary); }
+.header .actions { display: flex; gap: 8px; }
+.header .actions button {
+    width: 40px; height: 40px; border: none; background: var(--bg-primary);
+    border-radius: 12px; cursor: pointer; font-size: 18px;
+    display: flex; align-items: center; justify-content: center; color: var(--text-primary);
 }
 
-.popular-card {
+/* Tab Panes */
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+/* Global Ounce Card */
+.global-ounce-card {
+    margin: 14px; background: var(--bg-card); border-radius: var(--radius);
+    padding: 16px 20px; box-shadow: var(--shadow);
+    display: flex; align-items: center; justify-content: space-between;
+}
+.global-ounce-card .live-badge {
+    background: rgba(34,197,94,0.15); color: var(--green);
+    padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 800;
+    display: flex; align-items: center; gap: 4px;
+}
+.global-ounce-card .ounce-info { text-align: left; }
+.global-ounce-card .ounce-title { font-size: 13px; color: var(--text-secondary); margin-bottom: 2px; }
+.global-ounce-card .ounce-price { font-size: 22px; font-weight: 900; color: var(--text-primary); direction: ltr; }
+
+/* Section Title */
+.section-title {
+    padding: 16px 18px 10px; font-size: 18px; font-weight: 900; color: var(--text-primary);
+}
+
+/* Carats Grid */
+.carats-grid { display: flex; flex-direction: column; gap: 10px; padding: 0 14px; margin-bottom: 14px; }
+.carat-card {
+    background: var(--bg-card); border-radius: var(--radius-sm); padding: 16px;
+    box-shadow: var(--shadow); display: flex; align-items: center; justify-content: space-between;
+    position: relative; overflow: hidden;
+}
+.carat-card.featured {
     border: 2px solid var(--gold-primary);
+    background: linear-gradient(135deg, #FFFDF5 0%, #FFF9E6 100%);
 }
+.carat-card .carat-right { display: flex; align-items: center; gap: 10px; }
+.carat-card .carat-name { font-size: 18px; font-weight: 900; }
+.carat-card .carat-sub { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+.carat-card .carat-prices { display: flex; gap: 20px; text-align: center; }
+.carat-card .cp-box .cp-label { font-size: 11px; color: var(--text-secondary); display: block; margin-bottom: 2px; }
+.carat-card .cp-box .cp-val { font-size: 18px; font-weight: 900; }
 
-.badge-popular {
-    position: absolute;
-    top: 0;
-    left: 0;
-    background: var(--gold-primary);
-    color: #fff;
-    font-size: 0.65rem;
-    padding: 2px 8px;
-    border-bottom-right-radius: 8px;
-    font-weight: bold;
-}
-
-.card-top {
+/* Dollar Comparison Card */
+.dollar-compare-card {
+    margin: 0 14px 14px;
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow);
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
-}
-
-.metal-icon {
-    background: #fdf8e2;
-    color: var(--gold-primary);
-    width: 35px;
-    height: 35px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 10px;
-}
-
-.metal-title h4 {
-    font-size: 1rem;
-}
-
-.purity {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
-
-.card-prices {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    font-size: 0.9rem;
-}
-
-.price-row {
-    display: flex;
     justify-content: space-between;
-    align-items: center;
+    border: 1px solid rgba(201,162,39,0.25);
+}
+.dollar-compare-card .dc-item { text-align: center; flex: 1; }
+.dollar-compare-card .dc-label { font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; display: block; font-weight: 600; }
+.dollar-compare-card .dc-value { font-size: 18px; font-weight: 900; color: var(--text-primary); }
+.dollar-compare-card .dc-value.highlight { color: var(--gold-dark); }
+.dollar-compare-card .dc-value small { font-size: 11px; font-weight: 600; }
+.dollar-compare-card .dc-divider { display: flex; flex-direction: column; align-items: center; padding: 0 10px; }
+.dollar-compare-card .dc-diff-badge {
+    background: var(--gold-pale); color: var(--gold-dark);
+    font-size: 11px; font-weight: 800; padding: 6px 10px; border-radius: 20px;
+    border: 1px solid rgba(201,162,39,0.3); white-space: nowrap; box-shadow: 0 2px 8px rgba(201,162,39,0.15);
 }
 
-.price-row.sell strong {
-    color: var(--green-color);
-}
-
-.price-row.buy strong {
-    color: var(--red-color);
-}
-
-.single-price {
-    text-align: center;
-    font-size: 1.2rem;
-    color: var(--gold-primary);
-    padding: 5px 0;
-}
-
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--card-bg);
-    display: flex;
-    justify-content: space-around;
-    padding: 10px 0;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-    z-index: 100;
-}
-
-.nav-item {
-    background: none;
-    border: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: var(--text-muted);
-    font-size: 0.75rem;
-    cursor: pointer;
-    gap: 4px;
-}
-
-.nav-item i {
-    font-size: 1.2rem;
-}
-
-.nav-item.active {
-    color: var(--gold-primary);
-}
-
-.update-time-box {
-    text-align: center;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    margin-top: 20px;
-}
-
-.tools-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-}
-
+/* Tools Grid */
+.tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 14px; margin-bottom: 14px; }
 .tool-card {
-    background: var(--card-bg);
-    padding: 20px;
-    border-radius: 14px;
-    text-align: center;
-    box-shadow: var(--card-shadow);
-    border: 1px solid var(--border-color);
-    cursor: pointer;
+    background: var(--bg-card); border-radius: var(--radius-sm); padding: 18px 14px;
+    box-shadow: var(--shadow); text-align: center; cursor: pointer;
 }
+.tool-card .tool-icon {
+    width: 52px; height: 52px; background: var(--bg-primary); border-radius: 14px;
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 24px; color: var(--gold-primary);
+}
+.tool-card h4 { font-size: 14px; font-weight: 800; margin-bottom: 3px; }
+.tool-card p { font-size: 11px; color: var(--text-light); }
 
-.tool-card i {
-    font-size: 1.8rem;
-    color: var(--gold-primary);
-    margin-bottom: 10px;
+/* Bottom Navigation */
+.bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; max-width: 480px; margin: 0 auto;
+    background: var(--bg-card); display: flex; justify-content: space-around;
+    padding: 10px 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.06); z-index: 1000;
 }
-
-.tool-card h4 {
-    font-size: 0.95rem;
-    margin-bottom: 5px;
+.nav-item {
+    background: none; border: none; display: flex; flex-direction: column;
+    align-items: center; gap: 4px; color: var(--text-light); cursor: pointer;
+    font-family: 'Tajawal', sans-serif; font-size: 11px; font-weight: 700; transition: color 0.3s;
 }
-
-.tool-card p {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
-
-.select-box select {
-    width: 100%;
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
-    background: var(--card-bg);
-    color: var(--text-color);
-    font-size: 1rem;
-}
+.nav-item i { font-size: 20px; }
+.nav-item.active { color: var(--gold-primary); }
