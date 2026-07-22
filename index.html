@@ -1,1 +1,296 @@
 
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الصاغة اليوم - أسعار الذهب والعملات لحظة بلحظة</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- الهيدر العلوي -->
+    <header class="app-header">
+        <div class="header-title">الصاغة اليوم</div>
+        <div class="header-actions">
+            <button id="refresh-btn" title="تحديث الأسعار"><i class="fa-solid fa-rotate-right"></i></button>
+        </div>
+    </header>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="app-container">
+        
+        <!-- قسم الأسعار -->
+        <section id="tab-prices" class="tab-content active">
+            
+            <!-- كارت الجنيه الذهب المميز -->
+            <div class="featured-card">
+                <div class="featured-icon"><i class="fa-solid fa-coins"></i></div>
+                <div class="featured-info">
+                    <span class="featured-label">الجنيه الذهب (عيار 21)</span>
+                    <h2 id="main-coin-price">-- ج.م</h2>
+                    <p id="main-coin-sub">الشراء: -- | البيع: --</p>
+                </div>
+            </div>
+
+            <!-- عنوان القسم -->
+            <div class="section-header">
+                <h3>أسعار العيارات</h3>
+                <i class="fa-solid fa-gem"></i>
+            </div>
+
+            <!-- شبكة العيارات -->
+            <div class="prices-grid">
+                <!-- عيار 24 -->
+                <div class="price-card popular-card">
+                    <span class="badge-popular">الأكثر تداولاً</span>
+                    <div class="card-top">
+                        <div class="metal-icon"><i class="fa-solid fa-gem"></i></div>
+                        <div class="metal-title">
+                            <h4>عيار 24</h4>
+                            <span class="purity">نقاء 99.9%</span>
+                        </div>
+                    </div>
+                    <div class="card-prices">
+                        <div class="price-row sell">
+                            <span>بيع</span>
+                            <strong id="price-24-sell">--</strong>
+                        </div>
+                        <div class="price-row buy">
+                            <span>شراء</span>
+                            <strong id="price-24-buy">--</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- عيار 22 -->
+                <div class="price-card">
+                    <div class="card-top">
+                        <div class="metal-icon"><i class="fa-solid fa-gem"></i></div>
+                        <div class="metal-title">
+                            <h4>عيار 22</h4>
+                            <span class="purity">نقاء 91.6%</span>
+                        </div>
+                    </div>
+                    <div class="card-prices">
+                        <div class="price-row sell">
+                            <span>بيع</span>
+                            <strong id="price-22-sell">--</strong>
+                        </div>
+                        <div class="price-row buy">
+                            <span>شراء</span>
+                            <strong id="price-22-buy">--</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- عيار 21 -->
+                <div class="price-card popular-card">
+                    <span class="badge-popular">الأكثر تداولاً</span>
+                    <div class="card-top">
+                        <div class="metal-icon"><i class="fa-solid fa-gem"></i></div>
+                        <div class="metal-title">
+                            <h4>عيار 21</h4>
+                            <span class="purity">نقاء 87.5%</span>
+                        </div>
+                    </div>
+                    <div class="card-prices">
+                        <div class="price-row sell">
+                            <span>بيع</span>
+                            <strong id="price-21-sell">--</strong>
+                        </div>
+                        <div class="price-row buy">
+                            <span>شراء</span>
+                            <strong id="price-21-buy">--</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- عيار 18 -->
+                <div class="price-card">
+                    <div class="card-top">
+                        <div class="metal-icon"><i class="fa-solid fa-gem"></i></div>
+                        <div class="metal-title">
+                            <h4>عيار 18</h4>
+                            <span class="purity">نقاء 75.0%</span>
+                        </div>
+                    </div>
+                    <div class="card-prices">
+                        <div class="price-row sell">
+                            <span>بيع</span>
+                            <strong id="price-18-sell">--</strong>
+                        </div>
+                        <div class="price-row buy">
+                            <span>شراء</span>
+                            <strong id="price-18-buy">--</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- أسعار الدولار -->
+            <div class="section-header" style="margin-top: 25px;">
+                <h3>أسعار الدولار</h3>
+                <i class="fa-solid fa-dollar-sign"></i>
+            </div>
+            <div class="prices-grid">
+                <div class="price-card">
+                    <div class="card-top">
+                        <div class="metal-icon"><i class="fa-solid fa-building-columns"></i></div>
+                        <div class="metal-title"><h4>دولار البنك</h4></div>
+                    </div>
+                    <div class="card-prices single-price">
+                        <strong id="bank-usd">50.97</strong> ج.م
+                    </div>
+                </div>
+                <div class="price-card popular-card">
+                    <div class="card-top">
+                        <div class="metal-icon"><i class="fa-solid fa-store"></i></div>
+                        <div class="metal-title"><h4>دولار الصاغة</h4></div>
+                    </div>
+                    <div class="card-prices single-price">
+                        <strong id="market-usd">52.10</strong> ج.م
+                    </div>
+                </div>
+            </div>
+
+            <!-- وقت التحديث -->
+            <div class="update-time-box">
+                <i class="fa-solid fa-clock"></i> <span id="last-update-text">جاري تحديث الأسعار...</span>
+            </div>
+        </section>
+
+        <!-- قسم العملات -->
+        <section id="tab-currencies" class="tab-content">
+            <div class="section-header"><h3>أسعار العملات مقابل الجنيه</h3></div>
+            <div class="prices-grid">
+                <div class="price-card">
+                    <div class="card-top"><div class="metal-title"><h4>دولار أمريكي (USD)</h4></div></div>
+                    <div class="card-prices">
+                        <div class="price-row sell"><span>بيع</span><strong>51.34</strong></div>
+                        <div class="price-row buy"><span>شراء</span><strong>51.24</strong></div>
+                    </div>
+                </div>
+                <div class="price-card">
+                    <div class="card-top"><div class="metal-title"><h4>يورو (EUR)</h4></div></div>
+                    <div class="card-prices">
+                        <div class="price-row sell"><span>بيع</span><strong>58.62</strong></div>
+                        <div class="price-row buy"><span>شراء</span><strong>58.41</strong></div>
+                    </div>
+                </div>
+                <div class="price-card">
+                    <div class="card-top"><div class="metal-title"><h4>درهم إماراتي (AED)</h4></div></div>
+                    <div class="card-prices">
+                        <div class="price-row sell"><span>بيع</span><strong>13.98</strong></div>
+                        <div class="price-row buy"><span>شراء</span><strong>13.88</strong></div>
+                    </div>
+                </div>
+                <div class="price-card">
+                    <div class="card-top"><div class="metal-title"><h4>دينار كويتي (KWD)</h4></div></div>
+                    <div class="card-prices">
+                        <div class="price-row sell"><span>بيع</span><strong>166.77</strong></div>
+                        <div class="price-row buy"><span>شراء</span><strong>164.85</strong></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم السبائك -->
+        <section id="tab-bars" class="tab-content">
+            <div class="section-header"><h3>السبائك والعملات الذهبية</h3></div>
+            <div class="select-box" style="margin-bottom: 15px;">
+                <select id="bar-brand-select">
+                    <option value="">اختر الشركة المصنعة...</option>
+                    <option value="btc">BTC (بي تي سي)</option>
+                    <option value="jalala">الجلالة جولد</option>
+                    <option value="swiss">سويس جولد</option>
+                    <option value="sam">سام</option>
+                </select>
+            </div>
+            <div class="featured-card" style="background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color);">
+                <div class="featured-info" style="width: 100%; text-align: center;">
+                    <h4 style="color: var(--gold-primary); margin-bottom: 5px;">اختر الشركة لعرض التفاصيل</h4>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">استعرض أسعار السبائك والمنشآت المعتمدة</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم الفضة -->
+        <section id="tab-silver" class="tab-content">
+            <div class="section-header"><h3>أسعار الفضة</h3></div>
+            <div class="featured-card">
+                <div class="featured-icon"><i class="fa-solid fa-globe"></i></div>
+                <div class="featured-info">
+                    <span class="featured-label">أوقية الفضة عالمياً</span>
+                    <h2>$59.66</h2>
+                </div>
+            </div>
+            <div class="prices-grid">
+                <div class="price-card">
+                    <div class="card-top"><div class="metal-title"><h4>عيار 999</h4></div></div>
+                    <div class="card-prices single-price"><strong>101.21</strong> ج.م</div>
+                </div>
+                <div class="price-card">
+                    <div class="card-top"><div class="metal-title"><h4>عيار 925</h4></div></div>
+                    <div class="card-prices single-price"><strong>93.71</strong> ج.م</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- قسم الأدوات واتصل بنا -->
+        <section id="tab-tools" class="tab-content">
+            <div class="section-header"><h3>الأدوات المالية</h3></div>
+            <div class="tools-grid">
+                <div class="tool-card" onclick="alert('حاسبة الذهب مفعلة وتعمل بناءً على سعر الجرام الحالي')">
+                    <i class="fa-solid fa-calculator"></i>
+                    <h4>حاسبة الذهب</h4>
+                    <p>تقدير القيمة والوزن</p>
+                </div>
+                <div class="tool-card" onclick="alert('حاسبة المصنعية تعرض تفاصيل الفاتورة')">
+                    <i class="fa-solid fa-receipt"></i>
+                    <h4>حاسبة المصنعية</h4>
+                    <p>تفاصيل الفاتورة</p>
+                </div>
+                <div class="tool-card" onclick="alert('حاسبة زكاة الذهب تحسب النصاب الشرعي')">
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                    <h4>حاسبة الزكاة</h4>
+                    <p>حساب النصاب</p>
+                </div>
+                <div class="tool-card" onclick="location.href='mailto:Gyousef707@gmail.com'">
+                    <i class="fa-solid fa-envelope"></i>
+                    <h4>اتصل بنا</h4>
+                    <p>Gyousef707@gmail.com</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- شريط التنقل السفلي -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" data-target="tab-prices">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>الأسعار</span>
+        </button>
+        <button class="nav-item" data-target="tab-currencies">
+            <i class="fa-solid fa-dollar-sign"></i>
+            <span>العملات</span>
+        </button>
+        <button class="nav-item" data-target="tab-bars">
+            <i class="fa-solid fa-landmark"></i>
+            <span>السبائك</span>
+        </button>
+        <button class="nav-item" data-target="tab-silver">
+            <i class="fa-solid fa-gem"></i>
+            <span>الفضة</span>
+        </button>
+        <button class="nav-item" data-target="tab-tools">
+            <i class="fa-solid fa-gears"></i>
+            <span>الأدوات</span>
+        </button>
+    </nav>
+
+    <script src="app.js"></script>
+</body>
+</html>
