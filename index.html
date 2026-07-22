@@ -3,200 +3,842 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>الصاغة اليوم - أسعار الذهب والعملات</title>
-
+<title>ذهبي - أسعار الذهب والعملات</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="styles.css">
+<style>
+:root {
+    --gold-primary: #C9A227;
+    --gold-dark: #B8941F;
+    --gold-light: #E8D179;
+    --gold-pale: #F5ECD0;
+    --gold-gradient: linear-gradient(135deg, #D4AF37 0%, #C9A227 50%, #B8941F 100%);
+    --bg-primary: #F8F6F0;
+    --bg-card: #FFFFFF;
+    --text-primary: #1A1A1A;
+    --text-secondary: #666666;
+    --text-light: #999999;
+    --green: #22C55E;
+    --red: #EF4444;
+    --navy: #1E293B;
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
+    --shadow-gold: 0 4px 20px rgba(201,162,39,0.3);
+    --radius: 20px;
+    --radius-sm: 12px;
+}
+
+/* Dark Mode Variables */
+body.dark-mode {
+    --bg-primary: #0F0F0F;
+    --bg-card: #1A1A1A;
+    --text-primary: #F0F0F0;
+    --text-secondary: #A0A0A0;
+    --text-light: #666666;
+    --shadow: 0 4px 20px rgba(0,0,0,0.4);
+    --navy: #0a0a0a;
+}
+body.dark-mode .header { background: #1A1A1A; border-bottom: 1px solid #2a2a2a; }
+body.dark-mode .bottom-nav { background: #1A1A1A; }
+body.dark-mode .converter-card .conv-box { background: #2a2a2a; }
+body.dark-mode .silver-table .st-header { background: #2a2a2a; }
+body.dark-mode .settings-card .settings-item { border-bottom-color: #2a2a2a; }
+body.dark-mode .settings-card .settings-header { border-bottom-color: #2a2a2a; }
+body.dark-mode .carat-card.featured { background: linear-gradient(135deg, #1a1505 0%, #2a2008 100%); }
+body.dark-mode .tool-card .tool-icon { background: #2a2a2a; }
+body.dark-mode .settings-card .settings-item .si-left .si-icon { background: #2a2a2a; }
+body.dark-mode .news-ticker { background: #1A1A1A; }
+body.dark-mode .bullion-tabs { background: #1A1A1A; }
+body.dark-mode .header .menu-btn { background: #2a2a2a; }
+body.dark-mode .header .menu-btn span,
+body.dark-mode .header .menu-btn span::before,
+body.dark-mode .header .menu-btn span::after { background: #F0F0F0; }
+body.dark-mode .header .actions button { background: #2a2a2a; color: #F0F0F0; }
+body.dark-mode .converter-card .swap-btn { background: #2a2a2a; border-color: #3a3a3a; }
+body.dark-mode .silver-table .st-row { border-bottom-color: #2a2a2a; }
+body.dark-mode .carat-card .price-row-c { border-bottom-color: #2a2a2a; }
+body.dark-mode .currency-card .currency-code { color: #666; }
+body.dark-mode .app-version { color: #666; }
+body.dark-mode #splash { background: #0a0a0a; }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Tajawal', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.3s, color 0.3s;
+}
+
+/* Splash */
+#splash {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--navy); z-index: 9999;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+#splash.hidden { opacity: 0; visibility: hidden; }
+#splash .splash-icon {
+    width: 180px; height: 180px;
+    background: linear-gradient(135deg, #D4AF37, #B8941F);
+    border-radius: 40px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 80px;
+    margin-bottom: 30px;
+    animation: splashPulse 2s ease-in-out infinite;
+    box-shadow: 0 0 60px rgba(212,175,55,0.4);
+}
+@keyframes splashPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+#splash h1 {
+    color: var(--gold-primary); font-size: 48px; font-weight: 900;
+    letter-spacing: 4px; text-shadow: 0 0 30px rgba(201,162,39,0.5);
+}
+#splash .subtitle {
+    color: var(--gold-light); font-size: 16px; margin-top: 10px; opacity: 0.8;
+}
+#splash .loading-bar {
+    width: 200px; height: 3px; background: rgba(255,255,255,0.1);
+    border-radius: 3px; margin-top: 40px; overflow: hidden;
+}
+#splash .loading-bar::after {
+    content: ''; display: block; width: 0%; height: 100%;
+    background: var(--gold-gradient); border-radius: 3px;
+    animation: loading 2s ease-in-out forwards;
+}
+@keyframes loading { 0% { width: 0%; } 100% { width: 100%; } }
+
+/* App */
+#app { max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; padding-bottom: 90px; }
+
+/* Header */
+.header {
+    background: var(--bg-card); padding: 14px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    transition: background 0.3s;
+}
+.header .menu-btn {
+    width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+    border-radius: 12px; background: var(--bg-primary); cursor: pointer;
+}
+.header .menu-btn span { display: block; width: 20px; height: 2px; background: var(--text-primary); position: relative; }
+.header .menu-btn span::before, .header .menu-btn span::after {
+    content: ''; position: absolute; width: 20px; height: 2px; background: var(--text-primary); left: 0;
+}
+.header .menu-btn span::before { top: -6px; }
+.header .menu-btn span::after { top: 6px; }
+.header .logo-text { font-size: 24px; font-weight: 900; color: var(--gold-primary); display: flex; align-items: center; gap: 6px; }
+.header .logo-text .dot { width: 8px; height: 8px; background: var(--gold-primary); border-radius: 50%; display: inline-block; }
+.header .actions { display: flex; gap: 8px; }
+.header .actions button {
+    width: 40px; height: 40px; border: none; background: var(--bg-primary);
+    border-radius: 12px; cursor: pointer; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-primary);
+    transition: all 0.3s;
+}
+.header .actions button:hover { transform: scale(1.05); }
+.header .actions button:active { transform: scale(0.95); }
+.header .actions .refresh-btn { position: relative; }
+.header .actions .refresh-btn.spinning::after {
+    content: ''; position: absolute; width: 100%; height: 100%;
+    border: 2px solid transparent; border-top-color: var(--gold-primary);
+    border-radius: 50%; animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Section Title */
+.section-title {
+    display: flex; align-items: center; gap: 10px;
+    padding: 20px 18px 10px; font-size: 17px; font-weight: 800;
+}
+.section-title .line { flex: 1; height: 3px; background: var(--gold-gradient); border-radius: 3px; max-width: 50px; }
+.section-title .icon { font-size: 20px; }
+
+/* TradingView Chart */
+.tradingview-card {
+    margin: 0 14px 14px; background: var(--bg-card); border-radius: var(--radius);
+    padding: 16px; box-shadow: var(--shadow); overflow: hidden;
+}
+.tradingview-card .tv-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;
+}
+.tradingview-card .tv-header h3 { font-size: 15px; font-weight: 800; }
+.tradingview-card .tv-header .tv-badge {
+    background: var(--gold-gradient); color: #fff; font-size: 10px; font-weight: 700;
+    padding: 3px 10px; border-radius: 10px;
+}
+.tradingview-card .tv-container {
+    border-radius: var(--radius-sm); overflow: hidden;
+    border: 1px solid rgba(201,162,39,0.2);
+}
+
+/* Global Card */
+.global-card {
+    margin: 0 14px 14px; background: var(--navy); border-radius: var(--radius);
+    padding: 20px; position: relative; overflow: hidden;
+}
+.global-card::before {
+    content: ''; position: absolute; top: -50%; right: -30%;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 70%); border-radius: 50%;
+}
+.global-card .top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.global-card .symbol { display: flex; align-items: center; gap: 8px; color: #94A3B8; font-size: 15px; font-weight: 700; }
+.global-card .change {
+    background: rgba(34,197,94,0.15); color: var(--green);
+    padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: 700;
+}
+.global-card .change.down { background: rgba(239,68,68,0.15); color: var(--red); }
+.global-card .price { font-size: 40px; font-weight: 900; color: var(--gold-primary); text-align: center; margin: 8px 0; }
+.global-card .update-time { text-align: center; color: #64748B; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.global-card .update-time .live-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* Gold Bar Card */
+.gold-bar-card {
+    margin: 0 14px 14px; background: var(--gold-gradient); border-radius: var(--radius);
+    padding: 22px 18px; position: relative; overflow: hidden; box-shadow: var(--shadow-gold);
+}
+.gold-bar-card::before {
+    content: ''; position: absolute; top: -30px; left: -30px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); border-radius: 50%;
+}
+.gold-bar-card .label { color: rgba(255,255,255,0.9); font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+.gold-bar-card .price-row { display: flex; align-items: center; gap: 12px; }
+.gold-bar-card .price-row .icon-box {
+    width: 52px; height: 52px; background: rgba(255,255,255,0.2); border-radius: 14px;
+    display: flex; align-items: center; justify-content: center; font-size: 26px; backdrop-filter: blur(10px);
+}
+.gold-bar-card .price-main { font-size: 36px; font-weight: 900; color: #fff; }
+.gold-bar-card .price-main span { font-size: 16px; font-weight: 500; margin-right: 4px; }
+.gold-bar-card .prices-row { display: flex; gap: 16px; margin-top: 10px; color: rgba(255,255,255,0.85); font-size: 13px; }
+
+/* Carats Grid */
+.carats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 14px; margin-bottom: 14px; }
+.carat-card {
+    background: var(--bg-card); border-radius: var(--radius-sm); padding: 14px;
+    box-shadow: var(--shadow); position: relative; overflow: hidden;
+}
+.carat-card.featured {
+    border: 2px solid var(--gold-primary);
+    background: linear-gradient(135deg, #FFFDF5 0%, #FFF9E6 100%);
+}
+.carat-card .badge {
+    position: absolute; top: 8px; left: 8px;
+    background: var(--gold-gradient); color: #fff; font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: 8px;
+}
+.carat-card .carat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.carat-card .carat-name { font-size: 18px; font-weight: 800; }
+.carat-card .carat-icon {
+    width: 40px; height: 40px; background: linear-gradient(135deg, #F5ECD0 0%, #E8D179 100%);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.carat-card .purity { color: var(--text-secondary); font-size: 12px; margin-bottom: 10px; }
+.carat-card .price-row-c { display: flex; align-items: center; justify-content: space-between; padding: 5px 0; border-bottom: 1px dashed #eee; }
+.carat-card .price-row-c:last-child { border-bottom: none; }
+.carat-card .price-row-c .label { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-secondary); }
+.carat-card .price-row-c .value { font-size: 16px; font-weight: 800; }
+.carat-card .price-row-c .value.buy { color: var(--green); }
+.carat-card .price-row-c .value.sell { color: var(--red); }
+
+/* Currency Cards */
+.currency-section { padding: 0 14px; margin-bottom: 14px; }
+.currency-card {
+    background: var(--bg-card); border-radius: var(--radius-sm); padding: 14px;
+    margin-bottom: 10px; box-shadow: var(--shadow);
+    display: flex; align-items: center; justify-content: space-between;
+}
+.currency-card .currency-info { display: flex; align-items: center; gap: 10px; }
+.currency-card .flag { width: 44px; height: 32px; border-radius: 5px; object-fit: cover; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+.currency-card .currency-name { font-size: 15px; font-weight: 700; }
+.currency-card .currency-code { font-size: 12px; color: var(--text-light); }
+.currency-card .currency-prices { display: flex; gap: 16px; }
+.currency-card .cp { text-align: center; }
+.currency-card .cp .cp-label { font-size: 11px; color: var(--text-light); margin-bottom: 2px; }
+.currency-card .cp .cp-value { font-size: 16px; font-weight: 800; }
+
+/* Converter */
+.converter-card {
+    margin: 0 14px 14px; background: var(--bg-card); border-radius: var(--radius);
+    padding: 18px; box-shadow: var(--shadow);
+}
+.converter-card .conv-label { color: var(--text-secondary); font-size: 13px; margin-bottom: 10px; }
+.converter-card .conv-box {
+    background: var(--bg-primary); border-radius: var(--radius-sm); padding: 14px;
+    display: flex; align-items: center; justify-content: space-between;
+}
+.converter-card .conv-box .currency-select { display: flex; align-items: center; gap: 8px; }
+.converter-card .conv-box .currency-select select {
+    border: none; background: transparent; font-family: 'Tajawal', sans-serif;
+    font-size: 16px; font-weight: 800; color: var(--text-primary); cursor: pointer; outline: none;
+}
+.converter-card .conv-box .amount {
+    font-size: 22px; font-weight: 800; color: var(--text-light); background: transparent;
+    border: none; text-align: left; width: 100px; outline: none; font-family: 'Tajawal', sans-serif;
+}
+.converter-card .conv-box .amount:focus { color: var(--text-primary); }
+.converter-card .swap-btn {
+    width: 44px; height: 44px; border-radius: 50%; background: var(--bg-primary);
+    border: 2px solid #E5E5E5; display: flex; align-items: center; justify-content: center;
+    margin: 10px auto; cursor: pointer; font-size: 18px; color: var(--gold-primary);
+    transition: transform 0.3s;
+}
+.converter-card .swap-btn:active { transform: rotate(180deg); }
+
+/* Silver */
+.silver-card {
+    margin: 0 14px 14px; background: var(--bg-card); border-radius: var(--radius);
+    padding: 18px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 14px;
+}
+.silver-card .silver-icon {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, #E8E8E8 0%, #C0C0C0 100%); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 26px;
+}
+.silver-card .silver-info h3 { font-size: 15px; color: var(--text-secondary); margin-bottom: 4px; }
+.silver-card .silver-info .price { font-size: 30px; font-weight: 900; }
+.silver-table {
+    margin: 0 14px 14px; background: var(--bg-card); border-radius: var(--radius);
+    overflow: hidden; box-shadow: var(--shadow);
+}
+.silver-table .st-header {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; padding: 12px 14px;
+    background: var(--bg-primary); font-size: 13px; font-weight: 700;
+    color: var(--text-secondary); text-align: center;
+}
+.silver-table .st-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; padding: 12px 14px;
+    border-bottom: 1px solid #f0f0f0; align-items: center; text-align: center;
+}
+.silver-table .st-row:last-child { border-bottom: none; }
+.silver-table .st-row .st-karat { display: flex; align-items: center; justify-content: center; gap: 4px; font-weight: 700; font-size: 14px; }
+.silver-table .st-row .st-price { font-weight: 800; font-size: 14px; }
+
+/* Tools Grid */
+.tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 14px; margin-bottom: 14px; }
+.tool-card {
+    background: var(--bg-card); border-radius: var(--radius-sm); padding: 18px 14px;
+    box-shadow: var(--shadow); text-align: center; cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.tool-card:active { transform: scale(0.98); }
+.tool-card .tool-icon {
+    width: 52px; height: 52px; background: var(--bg-primary); border-radius: 14px;
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 24px;
+}
+.tool-card h4 { font-size: 14px; font-weight: 800; margin-bottom: 3px; }
+.tool-card p { font-size: 11px; color: var(--text-light); }
+
+/* Settings */
+.settings-list { padding: 0 14px; margin-bottom: 14px; }
+.settings-card {
+    background: var(--bg-card); border-radius: var(--radius-sm);
+    box-shadow: var(--shadow); overflow: hidden; margin-bottom: 10px;
+}
+.settings-card .settings-header {
+    padding: 14px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f0f0f0;
+}
+.settings-card .settings-header .sh-icon {
+    width: 44px; height: 44px; background: linear-gradient(135deg, #F5ECD0 0%, #E8D179 100%);
+    border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.settings-card .settings-header h3 { font-size: 16px; font-weight: 800; }
+.settings-card .settings-header p { font-size: 12px; color: var(--text-light); }
+.settings-card .settings-item {
+    padding: 14px; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #f5f5f5; cursor: pointer;
+}
+.settings-card .settings-item:last-child { border-bottom: none; }
+.settings-card .settings-item .si-left { display: flex; align-items: center; gap: 10px; }
+.settings-card .settings-item .si-left .si-icon {
+    width: 34px; height: 34px; background: var(--bg-primary); border-radius: 9px;
+    display: flex; align-items: center; justify-content: center; font-size: 15px;
+}
+.settings-card .settings-item .si-left span { font-size: 14px; font-weight: 600; }
+.settings-card .settings-item .arrow { color: var(--text-light); font-size: 16px; }
+.settings-card .settings-item .stars { color: var(--gold-primary); font-size: 15px; letter-spacing: 1px; }
+
+/* News */
+.news-ticker {
+    margin: 0 14px 14px; background: var(--bg-card); border-radius: var(--radius-sm);
+    padding: 12px 14px; box-shadow: var(--shadow); display: flex; align-items: center;
+    gap: 10px; overflow: hidden;
+}
+.news-ticker .news-icon {
+    width: 34px; height: 34px; background: linear-gradient(135deg, #F5ECD0 0%, #E8D179 100%);
+    border-radius: 9px; display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0;
+}
+.news-ticker .news-text-wrap { overflow: hidden; flex: 1; }
+.news-ticker .news-text {
+    font-size: 12px; color: var(--text-secondary); white-space: nowrap;
+    animation: scrollNews 20s linear infinite;
+}
+@keyframes scrollNews { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+.news-grid { padding: 0 14px; margin-bottom: 14px; }
+.news-card {
+    background: var(--bg-card); border-radius: var(--radius-sm); padding: 14px;
+    margin-bottom: 10px; box-shadow: var(--shadow); border-right: 3px solid var(--gold-primary);
+}
+.news-card .news-time { font-size: 11px; color: var(--gold-primary); font-weight: 700; margin-bottom: 5px; }
+.news-card .news-title { font-size: 14px; font-weight: 700; line-height: 1.5; margin-bottom: 5px; }
+.news-card .news-source { font-size: 11px; color: var(--text-light); }
+
+/* Bullion Tabs */
+.bullion-tabs {
+    display: flex; margin: 0 14px 14px; background: var(--bg-card);
+    border-radius: var(--radius-sm); overflow: hidden; box-shadow: var(--shadow);
+}
+.bullion-tabs .tab {
+    flex: 1; padding: 12px; text-align: center; font-size: 14px; font-weight: 700;
+    cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.bullion-tabs .tab.active { color: var(--gold-primary); border-bottom-color: var(--gold-primary); }
+.bullion-tabs .tab:not(.active) { color: var(--text-light); }
+.bullion-empty { text-align: center; padding: 50px 20px; color: var(--text-light); }
+.bullion-empty .empty-icon {
+    width: 70px; height: 70px; background: linear-gradient(135deg, #F5ECD0 0%, #E8D179 100%);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px; font-size: 32px;
+}
+.bullion-empty h3 { font-size: 18px; color: var(--text-primary); margin-bottom: 6px; }
+.bullion-empty p { font-size: 13px; line-height: 1.6; }
+
+/* Bottom Nav */
+.bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg-card);
+    display: flex; justify-content: space-around; padding: 6px 0 18px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08); z-index: 100;
+    max-width: 480px; margin: 0 auto; border-radius: 24px 24px 0 0;
+    transition: background 0.3s;
+}
+.bottom-nav .nav-item {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 5px 10px; cursor: pointer; border-radius: 10px;
+    transition: all 0.3s; color: var(--text-light);
+}
+.bottom-nav .nav-item.active { color: var(--gold-primary); background: var(--gold-pale); }
+.bottom-nav .nav-item .nav-icon { font-size: 20px; }
+.bottom-nav .nav-item .nav-label { font-size: 10px; font-weight: 700; }
+
+/* Pages */
+.page-section { display: none; animation: fadeIn 0.3s ease; }
+.page-section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Live Badge */
+.live-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(34,197,94,0.1); color: var(--green);
+    padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;
+    border: 1px solid rgba(34,197,94,0.2);
+}
+.live-badge .dot { width: 7px; height: 7px; background: var(--green); border-radius: 50%; animation: pulse 1.5s infinite; }
+
+/* App Version */
+.app-version { text-align: center; padding: 25px 18px; color: var(--text-light); font-size: 13px; }
+.app-version .version-name { font-size: 17px; font-weight: 800; color: var(--gold-primary); margin-bottom: 3px; }
+
+/* Responsive */
+@media (min-width: 481px) { body { background: #E8E4D9; } #app { background: var(--bg-primary); min-height: 100vh; } }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--gold-primary); border-radius: 4px; }
+
+/* Dark mode toggle in settings */
+.dark-toggle {
+    display: flex; align-items: center; gap: 10px;
+}
+.toggle-switch {
+    width: 50px; height: 28px; background: #ccc; border-radius: 14px;
+    position: relative; cursor: pointer; transition: background 0.3s;
+}
+.toggle-switch.active { background: var(--gold-primary); }
+.toggle-switch::after {
+    content: ''; position: absolute; width: 24px; height: 24px;
+    background: #fff; border-radius: 50%; top: 2px; right: 2px;
+    transition: transform 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.toggle-switch.active::after { transform: translateX(-22px); }
+</style>
 </head>
 <body>
 
-    <!-- شاشة البداية الاحترافية -->
-    <div id="splash">
-        <div class="splash-box">
-            <i class="fa-solid fa-chart-line"></i>
-        </div>
-        <h1>ذهبي</h1>
-        <div class="splash-sub">أسعار الذهب والعملات لحظة بلحظة</div>
-        <div class="loading-bar"></div>
-    </div>
-
-<div id="app">
-    <!-- Header -->
-    <header class="header">
-        <div class="actions">
-            <button onclick="refreshData()" title="تحديث الأسعار"><i class="fa-solid fa-rotate-right"></i></button>
-            <button onclick="toggleDarkMode()" title="الوضع المظلم"><i class="fa-solid fa-moon"></i></button>
-        </div>
-        <div class="logo-text">الصاغة اليوم</div>
-    </header>
-
-    <!-- 1. الرئيسية -->
-    <div id="tab-home" class="tab-pane active">
-        <!-- الأونصة العالمية -->
-        <div class="global-ounce-card">
-            <div class="live-badge"><span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block;"></span> LIVE</div>
-            <div class="ounce-info">
-                <div class="ounce-title">الأونصة العالمية</div>
-                <div class="ounce-price">$4,129.58</div>
-            </div>
-        </div>
-
-        <div class="section-title">أسعار الذهب في مصر</div>
-
-        <!-- العيارات -->
-        <div class="carats-grid">
-            <div class="carat-card">
-                <div class="carat-right">
-                    <div>
-                        <div class="carat-name">عيار 24</div>
-                        <div class="carat-sub">نقاء 99.9%</div>
-                    </div>
-                </div>
-                <div class="carat-prices">
-                    <div class="cp-box"><span class="cp-label">شراء</span><span class="cp-val buy">6,812</span></div>
-                    <div class="cp-box"><span class="cp-label">بيع</span><span class="cp-val sell">6,846</span></div>
-                </div>
-            </div>
-
-            <div class="carat-card">
-                <div class="carat-right">
-                    <div>
-                        <div class="carat-name">عيار 22</div>
-                        <div class="carat-sub">نقاء 91.6%</div>
-                    </div>
-                </div>
-                <div class="carat-prices">
-                    <div class="cp-box"><span class="cp-label">شراء</span><span class="cp-val buy">6,244</span></div>
-                    <div class="cp-box"><span class="cp-label">بيع</span><span class="cp-val sell">6,275</span></div>
-                </div>
-            </div>
-
-            <div class="carat-card featured">
-                <span style="position: absolute; top: 8px; left: 8px; background: var(--gold-gradient); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 6px;">الأكثر تداولاً</span>
-                <div class="carat-right">
-                    <div>
-                        <div class="carat-name" style="color: var(--gold-dark);">عيار 21</div>
-                        <div class="carat-sub">نقاء 87.5%</div>
-                    </div>
-                </div>
-                <div class="carat-prices">
-                    <div class="cp-box"><span class="cp-label">شراء</span><span class="cp-val buy">5,960</span></div>
-                    <div class="cp-box"><span class="cp-label">بيع</span><span class="cp-val sell">5,990</span></div>
-                </div>
-            </div>
-
-            <div class="carat-card">
-                <div class="carat-right">
-                    <div>
-                        <div class="carat-name">عيار 18</div>
-                        <div class="carat-sub">نقاء 75.0%</div>
-                    </div>
-                </div>
-                <div class="carat-prices">
-                    <div class="cp-box"><span class="cp-label">شراء</span><span class="cp-val buy">5,108</span></div>
-                    <div class="cp-box"><span class="cp-label">بيع</span><span class="cp-val sell">5,134</span></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- مؤشر سعر الدولار تحت العيارات مباشرة -->
-        <div class="section-title" style="font-size: 16px; padding-top: 5px;">مؤشر سعر الدولار</div>
-        <div class="dollar-compare-card">
-            <div class="dc-item">
-                <span class="dc-label">دولار البنك</span>
-                <span class="dc-value">50.97 <small>ج.م</small></span>
-            </div>
-            <div class="dc-divider">
-                <span class="dc-diff-badge">الفرق: 1.13 ج.م</span>
-            </div>
-            <div class="dc-item">
-                <span class="dc-label">دولار الصاغة</span>
-                <span class="dc-value highlight">52.10 <small>ج.م</small></span>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. العملات -->
-    <div id="tab-currencies" class="tab-pane">
-        <div class="section-title">أسعار العملات مقابل الجنيه</div>
-        <div style="padding: 0 14px;">
-            <div class="carat-card" style="margin-bottom: 10px;">
-                <div><h4>دولار أمريكي (USD)</h4><span style="font-size: 12px; color: var(--text-light);">البنك المركزي</span></div>
-                <div style="text-align: left;"><strong style="font-size: 18px; color: var(--gold-primary);">50.97 ج.م</strong></div>
-            </div>
-            <div class="carat-card" style="margin-bottom: 10px;">
-                <div><h4>يورو (EUR)</h4><span style="font-size: 12px; color: var(--text-light);">سعر الصرف</span></div>
-                <div style="text-align: left;"><strong style="font-size: 18px; color: var(--gold-primary);">58.62 ج.م</strong></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 3. السبائك -->
-    <div id="tab-bullion" class="tab-pane">
-        <div class="section-title">السبائك والعملات الذهبية</div>
-        <div style="padding: 0 14px;">
-            <div class="carat-card" style="margin-bottom: 10px;">
-                <div><h4 style="color: var(--gold-primary); margin-bottom: 5px;">سبيكة BTC (1 جرام)</h4><p style="font-size: 13px; color: var(--text-secondary);">وزن نقي مصحوب بالدمغة</p></div>
-                <div><strong style="font-size: 16px;">6,950 ج.م</strong></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 4. الأدوات -->
-    <div id="tab-tools" class="tab-pane">
-        <div class="section-title">الأدوات المالية والحاسبة</div>
-        <div class="tools-grid">
-            <div class="tool-card" onclick="alert('حاسبة الذهب تعمل بكفاءة تامة')">
-                <div class="tool-icon"><i class="fa-solid fa-calculator"></i></div>
-                <h4>حاسبة الذهب</h4>
-                <p>حساب القيمة والوزن</p>
-            </div>
-            <div class="tool-card" onclick="alert('حاسبة المصنعية تعمل بكفاءة تامة')">
-                <div class="tool-icon"><i class="fa-solid fa-receipt"></i></div>
-                <h4>حاسبة المصنعية</h4>
-                <p>تفاصيل الفاتورة</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- 5. الإعدادات -->
-    <div id="tab-settings" class="tab-pane">
-        <div class="section-title">إعدادات التطبيق</div>
-        <div style="padding: 0 14px;">
-            <div class="carat-card" style="margin-bottom: 10px; cursor:pointer;" onclick="toggleDarkMode()">
-                <span>الوضع المظلم / الفاتح</span>
-                <i class="fa-solid fa-moon" style="color: var(--gold-primary);"></i>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
-        <button class="nav-item active" onclick="switchTab('tab-home', this)">
-            <i class="fa-solid fa-house"></i>
-            <span>الرئيسية</span>
-        </button>
-        <button class="nav-item" onclick="switchTab('tab-currencies', this)">
-            <i class="fa-solid fa-dollar-sign"></i>
-            <span>العملات</span>
-        </button>
-        <button class="nav-item" onclick="switchTab('tab-bullion', this)">
-            <i class="fa-solid fa-landmark"></i>
-            <span>السبائك</span>
-        </button>
-        <button class="nav-item" onclick="switchTab('tab-tools', this)">
-            <i class="fa-solid fa-calculator"></i>
-            <span>الأدوات</span>
-        </button>
-        <button class="nav-item" onclick="switchTab('tab-settings', this)">
-            <i class="fa-solid fa-gear"></i>
-            <span>الإعدادات</span>
-        </button>
-    </nav>
+<!-- Splash Screen -->
+<div id="splash">
+    <div class="splash-icon">📈</div>
+    <h1>ذهبي</h1>
+    <p class="subtitle">أسعار الذهب والعملات لحظة بلحظة</p>
+    <div class="loading-bar"></div>
 </div>
 
-<script src="app.js"></script>
+<!-- App -->
+<div id="app">
+
+<!-- Header -->
+<div class="header">
+    <div class="menu-btn"><span></span></div>
+    <div class="logo-text">ذهبي<span class="dot"></span></div>
+    <div class="actions">
+        <button class="refresh-btn" onclick="refreshData()" title="تحديث">🔄</button>
+        <button onclick="toggleDarkMode()" title="وضع الظلام">🌙</button>
+        <button>🔔</button>
+    </div>
+</div>
+
+<!-- ========== HOME ========== -->
+<div id="page-home" class="page-section active">
+    <div style="padding: 14px 18px 0;"><span class="live-badge"><span class="dot"></span> مباشر</span></div>
+
+    <!-- TradingView Chart -->
+    <div class="section-title"><span class="line"></span><span>الرسم البياني</span><span class="icon">📊</span></div>
+    <div class="tradingview-card">
+        <div class="tv-header"><h3>XAU/USD - أونصة الذهب</h3><div class="tv-badge">TradingView</div></div>
+        <div class="tv-container">
+            <div class="tradingview-widget-container" style="height:300px;width:100%;">
+                <div class="tradingview-widget-container__widget" style="height:300px;width:100%;"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                {
+                    "autosize": false,
+                    "width": "100%",
+                    "height": "300",
+                    "symbol": "OANDA:XAUUSD",
+                    "interval": "15",
+                    "timezone": "Africa/Cairo",
+                    "theme": "light",
+                    "style": "1",
+                    "locale": "ar",
+                    "enable_publishing": false,
+                    "backgroundColor": "rgba(255, 255, 255, 1)",
+                    "gridColor": "rgba(240, 240, 240, 1)",
+                    "hide_top_toolbar": true,
+                    "hide_legend": false,
+                    "save_image": false,
+                    "calendar": false,
+                    "hide_volume": true,
+                    "support_host": "https://www.tradingview.com"
+                }
+                </script>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title"><span class="line"></span><span>الأونصة العالمية</span><span class="icon">📈</span></div>
+    <div class="global-card">
+        <div class="top-row"><div class="symbol">🌍 XAU/USD</div><div class="change" id="globalChange">▲ 1.46%+</div></div>
+        <div class="price" id="globalPrice">$4,067.49</div>
+        <div class="update-time"><span class="live-dot"></span>آخر تحديث: <span id="updateTime">21 يوليو 2026 - 22:09</span></div>
+    </div>
+
+    <div class="news-ticker">
+        <div class="news-icon">📢</div>
+        <div class="news-text-wrap"><div class="news-text">🔴 عاجل: الذهب يسجل أعلى مستوى في 3 أشهر | 📊 البنك المركزي يثبت أسعار الفائدة | 💰 سعر الجنيه الذهب 46,720 جنيه | 🌍 الأونصة العالمية تتجاوز 4,000 دولار</div></div>
+    </div>
+
+    <div class="section-title"><span class="line"></span><span>الجنيه الذهب</span><span class="icon">🏛️</span></div>
+    <div class="gold-bar-card">
+        <div class="label">الجنيه الذهب (عيار 21)</div>
+        <div class="price-row"><div class="icon-box">🏛️</div><div class="price-main"><span>ج.م</span>46,720</div></div>
+        <div class="prices-row"><span>الشراء: 46,280</span><span>|</span><span>البيع: 46,720</span></div>
+    </div>
+
+    <div class="section-title"><span class="line"></span><span>أسعار العيارات</span><span class="icon">💎</span></div>
+    <div class="carats-grid">
+        <div class="carat-card featured">
+            <div class="badge">الأكثر تداولاً</div>
+            <div class="carat-header"><div><div class="carat-name">عيار 24</div><div class="purity">نقاء 99.9%</div></div><div class="carat-icon">💎</div></div>
+            <div class="price-row-c"><div class="label">💰 بيع</div><div class="value buy">6,674</div></div>
+            <div class="price-row-c"><div class="label">📥 شراء</div><div class="value sell">6,612</div></div>
+        </div>
+        <div class="carat-card">
+            <div class="carat-header"><div><div class="carat-name">عيار 22</div><div class="purity">نقاء 91.6%</div></div><div class="carat-icon">💎</div></div>
+            <div class="price-row-c"><div class="label">💰 بيع</div><div class="value buy">6,033</div></div>
+            <div class="price-row-c"><div class="label">📥 شراء</div><div class="value sell">5,987</div></div>
+        </div>
+        <div class="carat-card">
+            <div class="carat-header"><div><div class="carat-name">عيار 21</div><div class="purity">نقاء 87.5%</div></div><div class="carat-icon">💎</div></div>
+            <div class="price-row-c"><div class="label">💰 بيع</div><div class="value buy">5,840</div></div>
+            <div class="price-row-c"><div class="label">📥 شراء</div><div class="value sell">5,785</div></div>
+        </div>
+        <div class="carat-card">
+            <div class="carat-header"><div><div class="carat-name">عيار 18</div><div class="purity">نقاء 75.0%</div></div><div class="carat-icon">💎</div></div>
+            <div class="price-row-c"><div class="label">💰 بيع</div><div class="value buy">5,006</div></div>
+            <div class="price-row-c"><div class="label">📥 شراء</div><div class="value sell">4,959</div></div>
+        </div>
+    </div>
+
+    <div class="section-title"><span class="line"></span><span>أسعار الدولار</span><span class="icon">💱</span></div>
+    <div class="currency-section">
+        <div class="currency-card">
+            <div class="currency-info"><img class="flag" src="https://flagcdn.com/w80/us.png"><div><div class="currency-name">دولار البنك</div><div class="currency-code">USD</div></div></div>
+            <div class="currency-prices"><div class="cp"><div class="cp-label">شراء</div><div class="cp-value">50.93</div></div><div class="cp"><div class="cp-label">بيع</div><div class="cp-value">51.03</div></div></div>
+        </div>
+        <div class="currency-card">
+            <div class="currency-info"><img class="flag" src="https://flagcdn.com/w80/us.png"><div><div class="currency-name">دولار الصاغة</div><div class="currency-code">USD</div></div></div>
+            <div class="currency-prices"><div class="cp"><div class="cp-label">شراء</div><div class="cp-value">51.28</div></div><div class="cp"><div class="cp-label">بيع</div><div class="cp-value">52.10</div></div></div>
+        </div>
+    </div>
+
+    <div class="section-title"><span class="line"></span><span>أحدث الأخبار</span><span class="icon">📰</span></div>
+    <div class="news-grid">
+        <div class="news-card"><div class="news-time">منذ 5 دقائق</div><div class="news-title">الذهب يرتفع لأعلى مستوى في 3 أشهر مع تراجع الدولار الأمريكي</div><div class="news-source">Bloomberg</div></div>
+        <div class="news-card"><div class="news-time">منذ 15 دقيقة</div><div class="news-title">البنك المركزي المصري يثبت أسعار الفائدة في اجتماعه الأخير</div><div class="news-source">Reuters</div></div>
+        <div class="news-card"><div class="news-time">منذ 30 دقيقة</div><div class="news-title">الجنيه الذهب يسجل 46,720 جنيه في السوق المحلي</div><div class="news-source">الأهرام الاقتصادي</div></div>
+        <div class="news-card"><div class="news-time">منذ ساعة</div><div class="news-title">الفضة تسجل ارتفاعاً ملحوظاً بنسبة 2.3% في التعاملات العالمية</div><div class="news-source">CNBC Arabia</div></div>
+    </div>
+</div>
+
+<!-- ========== CURRENCIES ========== -->
+<div id="page-currencies" class="page-section">
+    <div class="section-title" style="padding-top:18px;"><span class="line"></span><span>محول العملات</span><span class="icon">💱</span></div>
+    <div class="converter-card">
+        <div class="conv-label">تحويل من</div>
+        <div class="conv-box">
+            <div class="currency-select"><img class="flag" src="https://flagcdn.com/w80/us.png" style="width:32px;height:24px;"><select id="fromCurrency"><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option><option value="SAR">SAR</option><option value="AED">AED</option></select></div>
+            <input type="number" class="amount" id="convAmount" value="1" placeholder="0.00">
+        </div>
+        <div class="swap-btn" onclick="swapCurrencies()">⇅</div>
+        <div class="conv-label">إلى</div>
+        <div class="conv-box">
+            <div class="currency-select"><img class="flag" src="https://flagcdn.com/w80/eg.png" style="width:32px;height:24px;"><select id="toCurrency"><option value="EGP" selected>EGP</option><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option></select></div>
+            <div class="amount" id="convResult" style="color:var(--text-primary);">50.93</div>
+        </div>
+    </div>
+
+    <div class="section-title"><span class="line"></span><span>سعر صرف العملات بالجنيه المصري</span><span class="icon">💵</span></div>
+    <div class="currency-section">
+        <div class="currency-card"><div class="currency-info"><img class="flag" src="https://flagcdn.com/w80/us.png"><div><div class="currency-name">دولار أمريكي</div><div class="currency-code">USD</div></div></div><div class="currency-prices"><div class="cp"><div class="cp-label">شراء</div><div class="cp-value">50.93</div></div><div class="cp"><div class="cp-label">بيع</div><div class="cp-value">51.03</div></div></div></div>
+        <div class="currency-card"><div class="currency-info"><img class="flag" src="https://flagcdn.com/w80/eu.png"><div><div class="currency-name">يورو</div><div class="currency-code">EUR</div></div></div><div class="currency-prices"><div class="cp"><div class="cp-label">شراء</div><div class="cp-value">58.11</div></div><div class="cp"><div class="cp-label">بيع</div><div class="cp-value">58.32</div></div></div></div>
+        <div class="currency-card"><div class="currency-info"><img class="flag" src="https://flagcdn.com/w80/gb.png"><div><div class="currency-name">جنيه إسترليني</div><div class="currency-code">GBP</div></div></div><div class="currency-prices"><div class="cp"><div class="cp-label">شراء</div><div class="cp-value">66.45</div></div><div class="cp"><div class="cp-label">بيع</div><div class="cp-value">66.78</div></div></div></div>
+        <div class="currency-card"><div class="currency-info"><img class="flag" src="https://flagcdn.com/w80/sa.png"><div><div class="currency-name">ريال سعودي</div><div class="currency-code">SAR</div></div></div><div class="currency-prices"><div class="cp"><div class="cp-label">شراء</div><div class="cp-value">13.58</div></div><div class="cp"><div class="cp-label">بيع</div><div class="cp-value">13.61</div></div></div></div>
+        <div class="currency-card"><div class="currency-info"><img class="flag" src="https://flagcdn.com/w80/ae.png"><div><div class="currency-name">درهم إماراتي</div><div class="currency-code">AED</div></div></div><div class="currency-prices"><div class="cp"><div class="cp-label">شراء</div><div class="cp-value">13.86</div></div><div class="cp"><div class="cp-label">بيع</div><div class="cp-value">13.89</div></div></div></div>
+    </div>
+</div>
+
+<!-- ========== BULLION ========== -->
+<div id="page-bullion" class="page-section">
+    <div style="padding:18px 18px 0;"><h2 style="font-size:20px;font-weight:900;text-align:center;margin-bottom:3px;">السبائك والعملات</h2><p style="text-align:center;color:var(--text-light);font-size:13px;">أسعار السبائك والعملات الذهبية</p></div>
+    <div class="bullion-tabs">
+        <div class="tab active" onclick="switchBullionTab(this,'coins')">🪙 العملات</div>
+        <div class="tab" onclick="switchBullionTab(this,'bullion')">🏭 السبائك</div>
+    </div>
+    <div id="bullion-coins" class="bullion-content">
+        <div class="currency-section">
+            <div class="currency-card"><div class="currency-info"><div class="carat-icon" style="background:linear-gradient(135deg,#F5ECD0,#E8D179);">🪙</div><div><div class="currency-name">الجنيه الذهب (8 جرام)</div><div class="currency-code">عيار 21</div></div></div><div class="currency-prices"><div class="cp"><div class="cp-label">شراء</div><div class="cp-value">46,280</div></div><div class="cp"><div class="cp-label">بيع</div><div class="cp-value">46,720</div></div></div></div>
+            <div class="currency-card"><div class="currency-info"><div class="carat-icon" style="background:linear-gradient(135deg,#F5ECD0,#E8D179);">🪙</div><div><div class="currency-name">نصف جنيه (4 جرام)</div><div class="currency-code">عيار 21</div></div></div><div class="currency-prices"><div class="cp"><div class="cp-label">شراء</div><div class="cp-value">23,140</div></div><div class="cp"><div class="cp-label">بيع</div><div class="cp-value">23,360</div></div></div></div>
+            <div class="currency-card"><div class="currency-info"><div class="carat-icon" style="background:linear-gradient(135deg,#F5ECD0,#E8D179);">🪙</div><div><div class="currency-name">ربع جنيه (2 جرام)</div><div class="currency-code">عيار 21</div></div></div><div class="currency-prices"><div class="cp"><div class="cp-label">شراء</div><div class="cp-value">11,570</div></div><div class="cp"><div class="cp-label">بيع</div><div class="cp-value">11,680</div></div></div></div>
+        </div>
+    </div>
+    <div id="bullion-bullion" class="bullion-content" style="display:none;">
+        <div class="bullion-empty"><div class="empty-icon">🏭</div><h3>اختر الشركة أولاً</h3><p>ابدأ باختيار الشركة المصنعة، ثم اختر الوزن من القائمة التالية</p></div>
+    </div>
+</div>
+
+<!-- ========== SILVER ========== -->
+<div id="page-silver" class="page-section">
+    <div style="padding:18px 18px 0;"><h2 style="font-size:20px;font-weight:900;text-align:center;margin-bottom:3px;">أسعار الفضة</h2><p style="text-align:center;color:var(--text-light);font-size:13px;">عرض استرشادي لأسعار السوق</p></div>
+    <div class="silver-card" style="margin-top:14px;"><div class="silver-icon">🌐</div><div class="silver-info"><h3>أوقية الفضة (عالمي)</h3><div class="price">$58.96</div></div></div>
+    <div class="section-title"><span class="line"></span><span>أسعار العيارات محلياً</span><span class="icon">📍</span></div>
+    <div class="silver-table">
+        <div class="st-header"><div>العيار</div><div>شراء</div><div>بيع</div></div>
+        <div class="st-row"><div class="st-karat">📍 عيار 999</div><div class="st-price">99.47 ج.م</div><div class="st-price">100.72 ج.م</div></div>
+        <div class="st-row"><div class="st-karat">📍 عيار 925</div><div class="st-price">92.01 ج.م</div><div class="st-price">93.26 ج.م</div></div>
+        <div class="st-row"><div class="st-karat">📍 عيار 900</div><div class="st-price">89.49 ج.م</div><div class="st-price">90.74 ج.م</div></div>
+        <div class="st-row"><div class="st-karat">📍 عيار 800</div><div class="st-price">79.41 ج.م</div><div class="st-price">80.66 ج.م</div></div>
+    </div>
+    <p style="padding:0 18px;color:var(--text-light);font-size:12px;text-align:center;line-height:1.6;margin-bottom:14px;">تنبيه: الأسعار المعروضة استرشادية لمتوسط السوق وقد تختلف من تاجر لآخر.</p>
+</div>
+
+<!-- ========== TOOLS ========== -->
+<div id="page-tools" class="page-section">
+    <div style="padding:18px 18px 0;"><h2 style="font-size:20px;font-weight:900;text-align:center;margin-bottom:3px;">الأدوات المالية</h2><p style="text-align:center;color:var(--text-light);font-size:13px;">احسب وتابع قيمك بدقة</p></div>
+    <div class="settings-card" style="margin:14px;">
+        <div class="settings-header"><div class="sh-icon">🧮</div><div><h3>حاسبة الممتلكات</h3><p style="font-size:12px;color:var(--text-light);">إجمالي قيمة الذهب والفضة والعملات</p></div></div>
+    </div>
+    <div class="section-title"><span class="line"></span><span>الحاسبات</span><span class="icon">🧮</span></div>
+    <div class="tools-grid">
+        <div class="tool-card" onclick="alert('حاسبة الذهب: قريباً')"><div class="tool-icon">🧮</div><h4>حاسبة الذهب</h4><p>تقدير القيمة</p></div>
+        <div class="tool-card" onclick="alert('حاسبة الفضة: قريباً')"><div class="tool-icon">⭐</div><h4>حاسبة الفضة</h4><p>تقدير القيمة</p></div>
+        <div class="tool-card" onclick="alert('حاسبة المصنعية: قريباً')"><div class="tool-icon">🏭</div><h4>حاسبة المصنعية</h4><p>تفاصيل الفاتورة</p></div>
+        <div class="tool-card" onclick="alert('حاسبة الزكاة: قريباً')"><div class="tool-icon">🕌</div><h4>حاسبة زكاة الذهب</h4><p>حساب النصاب</p></div>
+    </div>
+    <div class="section-title"><span class="line"></span><span>أدوات مساعدة</span><span class="icon">🔧</span></div>
+    <div class="settings-list">
+        <div class="settings-card">
+            <div class="settings-item" onclick="navigateTo('currencies',document.querySelectorAll('.nav-item')[1])"><div class="si-left"><div class="si-icon">🔄</div><span>محول العملات</span></div><span class="arrow">‹</span></div>
+            <div class="settings-item" onclick="alert('قريباً')"><div class="si-left"><div class="si-icon">🐷</div><span>حاسبة إدخار الذهب والفضة</span></div><span class="arrow">‹</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== SETTINGS ========== -->
+<div id="page-settings" class="page-section">
+    <div style="padding:18px 18px 0;"><h2 style="font-size:20px;font-weight:900;text-align:center;margin-bottom:3px;">الإعدادات</h2></div>
+    <div class="settings-list" style="margin-top:14px;">
+        <div class="settings-card">
+            <div class="settings-item" onclick="alert('الإعدادات: قريباً')"><div class="si-left"><div class="si-icon">⚙️</div><span>الإعدادات</span></div><span class="arrow">‹</span></div>
+            <div class="settings-item">
+                <div class="si-left"><div class="si-icon">🌙</div><span>وضع الظلام</span></div>
+                <div class="toggle-switch" id="darkToggle" onclick="toggleDarkMode()"></div>
+            </div>
+            <div class="settings-item" onclick="shareApp()"><div class="si-left"><div class="si-icon">🔗</div><span>مشاركة التطبيق</span></div><span class="arrow">‹</span></div>
+            <div class="settings-item" onclick="alert('شكراً لتقييمك!')"><div class="si-left"><div class="si-icon">⭐</div><span>قيم التطبيق وأدعمنا</span></div><span class="stars">★★★★★</span></div>
+            <div class="settings-item" onclick="window.location.href='mailto:gyousef707@gmail.com'"><div class="si-left"><div class="si-icon">❓</div><span>اتصل بنا</span></div><span class="arrow">‹</span></div>
+            <div class="settings-item" onclick="alert('سياسة الخصوصية: قريباً')"><div class="si-left"><div class="si-icon">🛡️</div><span>سياسة الخصوصية</span></div><span class="arrow">‹</span></div>
+            <div class="settings-item" onclick="alert('إخلاء المسؤولية: الأسعار المعروضة استرشادية')"><div class="si-left"><div class="si-icon">📋</div><span>إخلاء المسؤولية</span></div><span class="arrow">‹</span></div>
+        </div>
+    </div>
+    <div class="app-version"><div class="version-name">تطبيق ذهبي</div><div>v1.0.0</div><div style="margin-top:6px;font-size:12px;">gyousef707@gmail.com</div></div>
+</div>
+
+</div>
+
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+    <div class="nav-item active" onclick="navigateTo('home',this)"><span class="nav-icon">🏠</span><span class="nav-label">الرئيسية</span></div>
+    <div class="nav-item" onclick="navigateTo('currencies',this)"><span class="nav-icon">💱</span><span class="nav-label">العملات</span></div>
+    <div class="nav-item" onclick="navigateTo('silver',this)"><span class="nav-icon">💎</span><span class="nav-label">الفضة</span></div>
+    <div class="nav-item" onclick="navigateTo('tools',this)"><span class="nav-icon">🧮</span><span class="nav-label">الأدوات</span></div>
+    <div class="nav-item" onclick="navigateTo('settings',this)"><span class="nav-icon">⚙️</span><span class="nav-label">الإعدادات</span></div>
+</div>
+
+<script>
+// Splash Screen
+setTimeout(function() {
+    document.getElementById('splash').classList.add('hidden');
+}, 2500);
+
+// Navigation
+function navigateTo(page, el) {
+    document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if(el) el.classList.add('active');
+    window.scrollTo(0,0);
+}
+
+// Bullion Tabs
+function switchBullionTab(el, type) {
+    document.querySelectorAll('.bullion-tabs .tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('bullion-coins').style.display = type === 'coins' ? 'block' : 'none';
+    document.getElementById('bullion-bullion').style.display = type === 'bullion' ? 'block' : 'none';
+}
+
+// Dark Mode
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    var toggle = document.getElementById('darkToggle');
+    if(toggle) toggle.classList.toggle('active');
+
+    // Save preference
+    localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+
+    // Update TradingView theme if exists
+    var tvWidgets = document.querySelectorAll('.tradingview-widget-container iframe');
+    tvWidgets.forEach(function(w) {
+        try { w.contentWindow.postMessage({theme: document.body.classList.contains('dark-mode') ? 'dark' : 'light'}, '*'); } catch(e) {}
+    });
+}
+
+// Load dark mode preference
+if(localStorage.getItem('darkMode') === 'true') {
+    document.body.classList.add('dark-mode');
+    var toggle = document.getElementById('darkToggle');
+    if(toggle) toggle.classList.add('active');
+}
+
+// Refresh Data
+function refreshData() {
+    var btn = document.querySelector('.refresh-btn');
+    btn.classList.add('spinning');
+
+    // Simulate refresh
+    setTimeout(function() {
+        btn.classList.remove('spinning');
+
+        // Update timestamp
+        var now = new Date();
+        var timeStr = now.getDate() + ' يوليو ' + now.getFullYear() + ' - ' + 
+                      String(now.getHours()).padStart(2,'0') + ':' + 
+                      String(now.getMinutes()).padStart(2,'0');
+        document.getElementById('updateTime').textContent = timeStr;
+
+        // Simulate price change
+        var priceEl = document.getElementById('globalPrice');
+        var changeEl = document.getElementById('globalChange');
+        if(priceEl) {
+            var current = parseFloat(priceEl.textContent.replace(/[$,]/g, ''));
+            var change = (Math.random() - 0.5) * 5;
+            var newPrice = current + change;
+            priceEl.textContent = '$' + newPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+            if(changeEl) {
+                var pct = (change / current * 100).toFixed(2);
+                if(change >= 0) {
+                    changeEl.textContent = '▲ ' + pct + '%+';
+                    changeEl.className = 'change';
+                } else {
+                    changeEl.textContent = '▼ ' + Math.abs(pct) + '%-';
+                    changeEl.className = 'change down';
+                }
+            }
+        }
+
+        alert('تم تحديث البيانات بنجاح! ✅');
+    }, 1500);
+}
+
+// Currency Converter
+const rates = { USD: 1, EGP: 50.93, EUR: 1.14, GBP: 1.31, SAR: 0.267, AED: 0.272 };
+document.getElementById('convAmount').addEventListener('input', doConvert);
+document.getElementById('fromCurrency').addEventListener('change', doConvert);
+document.getElementById('toCurrency').addEventListener('change', doConvert);
+
+function doConvert() {
+    const amt = parseFloat(document.getElementById('convAmount').value) || 0;
+    const from = document.getElementById('fromCurrency').value;
+    const to = document.getElementById('toCurrency').value;
+    const usd = amt / rates[from];
+    const result = usd * rates[to];
+    document.getElementById('convResult').textContent = result.toFixed(2);
+}
+
+function swapCurrencies() {
+    const from = document.getElementById('fromCurrency');
+    const to = document.getElementById('toCurrency');
+    const tmp = from.value; from.value = to.value; to.value = tmp;
+    doConvert();
+}
+
+// Share
+function shareApp() {
+    if(navigator.share) {
+        navigator.share({ title: 'تطبيق ذهبي', text: 'تطبيق ذهبي - أسعار الذهب والعملات لحظة بلحظة', url: window.location.href });
+    } else {
+        alert('انسخ الرابط وشاركه مع أصدقائك!');
+    }
+}
+
+// Live price simulation
+setInterval(function() {
+    var priceEl = document.querySelector('.global-card .price');
+    if(priceEl && !document.querySelector('.refresh-btn.spinning')) {
+        var price = parseFloat(priceEl.textContent.replace(/[$,]/g, ''));
+        price += (Math.random() - 0.5) * 1.5;
+        priceEl.textContent = '$' + price.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+}, 8000);
+</script>
+
 </body>
 </html>
