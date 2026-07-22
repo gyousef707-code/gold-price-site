@@ -62,7 +62,7 @@ body {
     position: sticky; top: 0; z-index: 100;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
-.header .logo-text { font-size: 22px; font-weight: 900; color: var(--text-primary); }
+.header .logo-text { font-size: 20px; font-weight: 900; color: var(--text-primary); }
 .header .actions { display: flex; gap: 8px; }
 .header .actions button {
     width: 40px; height: 40px; border: none; background: var(--bg-primary);
@@ -87,7 +87,7 @@ body {
 }
 .global-ounce-card .ounce-info { text-align: left; }
 .global-ounce-card .ounce-title { font-size: 13px; color: var(--text-secondary); margin-bottom: 2px; }
-.global-ounce-card .ounce-price { font-size: 24px; font-weight: 900; color: var(--text-primary); direction: ltr; }
+.global-ounce-card .ounce-price { font-size: 22px; font-weight: 900; color: var(--text-primary); direction: ltr; }
 
 /* Section Title */
 .section-title {
@@ -114,7 +114,7 @@ body {
 .carat-card .cp-box .cp-val.buy { color: var(--text-primary); }
 .carat-card .cp-box .cp-val.sell { color: var(--text-primary); }
 
-/* Dollar Comparison Card (مؤشر سعر الدولار) */
+/* Dollar Comparison Card */
 .dollar-compare-card {
     margin: 0 14px 14px;
     background: var(--bg-card);
@@ -126,48 +126,19 @@ body {
     justify-content: space-between;
     border: 1px solid rgba(201,162,39,0.25);
 }
-.dollar-compare-card .dc-item {
-    text-align: center;
-    flex: 1;
-}
-.dollar-compare-card .dc-label {
-    font-size: 13px;
-    color: var(--text-secondary);
-    margin-bottom: 6px;
-    display: block;
-    font-weight: 600;
-}
-.dollar-compare-card .dc-value {
-    font-size: 18px;
-    font-weight: 900;
-    color: var(--text-primary);
-}
-.dollar-compare-card .dc-value.highlight {
-    color: var(--gold-dark);
-}
-.dollar-compare-card .dc-value small {
-    font-size: 11px;
-    font-weight: 600;
-}
-.dollar-compare-card .dc-divider {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0 10px;
-}
+.dollar-compare-card .dc-item { text-align: center; flex: 1; }
+.dollar-compare-card .dc-label { font-size: 13px; color: var(--text-secondary); margin-bottom: 6px; display: block; font-weight: 600; }
+.dollar-compare-card .dc-value { font-size: 18px; font-weight: 900; color: var(--text-primary); }
+.dollar-compare-card .dc-value.highlight { color: var(--gold-dark); }
+.dollar-compare-card .dc-value small { font-size: 11px; font-weight: 600; }
+.dollar-compare-card .dc-divider { display: flex; flex-direction: column; align-items: center; padding: 0 10px; }
 .dollar-compare-card .dc-diff-badge {
-    background: var(--gold-pale);
-    color: var(--gold-dark);
-    font-size: 11px;
-    font-weight: 800;
-    padding: 6px 10px;
-    border-radius: 20px;
-    border: 1px solid rgba(201,162,39,0.3);
-    white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(201,162,39,0.15);
+    background: var(--gold-pale); color: var(--gold-dark);
+    font-size: 11px; font-weight: 800; padding: 6px 10px; border-radius: 20px;
+    border: 1px solid rgba(201,162,39,0.3); white-space: nowrap; box-shadow: 0 2px 8px rgba(201,162,39,0.15);
 }
 
-/* Tools & Other Pages Styling */
+/* Tools Grid */
 .tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 14px; margin-bottom: 14px; }
 .tool-card {
     background: var(--bg-card); border-radius: var(--radius-sm); padding: 18px 14px;
@@ -209,8 +180,7 @@ body {
 
     <!-- 1. الرئيسية -->
     <div id="tab-home" class="tab-pane active">
-        
-        <!-- الأونصة العالمية في الأعلى -->
+        <!-- الأونصة العالمية -->
         <div class="global-ounce-card">
             <div class="live-badge"><span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block;"></span> LIVE</div>
             <div class="ounce-info">
@@ -223,7 +193,6 @@ body {
 
         <!-- العيارات -->
         <div class="carats-grid">
-            <!-- عيار 24 -->
             <div class="carat-card">
                 <div class="carat-right">
                     <div>
@@ -237,7 +206,6 @@ body {
                 </div>
             </div>
 
-            <!-- عيار 22 -->
             <div class="carat-card">
                 <div class="carat-right">
                     <div>
@@ -251,12 +219,12 @@ body {
                 </div>
             </div>
 
-            <!-- عيار 21 (الأكثر تداولاً) -->
             <div class="carat-card featured">
+                <span style="position: absolute; top: 8px; left: 8px; background: var(--gold-gradient); color: #fff; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 6px;">الأكثر تداولاً</span>
                 <div class="carat-right">
                     <div>
                         <div class="carat-name" style="color: var(--gold-dark);">عيار 21</div>
-                        <div class="carat-sub">الأكثر تداولاً</div>
+                        <div class="carat-sub">نقاء 87.5%</div>
                     </div>
                 </div>
                 <div class="carat-prices">
@@ -265,7 +233,6 @@ body {
                 </div>
             </div>
 
-            <!-- عيار 18 -->
             <div class="carat-card">
                 <div class="carat-right">
                     <div>
@@ -280,7 +247,7 @@ body {
             </div>
         </div>
 
-        <!-- مؤشر سعر الدولار (بين البنوك والصاغة والفرق بينهما) تحت العيارات مباشرة -->
+        <!-- مؤشر سعر الدولار تحت العيارات مباشرة -->
         <div class="section-title" style="font-size: 16px; padding-top: 5px;">مؤشر سعر الدولار</div>
         <div class="dollar-compare-card">
             <div class="dc-item">
@@ -295,7 +262,6 @@ body {
                 <span class="dc-value highlight">52.10 <small>ج.م</small></span>
             </div>
         </div>
-
     </div>
 
     <!-- 2. العملات -->
@@ -317,9 +283,9 @@ body {
     <div id="tab-bullion" class="tab-pane">
         <div class="section-title">السبائك والعملات الذهبية</div>
         <div style="padding: 0 14px;">
-            <div class="carat-card" style="margin-bottom: 10px; display:block;">
-                <h4 style="color: var(--gold-primary); margin-bottom: 5px;">سبيكة BTC (1 جرام)</h4>
-                <p style="font-size: 14px;">السعر: 6,950 ج.م</p>
+            <div class="carat-card" style="margin-bottom: 10px;">
+                <div><h4 style="color: var(--gold-primary); margin-bottom: 5px;">سبيكة BTC (1 جرام)</h4><p style="font-size: 13px; color: var(--text-secondary);">وزن نقي مصحوب بالدمغة</p></div>
+                <div><strong style="font-size: 16px;">6,950 ج.م</strong></div>
             </div>
         </div>
     </div>
@@ -328,12 +294,12 @@ body {
     <div id="tab-tools" class="tab-pane">
         <div class="section-title">الأدوات المالية والحاسبة</div>
         <div class="tools-grid">
-            <div class="tool-card" onclick="alert('حاسبة الذهب تعمل بكفاءة')">
+            <div class="tool-card" onclick="alert('حاسبة الذهب تعمل بكفاءة تامة')">
                 <div class="tool-icon"><i class="fa-solid fa-calculator"></i></div>
                 <h4>حاسبة الذهب</h4>
                 <p>حساب القيمة والوزن</p>
             </div>
-            <div class="tool-card" onclick="alert('حاسبة المصنعية تعمل بكفاءة')">
+            <div class="tool-card" onclick="alert('حاسبة المصنعية تعمل بكفاءة تامة')">
                 <div class="tool-icon"><i class="fa-solid fa-receipt"></i></div>
                 <h4>حاسبة المصنعية</h4>
                 <p>تفاصيل الفاتورة</p>
@@ -345,7 +311,7 @@ body {
     <div id="tab-settings" class="tab-pane">
         <div class="section-title">إعدادات التطبيق</div>
         <div style="padding: 0 14px;">
-            <div class="carat-card" style="margin-bottom: 10px;" onclick="toggleDarkMode()">
+            <div class="carat-card" style="margin-bottom: 10px; cursor:pointer;" onclick="toggleDarkMode()">
                 <span>الوضع المظلم / الفاتح</span>
                 <i class="fa-solid fa-moon" style="color: var(--gold-primary);"></i>
             </div>
