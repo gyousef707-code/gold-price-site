@@ -1,26 +1,28 @@
-// إخفاء شاشة البداية تلقائياً بعد ثانيتين بسلاسة تامة
-window.addEventListener('load', () => {
-    setTimeout(() => {
-        const splash = document.getElementById('splash');
-        if(splash) {
-            splash.classList.add('hidden');
-        }
-    }, 2000);
+document.addEventListener('DOMContentLoaded', () => {
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const refreshBtn = document.getElementById('refresh-btn');
+
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const icon = themeToggleBtn.querySelector('i');
+            if (document.body.classList.contains('light-mode')) {
+                icon.className = 'fa-solid fa-sun';
+            } else {
+                icon.className = 'fa-solid fa-moon';
+            }
+        });
+    }
+
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+            const icon = refreshBtn.querySelector('i');
+            icon.style.transform = 'rotate(360deg)';
+            icon.style.transition = 'transform 0.6s ease';
+            
+            setTimeout(() => {
+                icon.style.transform = 'rotate(0deg)';
+            }, 600);
+        });
+    }
 });
-
-function switchTab(tabId, el) {
-    document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    
-    document.getElementById(tabId).classList.add('active');
-    el.classList.add('active');
-    window.scrollTo(0, 0);
-}
-
-function toggleDarkMode() {
-    document.body.classList.toggle('dark-mode');
-}
-
-function refreshData() {
-    alert("تم تحديث الأسعار بنجاح!");
-}
