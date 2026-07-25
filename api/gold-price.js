@@ -1,59 +1,77 @@
 // api/gold-price.js
-// جلب أسعار الذهب من السوق المصري المحلي (الصاغة المصرية)
+// يجيب أسعار الذهب من موقع "الشعبة العامة للذهب والمجوهرات" (egajtd.com) - المصدر الرسمي في مصر
+// مصدر عام مفتوح، بدون مفتاح API وبدون حد شهري للطلبات
+
+const GOLD_PURITY = { 24: 0.999, 22: 0.916, 21: 0.875, 18: 0.750, 14: 0.583, 12: 0.500 };
+
+function stripTags(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ');
+}
+
+function extractPair(text, labelPattern) {
+  const re = new RegExp(labelPattern + '\\s*\\$?\\s*([\\d,]+\\.?\\d*)\\s*\\$?\\s*([\\d,]+\\.?\\d*)');
+  const m = text.match(re);
+  if (!m) return null;
+  return {
+    sell: parseFloat(m[1].replace(/,/g, '')),
+    buy: parseFloat(m[2].replace(/,/g, '')),
+  };
+}
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate');
-
   try {
-    // استخدام API مخصص لأسعار الذهب في مصر
-    const response = await fetch('https://raw.githubusercontent.com/egypt-gold-prices/api/main/data.json', {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-      }
+    const response = await fetch('https://egajtd.com/', {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DahabySite/1.0)' },
     });
+    if (!response.ok) throw new Error('تعذر الوصول لموقع الشعبة العامة للذهب');
 
-    if (!response.ok) {
-      // مصدر مصري بديل في حال تعذر الأول (سحب مباشر)
-      throw new Error('المصدر الأول غير متاح');
+    const html = await response.text();
+    const text = stripTags(html);
+
+    const ounce = extractPair(text, 'الأوقية');
+    const k24 = extractPair(text, 'عيار\\s*24');
+    const k21 = extractPair(text, 'عيار\\s*21');
+    const k18 = extractPair(text, 'عيار\\s*18');
+    const k14 = extractPair(text, 'عيار\\s*14');
+    const pound = extractPair(text, 'الجني[ةه]\\s*الذهب');
+
+    if (!k24) {
+      throw new Error('لم يتم العثور على جدول الأسعار - شكل صفحة الشعبة ممكن يكون اتغيّر');
     }
 
-    const data = await response.json();
+    const caratPrices = { 24: k24 };
+    if (k21) caratPrices[21] = k21;
+    if (k18) caratPrices[18] = k18;
+    if (k14) caratPrices[14] = k14;
+
+    // عيار 22 و12 مش منشورين عند الشعبة - بنشتقهم من سعر جرام الذهب الخالص (عيار 24)
+    const unitSell = k24.sell / GOLD_PURITY[24];
+    const unitBuy = k24.buy / GOLD_PURITY[24];
+    for (const c of [22, 12]) {
+      if (!caratPrices[c]) {
+        caratPrices[c] = {
+          sell: Math.round(unitSell * GOLD_PURITY[c]),
+          buy: Math.round(unitBuy * GOLD_PURITY[c]),
+        };
+      }
+    }
+
+    // كاش 10 دقايق - مصدر عام بدون حد طلبات، فمينفعش نضغط عليه أوي برضه
+    res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=1200');
 
     return res.status(200).json({
-      source: 'الصاغة المصرية (مباشر)',
+      source: 'egajtd.com - الشعبة العامة للذهب والمجوهرات',
+      ounce_usd: ounce ? ounce.sell : null,
+      pound: pound || null,
+      caratPrices,
       updated_at: new Date().toISOString(),
-      prices: {
-        24: { sell: data.k24.sell, buy: data.k24.buy },
-        21: { sell: data.k21.sell, buy: data.k21.buy },
-        18: { sell: data.k18.sell, buy: data.k18.buy },
-        14: { sell: data.k14.sell, buy: data.k14.buy },
-      },
-      pound: { sell: data.pound.sell, buy: data.pound.buy }
     });
-
-  } catch (error) {
-    // في حالة حدوث أي تعذر، نستخدم سحب برمجيات مباشر محلي لأسعار مصر
-    try {
-      const altRes = await fetch('https://goldpricez.com/api/rates/currency/egp/measure/gram', {
-        headers: { 'User-Agent': 'Mozilla/5.0' }
-      });
-      
-      // إذا فشل كل شيء، بنرجع أحدث أسعار حقيقية مسجلة بالسوق المصري
-      return res.status(200).json({
-        source: 'السوق المصري (تحديث أخير)',
-        updated_at: new Date().toISOString(),
-        prices: {
-          24: { sell: 4630, buy: 4600 },
-          21: { sell: 4050, buy: 4025 },
-          18: { sell: 3470, buy: 3450 },
-          14: { sell: 2700, buy: 2680 },
-          12: { sell: 2315, buy: 2300 }
-        },
-        pound: { sell: 32400, buy: 32200 }
-      });
-    } catch (e) {
-      return res.status(500).json({ error: 'تعذر جلب أسعار الصاغة' });
-    }
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
   }
 };
