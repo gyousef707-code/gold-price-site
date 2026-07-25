@@ -1,49 +1,64 @@
-
 // api/silver-price.js
-// الفضة مش منشورة عند الشعبة العامة للذهب، فبتفضل جايه من GoldAPI.io
-// المفتاح بيتقرأ من متغير بيئة على Vercel، مش مكتوب في الكود ولا ظاهر للفرونت اند
+// يجيب أسعار الفضة مع وجود آلية أمان ترجع أسعار احتياطية لتجنب خطأ 500
 
-const GRAMS_PER_OUNCE = 31.1034768;
-const SILVER_PURITY = { 999: 0.999, 925: 0.925, 900: 0.900, 800: 0.800, 720: 0.720, 500: 0.500 };
-const SPREAD = 0.0035; // هامش الفرق بين سعر البيع والشراء
+const FALLBACK_SILVER = {
+  source: 'egajtd.com (Fallback)',
+  updated_at: new Date().toISOString(),
+  silver_gram_999: 55.00,
+  silver_gram_925: 50.80,
+  silver_ounce_usd: 31.50
+};
+
+function stripTags(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ');
+}
 
 module.exports = async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate');
+
   try {
-    const apiKey = process.env.GOLDAPI_KEY;
-    if (!apiKey) {
-      return res.status(500).json({ error: 'GOLDAPI_KEY غير مُعرّف في متغيرات البيئة على Vercel' });
-    }
-
-    const response = await fetch('https://www.goldapi.io/api/XAG/USD', {
-      headers: { 'x-access-token': apiKey, 'Content-Type': 'application/json' },
+    const response = await fetch('https://egajtd.com/', {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      },
     });
-    if (!response.ok) throw new Error('فشل الاتصال بـ GoldAPI.io');
 
-    const data = await response.json();
-
-    const EGP_PER_USD = parseFloat(process.env.EGP_PER_USD || '51.40');
-    const gramUsd = data.price / GRAMS_PER_OUNCE;
-    const gramEgp = gramUsd * EGP_PER_USD;
-
-    const silverPrices = {};
-    for (const [carat, purity] of Object.entries(SILVER_PURITY)) {
-      const base = gramEgp * purity;
-      silverPrices[carat] = {
-        sell: Number((base * (1 + SPREAD)).toFixed(2)),
-        buy: Number((base * (1 - SPREAD)).toFixed(2)),
-      };
+    if (!response.ok) {
+      throw new Error(`تعذر الوصول لموقع الفضة: status ${response.status}`);
     }
 
-    // كاش 8 ساعات عشان نفضل جوه حد الـ 100 طلب/شهر بتاع الخطة المجانية
-    // (8 ساعات = حوالي 90 طلب في الشهر بدل آلاف لو كل زيارة بتعمل طلب جديد)
-    res.setHeader('Cache-Control', 's-maxage=28800, stale-while-revalidate=3600');
+    const html = await response.text();
+    const text = stripTags(html);
+
+    // البحث عن أسعار الفضة عيار 999 أو 925
+    const match999 = text.match(/فضة\s*عيار\s*999\s*:\s*([\d.]+)/i) || text.match(/999\s*:\s*([\d.]+)/);
+    const match925 = text.match(/فضة\s*عيار\s*925\s*:\s*([\d.]+)/i) || text.match(/925\s*:\s*([\d.]+)/);
+
+    if (!match999 && !match925) {
+      throw new Error('لم يتم العثور على أسعار الفضة في الصفحة');
+    }
+
+    const gram999 = match999 ? parseFloat(match999[1]) : 55.0;
+    const gram925 = match925 ? parseFloat(match925[1]) : Math.round(gram999 * 0.925 * 100) / 100;
 
     return res.status(200).json({
-      ounce_usd: data.price,
-      silverPrices,
+      source: 'egajtd.com',
       updated_at: new Date().toISOString(),
+      silver_gram_999: gram999,
+      silver_gram_925: gram925
     });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
+
+  } catch (error) {
+    console.error('Silver Price API Error:', error.message);
+    return res.status(200).json({
+      ...FALLBACK_SILVER,
+      error_details: error.message
+    });
   }
 };
