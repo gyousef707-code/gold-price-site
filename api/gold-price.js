@@ -9,15 +9,16 @@ function stripTags(html) {
     .replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/g, ' ')
     .replace(/&amp;/g, '&')
+    .replace(/[-+]?\d+(?:\.\d+)?%/g, ' ') // شيل نسب التغيير زي "0.09%" أو "-1.2%" بالكامل عشان متتلخبطش مع الأسعار
     .replace(/\s+/g, ' ');
 }
 
-// بيرجع أعلى وأقل رقم بعد التسمية (سعر البيع لك وسعر الشراء منك)، متجاهل نسب التغيير %
+// بيرجع أعلى وأقل رقم بعد التسمية (سعر البيع لك وسعر الشراء منك)
 function extractPair(text, label) {
   const idx = text.indexOf(label);
   if (idx === -1) return null;
   const after = text.slice(idx + label.length, idx + label.length + 150);
-  const nums = after.match(/[\d,]+\.?\d*(?!%)/g);
+  const nums = after.match(/[\d,]+\.?\d*/g);
   if (!nums || nums.length < 2) return null;
   const v1 = parseFloat(nums[0].replace(/,/g, ''));
   const v2 = parseFloat(nums[1].replace(/,/g, ''));
