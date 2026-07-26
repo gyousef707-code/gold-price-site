@@ -1,9 +1,10 @@
 // api/silver-price.js
-// يجيب أسعار الفضة اللحظية الفعلية من banklive.net - بديل عن GoldAPI.io
-// مصدر مجاني بدون مفتاح API وبدون حد شهري للطلبات (حل نهائي لمشكلة "الحصة الشهرية")
+// سعر الفضة العالمي من gold-api.com (مصدر مجاني حقيقي بدون مفتاح وبدون حد طلبات)
+// وسعر الدولار الرسمي من banklive.net، وبنحسب سعر الجرام بالجنيه بنفسنا
 
+const GRAMS_PER_OUNCE = 31.1034768;
 const SILVER_PURITY = { 999: 0.999, 925: 0.925, 900: 0.900, 800: 0.800, 720: 0.720, 500: 0.500 };
-const SPREAD = 0.0035; // الموقع بيعرض سعر واحد بس للفضة، فبنولّد هامش بيع/شراء بنفسنا
+const SPREAD = 0.0035; // هامش الفرق بين سعر البيع والشراء
 
 function stripTags(html) {
   return html
@@ -12,15 +13,14 @@ function stripTags(html) {
     .replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/g, ' ')
     .replace(/&amp;/g, '&')
-    .replace(/[-+]?\d+(?:\.\d+)?%/g, ' ') // شيل نسب التغيير زي "0.09%" أو "-1.2%" بالكامل عشان متتلخبطش مع الأسعار
+    .replace(/[-+]?\d+(?:\.\d+)?%/g, ' ')
     .replace(/\s+/g, ' ');
 }
 
-// بيرجع أول رقم بعد التسمية (سعر الجرام بالجنيه)
 function extractOne(text, label) {
   const idx = text.indexOf(label);
   if (idx === -1) return null;
-  const after = text.slice(idx + label.length, idx + label.length + 150);
+  const after = text.slice(idx + label.length, idx + label.length + 60);
   const nums = after.match(/[\d,]+\.?\d*/g);
   if (!nums || nums.length < 1) return null;
   const v = parseFloat(nums[0].replace(/,/g, ''));
@@ -29,49 +29,50 @@ function extractOne(text, label) {
 
 module.exports = async function handler(req, res) {
   try {
-    const response = await fetch('https://banklive.net/en/silver-price-today-in-egypt', {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DahabySite/1.0)' },
-    });
-    if (!response.ok) throw new Error('تعذر الوصول لموقع banklive.net');
+    const [silverRes, goldPageRes] = await Promise.all([
+      fetch('https://api.gold-api.com/price/XAG'),
+      fetch('https://banklive.net/en/gold-price-today-in-egypt', {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DahabySite/1.0)' },
+      }),
+    ]);
 
-    const html = await response.text();
-    const text = stripTags(html);
-
-    const gramEgp = {
-      999: extractOne(text, 'Silver Gram Carat 99.9'),
-      925: extractOne(text, 'Silver Gram Carat 92.5'),
-      900: extractOne(text, 'Silver Gram Carat 900'),
-      800: extractOne(text, 'Silver Gram Carat 800'),
-    };
-
-    if (!gramEgp[999]) {
-      throw new Error('لم يتم العثور على جدول أسعار الفضة - شكل الموقع ممكن يكون اتغيّر');
+    if (!silverRes.ok) {
+      const body = await silverRes.text();
+      throw new Error(`فشل الاتصال بمصدر سعر الفضة العالمي - Status: ${silverRes.status} - ${body}`);
+    }
+    const silverData = await silverRes.json();
+    const ounce_usd = silverData.price ?? silverData.rate ?? silverData.value ?? null;
+    if (!ounce_usd) {
+      throw new Error('تعذر قراءة سعر الفضة من الاستجابة: ' + JSON.stringify(silverData));
     }
 
-    // عيار 720 و500 مش منشورين، فبنشتقهم من الفضة الخالصة (999)
-    const unitEgp = gramEgp[999] / SILVER_PURITY[999];
-    if (!gramEgp[720]) gramEgp[720] = unitEgp * SILVER_PURITY[720];
-    if (!gramEgp[500]) gramEgp[500] = unitEgp * SILVER_PURITY[500];
+    // سعر الدولار الرسمي من نفس مصدر الذهب (banklive.net)، مع قيمة احتياطية لو فشل السحب
+    let bank_usd_rate = 51.4;
+    if (goldPageRes.ok) {
+      const html = await goldPageRes.text();
+      const text = stripTags(html);
+      const rate = extractOne(text, 'USD (Bank)');
+      if (rate) bank_usd_rate = rate;
+    }
+
+    const gramUsd = ounce_usd / GRAMS_PER_OUNCE;
+    const gramEgp = gramUsd * bank_usd_rate;
 
     const silverPrices = {};
-    for (const carat of Object.keys(SILVER_PURITY)) {
-      const base = gramEgp[carat];
-      if (!base) continue;
+    for (const [carat, purity] of Object.entries(SILVER_PURITY)) {
+      const base = gramEgp * purity;
       silverPrices[carat] = {
         sell: Number((base * (1 + SPREAD)).toFixed(2)),
         buy: Number((base * (1 - SPREAD)).toFixed(2)),
       };
     }
 
-    const ounceMatch = text.match(/XAG\/USD\s*\$?\s*([\d,]+\.?\d*)/);
-    const ounce_usd = ounceMatch ? parseFloat(ounceMatch[1].replace(/,/g, '')) : null;
-
-    // كاش 10 دقايق - مصدر عام مجاني بدون حد طلبات
     res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=1200');
 
     return res.status(200).json({
-      source: 'banklive.net',
+      source: 'gold-api.com + banklive.net',
       ounce_usd,
+      bank_usd_rate,
       silverPrices,
       updated_at: new Date().toISOString(),
     });
