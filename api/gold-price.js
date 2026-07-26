@@ -2,15 +2,18 @@
 // يجيب أسعار الذهب اللحظية الفعلية من banklive.net (متابعة مستمرة لأسعار محلات الذهب في مصر)
 // مصدر مجاني بدون مفتاح API وبدون حد شهري للطلبات
 
-function stripTags(html) {
+function stripTagsKeepPercent(html) {
   return html
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
     .replace(/<style[\s\S]*?<\/style>/gi, ' ')
     .replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/g, ' ')
     .replace(/&amp;/g, '&')
-    .replace(/[-+]?\d+(?:\.\d+)?%/g, ' ') // شيل نسب التغيير زي "0.09%" أو "-1.2%" بالكامل عشان متتلخبطش مع الأسعار
     .replace(/\s+/g, ' ');
+}
+
+function stripPercents(text) {
+  return text.replace(/[-+]?\d+(?:\.\d+)?%/g, ' ').replace(/\s+/g, ' ');
 }
 
 // بيرجع أعلى وأقل رقم بعد التسمية (سعر البيع لك وسعر الشراء منك)
@@ -47,7 +50,8 @@ module.exports = async function handler(req, res) {
     if (!response.ok) throw new Error('تعذر الوصول لموقع banklive.net');
 
     const html = await response.text();
-    const text = stripTags(html);
+    const rawText = stripTagsKeepPercent(html);
+    const text = stripPercents(rawText);
 
     const k24 = extractPair(text, 'Gold 24 Karat');
     const k22 = extractPair(text, 'Gold 22 Karat');
@@ -85,6 +89,10 @@ module.exports = async function handler(req, res) {
     const ounceMatch = text.match(/XAU\/USD\s*\$?\s*([\d,]+\.?\d*)/);
     const ounce_usd = ounceMatch ? parseFloat(ounceMatch[1].replace(/,/g, '')) : null;
 
+    // نسبة تغيّر الأونصة اليومية (زي -0.003% أو +1.2%)
+    const changeMatch = rawText.match(/XAU\/USD\s*\$?\s*[\d,]+\.?\d*\s*([-+]?\d+\.?\d*)%/);
+    const ounce_change_percent = changeMatch ? parseFloat(changeMatch[1]) : null;
+
     // سعر الدولار الرسمي في البنوك (من نفس الصفحة)
     const bank_usd_rate = extractOne(text, 'USD (Bank)');
 
@@ -104,6 +112,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({
       source: 'banklive.net',
       ounce_usd,
+      ounce_change_percent,
       pound: pound || null,
       caratPrices,
       bank_usd_rate,
