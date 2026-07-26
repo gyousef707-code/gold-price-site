@@ -432,6 +432,17 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     border: 2px solid var(--gold-primary);
     box-shadow: 0 0 16px rgba(227,179,65,0.12);
 }
+.clickable-card {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+.clickable-card:active {
+    transform: translateY(0) scale(0.97);
+}
+.clickable-card:focus-visible {
+    outline: 2px solid var(--gold-primary);
+    outline-offset: 2px;
+}
 .gold-card-badge {
     position: absolute;
     top: 6px;
@@ -2314,7 +2325,7 @@ function calculateSilver() {
     let pricePerGram = silverPrices[carat][type];
     let total = weight * pricePerGram;
     if (currency === 'usd') {
-        total = total / 51.40;
+        total = total / currencyRates.usd;
         document.getElementById('calc-silver-result').textContent = total.toFixed(2);
         document.querySelector('#section-silver .calc-result-unit').textContent = 'دولار امريكي';
     } else {
@@ -2340,7 +2351,7 @@ function calculateToolGold() {
     let pricePerGram = caratPrices[carat][type];
     let total = weight * pricePerGram;
     if (currency === 'usd') {
-        total = total / 51.40;
+        total = total / currencyRates.usd;
         document.getElementById('tool-gold-result').textContent = total.toFixed(2);
         document.querySelector('#tool-gold-calc .calc-result-unit').textContent = 'دولار امريكي';
     } else {
@@ -2357,7 +2368,7 @@ function calculateToolSilver() {
     let pricePerGram = silverPrices[carat][type];
     let total = weight * pricePerGram;
     if (currency === 'usd') {
-        total = total / 51.40;
+        total = total / currencyRates.usd;
         document.getElementById('tool-silver-result').textContent = total.toFixed(2);
         document.querySelector('#tool-silver-calc .calc-result-unit').textContent = 'دولار امريكي';
     } else {
@@ -2515,15 +2526,84 @@ async function fetchSilverPrices() {
     }
 }
 
+// ====== أسعار العملات اللايف من banklive.net ======
+async function fetchCurrencyPrices() {
+    try {
+        const res = await fetch('/api/currency-price');
+        if (!res.ok) throw new Error('currency API error: ' + res.status);
+        const data = await res.json();
+        if (!data.rates) throw new Error('بيانات عملات ناقصة من الـ API');
+
+        // تحديث currencyRates (المستخدم في أداة التحويل) بسعر الـ mid
+        for (const [code, r] of Object.entries(data.rates)) {
+            if (typeof r.mid === 'number') currencyRates[code] = r.mid;
+        }
+        calculateConverter();
+
+        // تحديث كروت "سعر صرف العملات بالجنيه المصري"
+        document.querySelectorAll('#section-currencies .currency-card-new').forEach(card => {
+            const codeEl = card.querySelector('.currency-card-code');
+            const buyEl = card.querySelector('.currency-card-price-value.buy');
+            const sellEl = card.querySelector('.currency-card-price-value.sell');
+            if (!codeEl || !buyEl || !sellEl) return;
+            const code = codeEl.textContent.trim().toLowerCase();
+            if (data.rates[code]) {
+                buyEl.textContent = data.rates[code].buy.toFixed(2);
+                sellEl.textContent = data.rates[code].sell.toFixed(2);
+            }
+        });
+    } catch (err) {
+        console.warn('تعذر تحميل أسعار العملات، هيتم استخدام الأسعار الاحتياطية:', err.message);
+    }
+}
+
 function fetchLivePrices() {
     fetchGoldPrices();
     fetchSilverPrices();
+    fetchCurrencyPrices();
 }
 
 fetchLivePrices();
 setInterval(fetchGoldPrices, 10 * 60 * 1000);        // الذهب: كل 10 دقايق (مصدر مجاني بدون حد طلبات)
 setInterval(fetchSilverPrices, 8 * 60 * 60 * 1000);   // الفضة: كل 8 ساعات (يحافظ على حصة GoldAPI الشهرية)
+setInterval(fetchCurrencyPrices, 30 * 60 * 1000);     // العملات: كل 30 دقيقة
 document.getElementById('refresh-btn')?.addEventListener('click', fetchLivePrices);
+
+// ====== الضغط على كارت ذهب/فضة ينقلك لأداة الحاسبة بنفس العيار ======
+function goToCalculator(kind, carat) {
+    switchTab('tools');
+    switchTool(kind + '-calc');
+    const caratSelect = document.getElementById('tool-' + kind + '-carat');
+    if (caratSelect && [...caratSelect.options].some(o => o.value === carat)) {
+        caratSelect.value = carat;
+    }
+    if (kind === 'gold') calculateToolGold(); else calculateToolSilver();
+}
+
+document.querySelectorAll('#section-prices .gold-card').forEach(card => {
+    const caratEl = card.querySelector('.gold-carat-num');
+    if (!caratEl || !caratPrices[caratEl.textContent.trim()]) return; // يستبعد كارت "الجنيه ذهب"
+    card.classList.add('clickable-card');
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('title', 'اضغط لحساب قيمة عيار ' + caratEl.textContent.trim() + ' في الحاسبة');
+    const go = () => goToCalculator('gold', caratEl.textContent.trim());
+    card.addEventListener('click', go);
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+});
+
+document.querySelectorAll('#section-silver .silver-card').forEach(card => {
+    const caratEl = card.querySelector('.silver-carat-num');
+    if (!caratEl || !silverPrices[caratEl.textContent.trim()]) return;
+    card.classList.add('clickable-card');
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('title', 'اضغط لحساب قيمة عيار ' + caratEl.textContent.trim() + ' في الحاسبة');
+    const go = () => goToCalculator('silver', caratEl.textContent.trim());
+    card.addEventListener('click', go);
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+});
+
 </script>
 
 </body>
