@@ -1442,13 +1442,13 @@ body.light-mode .swap-btn { background: #f3f4f6; }
         <div class="section-title-bar"><h2><i class="fa-solid fa-chart-pie"></i> مؤشر الفجوة السعرية (24)</h2></div>
         <div class="gap-card-container">
             <div class="dollar-side-boxes">
-                <div class="mini-dollar-box"><span class="md-title">دولار الصاغة</span><span class="md-val">52.40</span></div>
-                <div class="mini-dollar-box"><span class="md-title">دولار البنك</span><span class="md-val">51.34</span></div>
+                <div class="mini-dollar-box"><span class="md-title">دولار الصاغة</span><span class="md-val" id="mini-dollar-sagha">52.40</span></div>
+                <div class="mini-dollar-box"><span class="md-title">دولار البنك</span><span class="md-val" id="mini-dollar-bank">51.34</span></div>
             </div>
             <div class="gap-circle-badge">
                 <div class="gap-circle-inner">
                     <span class="gap-label-top">قيمة الفجوة</span>
-                    <span class="gap-number">137.3</span>
+                    <span class="gap-number" id="gap-value-number">137.3</span>
                     <span class="gap-unit">ج.م</span>
                 </div>
             </div>
@@ -2457,6 +2457,20 @@ async function fetchGoldPrices() {
         const ouncePriceEl = document.querySelector('#section-prices .ounce-price');
         if (ouncePriceEl && typeof data.ounce_usd === 'number') {
             ouncePriceEl.textContent = '$' + data.ounce_usd.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        // تحديث قسم "دولار الصاغة / دولار البنك / قيمة الفجوة"
+        const saghaEl = document.getElementById('mini-dollar-sagha');
+        const bankEl = document.getElementById('mini-dollar-bank');
+        const gapEl = document.getElementById('gap-value-number');
+        if (saghaEl && typeof data.implied_usd_rate === 'number') {
+            saghaEl.textContent = data.implied_usd_rate.toFixed(2);
+        }
+        if (bankEl && typeof data.bank_usd_rate === 'number') {
+            bankEl.textContent = data.bank_usd_rate.toFixed(2);
+        }
+        if (gapEl && typeof data.gap_value === 'number') {
+            gapEl.textContent = Math.abs(data.gap_value).toFixed(1);
         }
 
         calculateToolGold();
