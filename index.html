@@ -434,6 +434,37 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     50% { opacity: 0.5; box-shadow: 0 0 0 8px rgba(63,185,80,0); }
 }
 
+/* ====== علامة حالة السوق: مفتوح / مغلق ====== */
+.market-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+.market-status-badge.open {
+    background: rgba(63,185,80,0.12);
+    color: var(--success);
+}
+.market-status-badge.closed {
+    background: rgba(139,148,158,0.15);
+    color: var(--text-muted);
+}
+.market-status-dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+}
+.market-status-badge.open .market-status-dot {
+    background: var(--success);
+    animation: pulse-live 1.8s infinite;
+}
+.market-status-badge.closed .market-status-dot {
+    background: var(--text-muted);
+}
+
 /* ====== GOLD CARDS - VERTICAL ====== */
 .gold-cards-grid {
     display: grid;
@@ -1415,12 +1446,13 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
     <section class="global-ounce-section">
         <div class="ounce-card clickable-card" style="padding: 12px;" onclick="document.getElementById('tradingview-gold').scrollIntoView({behavior:'smooth', block:'start'})" role="button" tabindex="0" title="اضغط لعرض الرسم البياني">
             <div class="ounce-header">
-                <span class="badge-change negative">&#9660; 2.05%</span>
+                <span class="badge-change negative" id="gold-ounce-change">&#9660; 2.05%</span>
                 <span>XAU/USD - سعر الاونصة العالمية</span>
             </div>
             <div class="ounce-price" style="font-size: 26px; margin: 4px 0;">$4,048.67</div>
             <div class="ounce-footer">
                 <span class="live-pulse"><span class="update-dot"></span> مباشر</span>
+                <span class="market-status-badge" id="gold-market-status"></span>
                 <span>دولار امريكي</span>
                 <span class="updated-time-badge" id="gold-updated-time"></span>
             </div>
@@ -1942,7 +1974,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
     <div class="ounce-card clickable-card" style="margin-bottom:14px; padding: 12px;" onclick="document.getElementById('tradingview-silver').scrollIntoView({behavior:'smooth', block:'start'})" role="button" tabindex="0" title="اضغط لعرض الرسم البياني">
         <div class="ounce-header"><span class="badge-change positive">&#9650; 1.24%</span><span>XAG/USD - اونصة الفضة العالمية</span></div>
         <div class="ounce-price" id="silver-ounce-price" style="font-size:22px; margin: 4px 0;">$32.45</div>
-        <div class="ounce-footer"><span class="live-pulse"><span class="update-dot"></span> مباشر</span><span>دولار امريكي</span><span class="updated-time-badge" id="silver-updated-time"></span></div>
+        <div class="ounce-footer"><span class="live-pulse"><span class="update-dot"></span> مباشر</span><span class="market-status-badge" id="silver-market-status"></span><span>دولار امريكي</span><span class="updated-time-badge" id="silver-updated-time"></span></div>
     </div>
 
     <div class="silver-cards-grid">
@@ -2627,6 +2659,14 @@ async function fetchGoldPrices() {
             ouncePriceEl.textContent = '$' + data.ounce_usd.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
         }
 
+        const ounceChangeEl = document.getElementById('gold-ounce-change');
+        if (ounceChangeEl && typeof data.ounce_change_percent === 'number') {
+            const pct = data.ounce_change_percent;
+            const isNeg = pct < 0;
+            ounceChangeEl.className = 'badge-change ' + (isNeg ? 'negative' : 'positive');
+            ounceChangeEl.innerHTML = (isNeg ? '&#9660; ' : '&#9650; ') + Math.abs(pct).toFixed(2) + '%';
+        }
+
         // تحديث قسم "دولار الصاغة / دولار البنك / قيمة الفجوة"
         const saghaEl = document.getElementById('mini-dollar-sagha');
         const bankEl = document.getElementById('mini-dollar-bank');
@@ -2962,6 +3002,30 @@ function updateTimeBadges() {
     if (silverBadge && lastUpdateTimes.silver) silverBadge.textContent = relativeTimeAr(lastUpdateTimes.silver);
 }
 setInterval(updateTimeBadges, 30 * 1000);
+
+// ====== حالة السوق العالمي: مفتوح / مغلق ======
+// السوق العالمي (فوركس/معادن) بيقفل من الجمعة بعد الساعة 12 صباحًا (تقريبًا) لحد الأحد الساعة 1 صباحًا بتوقيت القاهرة
+function isMarketOpen() {
+    const cairoStr = new Date().toLocaleString('en-US', { timeZone: 'Africa/Cairo', hour12: false });
+    const cairoDate = new Date(cairoStr);
+    const day = cairoDate.getDay(); // 0 = الأحد ... 6 = السبت
+    const hour = cairoDate.getHours();
+    if (day === 6) return false; // السبت طول اليوم مغلق
+    if (day === 0 && hour < 1) return false; // الأحد قبل الساعة 1 صباحًا لسه مغلق
+    return true;
+}
+function updateMarketStatus() {
+    const open = isMarketOpen();
+    const label = open ? 'السوق مفتوح' : 'السوق مغلق';
+    ['gold-market-status', 'silver-market-status'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.className = 'market-status-badge ' + (open ? 'open' : 'closed');
+        el.innerHTML = '<span class="market-status-dot"></span>' + label;
+    });
+}
+updateMarketStatus();
+setInterval(updateMarketStatus, 60 * 1000);
 
 renderNotifications();
 document.querySelector('.drawer-item[onclick*="notifications"]')?.addEventListener('click', () => setTimeout(markNotificationsRead, 800));
