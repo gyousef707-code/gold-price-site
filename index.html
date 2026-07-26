@@ -374,6 +374,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     letter-spacing: -1px;
     position: relative;
     z-index: 1;
+    font-variant-numeric: tabular-nums;
 }
 .ounce-footer {
     font-size: 12px;
@@ -384,6 +385,32 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     position: relative;
     z-index: 1;
 }
+.updated-time-badge {
+    margin-inline-start: auto;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+.updated-time-badge:not(:empty)::before {
+    content: "\f017";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    margin-inline-end: 4px;
+    opacity: 0.7;
+}
+.carat-change-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 8px;
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+}
+.carat-change-badge:empty { display: none; }
+.carat-change-badge.up { color: var(--success); background: rgba(63,185,80,0.12); }
+.carat-change-badge.down { color: var(--danger); background: rgba(248,81,73,0.12); }
+.carat-change-badge.flat { color: var(--text-muted); background: rgba(139,148,158,0.12); }
 .live-pulse {
     display: inline-flex;
     align-items: center;
@@ -460,6 +487,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     font-size: 18px;
     margin-bottom: 4px;
     opacity: 0.85;
+    color: var(--gold-primary);
 }
 .gold-carat-wrap {
     display: flex;
@@ -964,6 +992,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     font-size: 18px;
     margin-bottom: 4px;
     opacity: 0.85;
+    color: #c9d1d9;
 }
 .silver-carat-wrap {
     display: flex;
@@ -1084,6 +1113,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     transition: 0.3s;
 }
 .news-item:hover { border-color: var(--border-gold); }
+a.news-item { display: block; text-decoration: none; cursor: pointer; }
 .news-time {
     font-size: 10px;
     color: var(--gold-primary);
@@ -1171,6 +1201,61 @@ body.light-mode .swap-btn { background: #f3f4f6; }
 .contact-card a:hover {
     text-decoration: underline;
 }
+.policy-text { text-align: right; }
+.policy-text h3 {
+    font-size: 14px;
+    color: var(--gold-primary);
+    margin: 14px 0 6px;
+}
+.policy-text p {
+    font-size: 13px;
+    line-height: 1.9;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+.theme-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.theme-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card-bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: var(--text-color);
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.theme-option i { font-size: 17px; color: var(--text-muted); width: 20px; }
+.theme-option.active {
+    border-color: var(--gold-primary);
+    background: rgba(227,179,65,0.08);
+}
+.theme-option.active i { color: var(--gold-primary); }
+.theme-option.active::after {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    margin-inline-start: auto;
+    color: var(--gold-primary);
+    font-size: 13px;
+}
+.star-rating {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    font-size: 30px;
+    color: var(--text-muted);
+}
+.star-rating i { cursor: pointer; transition: transform 0.15s ease, color 0.15s ease; }
+.star-rating i:hover { transform: scale(1.15); }
+.star-rating i.filled { color: var(--gold-primary); }
 
 /* EFFECTS */
 .glow-effect { animation: glow 2.5s infinite alternate; }
@@ -1310,13 +1395,15 @@ body.light-mode .swap-btn { background: #f3f4f6; }
         <button class="drawer-close" id="drawer-close"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="drawer-body">
-        <button class="drawer-item" onclick="switchTab('prices')"><i class="fa-solid fa-chart-line"></i><span>الاسعار</span></button>
-        <button class="drawer-item" onclick="switchTab('currencies')"><i class="fa-solid fa-money-bill-transfer"></i><span>العملات</span></button>
-        <button class="drawer-item" onclick="switchTab('silver')"><i class="fa-solid fa-gem"></i><span>الفضة</span></button>
-        <button class="drawer-item" onclick="switchTab('tools')"><i class="fa-solid fa-toolbox"></i><span>الادوات</span></button>
+        <button class="drawer-item" onclick="switchTab('notifications')"><i class="fa-solid fa-bell"></i><span>الاشعارات</span><span class="badge-count" id="notif-badge-count" style="display:none;">0</span></button>
         <div class="drawer-divider"></div>
-        <button class="drawer-item" onclick="switchTab('notifications')"><i class="fa-solid fa-bell"></i><span>الاشعارات</span><span class="badge-count">3</span></button>
+        <button class="drawer-item" onclick="switchTab('settings')"><i class="fa-solid fa-gear"></i><span>الاعدادات</span></button>
+        <button class="drawer-item" id="drawer-share-btn"><i class="fa-solid fa-share-nodes"></i><span>مشاركة التطبيق</span></button>
+        <button class="drawer-item" onclick="switchTab('rate')"><i class="fa-solid fa-star"></i><span>قيّم التطبيق وادعمنا</span></button>
         <button class="drawer-item" onclick="switchTab('contact')"><i class="fa-solid fa-envelope"></i><span>اتصل بنا</span></button>
+        <div class="drawer-divider"></div>
+        <button class="drawer-item" onclick="switchTab('privacy')"><i class="fa-solid fa-shield-halved"></i><span>سياسة الخصوصية</span></button>
+        <button class="drawer-item" onclick="switchTab('disclaimer')"><i class="fa-solid fa-triangle-exclamation"></i><span>اخلاء المسؤولية</span></button>
     </div>
     <div class="drawer-footer">ذهبي v2.0 - جميع الاسعار محدثة</div>
 </div>
@@ -1326,7 +1413,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
 <!-- ====== PRICES SECTION ====== -->
 <div class="section active" id="section-prices">
     <section class="global-ounce-section">
-        <div class="ounce-card" style="padding: 12px;">
+        <div class="ounce-card clickable-card" style="padding: 12px;" onclick="document.getElementById('tradingview-gold').scrollIntoView({behavior:'smooth', block:'start'})" role="button" tabindex="0" title="اضغط لعرض الرسم البياني">
             <div class="ounce-header">
                 <span class="badge-change negative">&#9660; 2.05%</span>
                 <span>XAU/USD - سعر الاونصة العالمية</span>
@@ -1335,6 +1422,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
             <div class="ounce-footer">
                 <span class="live-pulse"><span class="update-dot"></span> مباشر</span>
                 <span>دولار امريكي</span>
+                <span class="updated-time-badge" id="gold-updated-time"></span>
             </div>
         </div>
     </section>
@@ -1342,10 +1430,11 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     <section class="carats-unified-section">
         <div class="gold-cards-grid">
             <div class="gold-card featured">
-                <div class="gold-card-icon-top">&#129689;</div>
+                <div class="gold-card-icon-top"><i class="fa-solid fa-coins"></i></div>
                 <div class="gold-carat-wrap">
                     <span class="gold-carat-label">عيار</span>
                     <span class="gold-carat-num">24</span>
+                    <span class="carat-change-badge" data-metal="gold" data-carat="24"></span>
                 </div>
                 <div class="gold-v-row">
                     <span class="gold-v-label">البيع لك</span>
@@ -1357,10 +1446,11 @@ body.light-mode .swap-btn { background: #f3f4f6; }
                 </div>
             </div>
             <div class="gold-card">
-                <div class="gold-card-icon-top">&#129689;</div>
+                <div class="gold-card-icon-top"><i class="fa-solid fa-coins"></i></div>
                 <div class="gold-carat-wrap">
                     <span class="gold-carat-label">عيار</span>
                     <span class="gold-carat-num">22</span>
+                    <span class="carat-change-badge" data-metal="gold" data-carat="22"></span>
                 </div>
                 <div class="gold-v-row">
                     <span class="gold-v-label">البيع لك</span>
@@ -1372,10 +1462,11 @@ body.light-mode .swap-btn { background: #f3f4f6; }
                 </div>
             </div>
             <div class="gold-card">
-                <div class="gold-card-icon-top">&#129689;</div>
+                <div class="gold-card-icon-top"><i class="fa-solid fa-coins"></i></div>
                 <div class="gold-carat-wrap">
                     <span class="gold-carat-label">عيار</span>
                     <span class="gold-carat-num">21</span>
+                    <span class="carat-change-badge" data-metal="gold" data-carat="21"></span>
                 </div>
                 <div class="gold-v-row">
                     <span class="gold-v-label">البيع لك</span>
@@ -1387,10 +1478,11 @@ body.light-mode .swap-btn { background: #f3f4f6; }
                 </div>
             </div>
             <div class="gold-card">
-                <div class="gold-card-icon-top">&#129689;</div>
+                <div class="gold-card-icon-top"><i class="fa-solid fa-coins"></i></div>
                 <div class="gold-carat-wrap">
                     <span class="gold-carat-label">عيار</span>
                     <span class="gold-carat-num">18</span>
+                    <span class="carat-change-badge" data-metal="gold" data-carat="18"></span>
                 </div>
                 <div class="gold-v-row">
                     <span class="gold-v-label">البيع لك</span>
@@ -1402,10 +1494,11 @@ body.light-mode .swap-btn { background: #f3f4f6; }
                 </div>
             </div>
             <div class="gold-card">
-                <div class="gold-card-icon-top">&#129689;</div>
+                <div class="gold-card-icon-top"><i class="fa-solid fa-coins"></i></div>
                 <div class="gold-carat-wrap">
                     <span class="gold-carat-label">عيار</span>
                     <span class="gold-carat-num">14</span>
+                    <span class="carat-change-badge" data-metal="gold" data-carat="14"></span>
                 </div>
                 <div class="gold-v-row">
                     <span class="gold-v-label">البيع لك</span>
@@ -1417,10 +1510,11 @@ body.light-mode .swap-btn { background: #f3f4f6; }
                 </div>
             </div>
             <div class="gold-card">
-                <div class="gold-card-icon-top">&#129689;</div>
+                <div class="gold-card-icon-top"><i class="fa-solid fa-coins"></i></div>
                 <div class="gold-carat-wrap">
                     <span class="gold-carat-label">عيار</span>
                     <span class="gold-carat-num">12</span>
+                    <span class="carat-change-badge" data-metal="gold" data-carat="12"></span>
                 </div>
                 <div class="gold-v-row">
                     <span class="gold-v-label">البيع لك</span>
@@ -1431,11 +1525,12 @@ body.light-mode .swap-btn { background: #f3f4f6; }
                     <span class="gold-v-value buy-price">3,400</span>
                 </div>
             </div>
-            <div class="gold-card" style="border-color: rgba(227,179,65,0.4); grid-column: span 2;">
-                <div class="gold-card-icon-top">&#128176;</div>
+            <div class="gold-card" id="gold-pound-card" style="border-color: rgba(227,179,65,0.4); grid-column: span 2;">
+                <div class="gold-card-icon-top"><i class="fa-solid fa-sack-dollar"></i></div>
                 <div class="gold-carat-wrap" style="margin-bottom: 14px;">
                     <span class="gold-carat-label" style="font-size: 10px;">الجنيه</span>
                     <span class="gold-carat-num" style="font-size: 20px;">ذهب</span>
+                    <span class="carat-change-badge" data-metal="gold" data-carat="pound"></span>
                 </div>
                 <div class="gold-v-row" style="border-bottom: none; padding: 8px 0;">
                     <span class="gold-v-label">سعر الجنيه</span>
@@ -1492,10 +1587,10 @@ body.light-mode .swap-btn { background: #f3f4f6; }
 
     <section class="news-section">
         <div class="section-title-bar"><h2><i class="fa-solid fa-newspaper"></i> احدث الاخبار</h2></div>
-        <div class="news-list">
-            <article class="news-item"><span class="news-time">منذ 5 دقائق</span><h3>الذهب يتراجع دون 4100 دولار مع صعود الدولار الامريكي</h3><span class="news-source">Bloomberg</span></article>
-            <article class="news-item"><span class="news-time">منذ 15 دقيقة</span><h3>البنك المركزي المصري يثبت اسعار الفائدة في اجتماعه الاخير</h3><span class="news-source">Reuters</span></article>
+        <div class="news-list" id="news-list-preview">
+            <p style="color:var(--text-muted);font-size:13px;text-align:center;padding:10px 0;">جارِ تحميل الأخبار...</p>
         </div>
+        <button class="drawer-item" onclick="switchTab('news')" style="justify-content:center;margin-top:6px;"><i class="fa-solid fa-newspaper"></i><span>عرض كل الأخبار</span></button>
     </section>
 </div>
 
@@ -1844,18 +1939,19 @@ body.light-mode .swap-btn { background: #f3f4f6; }
 <div class="section" id="section-silver">
     <div class="section-title-bar" style="margin-bottom:14px;"><h2><i class="fa-solid fa-gem"></i> اسعار الفضة</h2></div>
 
-    <div class="ounce-card" style="margin-bottom:14px; padding: 12px;">
+    <div class="ounce-card clickable-card" style="margin-bottom:14px; padding: 12px;" onclick="document.getElementById('tradingview-silver').scrollIntoView({behavior:'smooth', block:'start'})" role="button" tabindex="0" title="اضغط لعرض الرسم البياني">
         <div class="ounce-header"><span class="badge-change positive">&#9650; 1.24%</span><span>XAG/USD - اونصة الفضة العالمية</span></div>
         <div class="ounce-price" id="silver-ounce-price" style="font-size:22px; margin: 4px 0;">$32.45</div>
-        <div class="ounce-footer"><span class="live-pulse"><span class="update-dot"></span> مباشر</span><span>دولار امريكي</span></div>
+        <div class="ounce-footer"><span class="live-pulse"><span class="update-dot"></span> مباشر</span><span>دولار امريكي</span><span class="updated-time-badge" id="silver-updated-time"></span></div>
     </div>
 
     <div class="silver-cards-grid">
         <div class="silver-card">
-            <div class="silver-card-icon-top">&#129352;</div>
+            <div class="silver-card-icon-top"><i class="fa-solid fa-gem"></i></div>
             <div class="silver-carat-wrap">
                 <span class="silver-carat-label">عيار</span>
                 <span class="silver-carat-num">999</span>
+                <span class="carat-change-badge" data-metal="silver" data-carat="999"></span>
             </div>
             <div class="silver-v-row">
                 <span class="silver-v-label">البيع لك</span>
@@ -1867,10 +1963,11 @@ body.light-mode .swap-btn { background: #f3f4f6; }
             </div>
         </div>
         <div class="silver-card">
-            <div class="silver-card-icon-top">&#129352;</div>
+            <div class="silver-card-icon-top"><i class="fa-solid fa-gem"></i></div>
             <div class="silver-carat-wrap">
                 <span class="silver-carat-label">عيار</span>
                 <span class="silver-carat-num">925</span>
+                <span class="carat-change-badge" data-metal="silver" data-carat="925"></span>
             </div>
             <div class="silver-v-row">
                 <span class="silver-v-label">البيع لك</span>
@@ -1882,10 +1979,11 @@ body.light-mode .swap-btn { background: #f3f4f6; }
             </div>
         </div>
         <div class="silver-card">
-            <div class="silver-card-icon-top">&#129352;</div>
+            <div class="silver-card-icon-top"><i class="fa-solid fa-gem"></i></div>
             <div class="silver-carat-wrap">
                 <span class="silver-carat-label">عيار</span>
                 <span class="silver-carat-num">900</span>
+                <span class="carat-change-badge" data-metal="silver" data-carat="900"></span>
             </div>
             <div class="silver-v-row">
                 <span class="silver-v-label">البيع لك</span>
@@ -1897,10 +1995,11 @@ body.light-mode .swap-btn { background: #f3f4f6; }
             </div>
         </div>
         <div class="silver-card">
-            <div class="silver-card-icon-top">&#129352;</div>
+            <div class="silver-card-icon-top"><i class="fa-solid fa-gem"></i></div>
             <div class="silver-carat-wrap">
                 <span class="silver-carat-label">عيار</span>
                 <span class="silver-carat-num">800</span>
+                <span class="carat-change-badge" data-metal="silver" data-carat="800"></span>
             </div>
             <div class="silver-v-row">
                 <span class="silver-v-label">البيع لك</span>
@@ -1912,10 +2011,11 @@ body.light-mode .swap-btn { background: #f3f4f6; }
             </div>
         </div>
         <div class="silver-card">
-            <div class="silver-card-icon-top">&#129352;</div>
+            <div class="silver-card-icon-top"><i class="fa-solid fa-gem"></i></div>
             <div class="silver-carat-wrap">
                 <span class="silver-carat-label">عيار</span>
                 <span class="silver-carat-num">720</span>
+                <span class="carat-change-badge" data-metal="silver" data-carat="720"></span>
             </div>
             <div class="silver-v-row">
                 <span class="silver-v-label">البيع لك</span>
@@ -1927,10 +2027,11 @@ body.light-mode .swap-btn { background: #f3f4f6; }
             </div>
         </div>
         <div class="silver-card">
-            <div class="silver-card-icon-top">&#129352;</div>
+            <div class="silver-card-icon-top"><i class="fa-solid fa-gem"></i></div>
             <div class="silver-carat-wrap">
                 <span class="silver-carat-label">عيار</span>
                 <span class="silver-carat-num">500</span>
+                <span class="carat-change-badge" data-metal="silver" data-carat="500"></span>
             </div>
             <div class="silver-v-row">
                 <span class="silver-v-label">البيع لك</span>
@@ -2160,11 +2261,8 @@ body.light-mode .swap-btn { background: #f3f4f6; }
 <!-- ====== NEWS SECTION ====== -->
 <div class="section" id="section-news">
     <div class="section-title-bar" style="margin-bottom:14px;"><h2><i class="fa-solid fa-newspaper"></i> الاخبار</h2></div>
-    <div class="news-list">
-        <article class="news-item"><span class="news-time">منذ 5 دقائق</span><h3>الذهب يتراجع دون 4100 دولار مع صعود الدولار الامريكي</h3><span class="news-source">Bloomberg</span></article>
-        <article class="news-item"><span class="news-time">منذ 15 دقيقة</span><h3>البنك المركزي المصري يثبت اسعار الفائدة في اجتماعه الاخير</h3><span class="news-source">Reuters</span></article>
-        <article class="news-item"><span class="news-time">منذ ساعة</span><h3>الطلب على الذهب في مصر يرتفع بنسبة 15% خلال الربع الثاني</h3><span class="news-source">World Gold Council</span></article>
-        <article class="news-item"><span class="news-time">منذ 3 ساعات</span><h3>تراجع مؤشر الدولار الامريكي لأدنى مستوى في اسبوعين</h3><span class="news-source">CNBC</span></article>
+    <div class="news-list" id="news-list-full">
+        <p style="color:var(--text-muted);font-size:13px;text-align:center;padding:10px 0;">جارِ تحميل الأخبار...</p>
     </div>
 </div>
 
@@ -2187,6 +2285,69 @@ body.light-mode .swap-btn { background: #f3f4f6; }
         <h3>عن التطبيق</h3>
         <p>تطبيق ذهبي - وجهتك الاولى لمتابعة اسعار الذهب والفضة والعملات في مصر</p>
         <p style="margin-top:8px;font-size:11px;">الاصدار 2.0 - جميع الاسعار محدثة بشكل مستمر</p>
+    </div>
+</div>
+
+<!-- ====== SETTINGS SECTION ====== -->
+<div class="section" id="section-settings">
+    <div class="section-title-bar" style="margin-bottom:14px;"><h2><i class="fa-solid fa-gear"></i> الاعدادات</h2></div>
+    <div class="contact-card">
+        <h3 style="margin-bottom:12px;">مظهر التطبيق</h3>
+        <div class="theme-options">
+            <button class="theme-option" data-theme-mode="light"><i class="fa-solid fa-sun"></i><span>فاتح</span></button>
+            <button class="theme-option" data-theme-mode="dark"><i class="fa-solid fa-moon"></i><span>داكن</span></button>
+            <button class="theme-option" data-theme-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i><span>تلقائي (حسب النظام)</span></button>
+        </div>
+        <p style="margin-top:12px;font-size:12px;color:var(--text-muted);">وضع "تلقائي" بيغيّر مظهر التطبيق (فاتح/داكن) تبعًا لإعدادات نظام تشغيل جهازك مباشرة.</p>
+    </div>
+</div>
+
+<!-- ====== RATE SECTION ====== -->
+<div class="section" id="section-rate">
+    <div class="section-title-bar" style="margin-bottom:14px;"><h2><i class="fa-solid fa-star"></i> قيّم التطبيق وادعمنا</h2></div>
+    <div class="contact-card" style="text-align:center;">
+        <h3>رأيك بيهمنا</h3>
+        <p style="margin:8px 0 16px;">قيّم تجربتك مع تطبيق ذهبي، وشاركنا اقتراحاتك عشان نطوّره أكتر</p>
+        <div class="star-rating" id="star-rating">
+            <i class="fa-regular fa-star" data-star="1"></i>
+            <i class="fa-regular fa-star" data-star="2"></i>
+            <i class="fa-regular fa-star" data-star="3"></i>
+            <i class="fa-regular fa-star" data-star="4"></i>
+            <i class="fa-regular fa-star" data-star="5"></i>
+        </div>
+        <p id="rate-thanks-msg" style="margin-top:12px;color:var(--gold-primary);font-size:13px;display:none;">شكرًا لتقييمك! 🙏</p>
+        <button class="drawer-item" id="rate-share-btn" style="margin-top:16px;justify-content:center;"><i class="fa-solid fa-heart"></i><span>ادعمنا بمشاركة التطبيق مع أصدقائك</span></button>
+    </div>
+</div>
+
+<!-- ====== PRIVACY POLICY SECTION ====== -->
+<div class="section" id="section-privacy">
+    <div class="section-title-bar" style="margin-bottom:14px;"><h2><i class="fa-solid fa-shield-halved"></i> سياسة الخصوصية</h2></div>
+    <div class="contact-card policy-text">
+        <p>نحن في تطبيق "ذهبي" نحترم خصوصيتك، وده ملخص بسيط وواضح لطريقة تعاملنا مع بياناتك:</p>
+        <h3>البيانات اللي بنجمعها</h3>
+        <p>التطبيق ده متصفح ويب (Web App) ومش بيطلب منك تسجيل دخول أو أي بيانات شخصية زي الاسم أو رقم التليفون أو البريد الالكتروني عشان تستخدمه.</p>
+        <h3>التخزين على جهازك فقط</h3>
+        <p>بنستخدم خاصية التخزين المحلي في المتصفح (Local Storage) لحفظ تفضيل المظهر (فاتح/داكن) وآخر أسعار اطّلعت عليها، عشان نقدر نوريك التغيّر في الأسعار. البيانات دي بتفضل على جهازك بس ومحدش عندنا بيشوفها أو بيوصلها.</p>
+        <h3>مصادر الأسعار</h3>
+        <p>أسعار الذهب والفضة والعملات بتتجاب من مواقع عامة متاحة للجميع (زي banklive.net و gold-api.com) وبتتحدث بشكل دوري. احنا مش الجهة المصدرة للأسعار دي، واحنا بس بنعرضها بشكل منظم.</p>
+        <h3>التواصل معنا</h3>
+        <p>لو عندك أي سؤال يخص الخصوصية، تقدر تتواصل معانا على البريد الالكتروني الموجود في صفحة "اتصل بنا".</p>
+        <p style="margin-top:10px;font-size:11px;color:var(--text-muted);">آخر تحديث لسياسة الخصوصية: 2026</p>
+    </div>
+</div>
+
+<!-- ====== DISCLAIMER SECTION ====== -->
+<div class="section" id="section-disclaimer">
+    <div class="section-title-bar" style="margin-bottom:14px;"><h2><i class="fa-solid fa-triangle-exclamation"></i> اخلاء المسؤولية</h2></div>
+    <div class="contact-card policy-text">
+        <p>الأسعار المعروضة في تطبيق "ذهبي" (الذهب، الفضة، العملات) بغرض المعرفة والاسترشاد العام فقط، ومش نصيحة استثمارية أو مالية.</p>
+        <h3>مصدر الأسعار وتأخر التحديث</h3>
+        <p>الأسعار بتتجاب من مصادر خارجية عامة (banklive.net و gold-api.com) بشكل دوري، وممكن يحصل فرق بسيط أو تأخر في التحديث عن الأسعار الفعلية عند محل الصاغة أو البنك وقت الشراء أو البيع الفعلي.</p>
+        <h3>قبل أي عملية بيع أو شراء</h3>
+        <p>ننصحك دايمًا تتأكد من السعر الفعلي مباشرة من محل الصاغة أو البنك اللي هتتعامل معاه قبل اتخاذ أي قرار مالي.</p>
+        <h3>المسؤولية</h3>
+        <p>التطبيق ومطوّروه مش مسؤولين عن أي خسارة أو قرار مالي يتم بناءً على الأسعار المعروضة في التطبيق.</p>
     </div>
 </div>
 
@@ -2235,11 +2396,7 @@ drawerClose.addEventListener('click', closeDrawer);
 drawerOverlay.addEventListener('click', closeDrawer);
 
 const themeToggleBtn = document.getElementById('theme-toggle');
-themeToggleBtn.addEventListener('click', () => {
-    document.body.classList.toggle('light-mode');
-    const icon = themeToggleBtn.querySelector('i');
-    icon.className = document.body.classList.contains('light-mode') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-});
+// ملحوظة: منطق تبديل المظهر (فاتح/داكن/تلقائي) بيتحدد لاحقًا في نظام الأوضاع الثلاثة بآخر الملف
 
 const refreshBtn = document.getElementById('refresh-btn');
 refreshBtn.addEventListener('click', () => {
@@ -2487,6 +2644,10 @@ async function fetchGoldPrices() {
         calculateToolGold();
         calculateZakat();
         calculateGoldSavings();
+
+        trackPriceChanges('gold', { ...data.caratPrices, ...(data.pound ? { pound: data.pound } : {}) }, 'عيار');
+        lastUpdateTimes.gold = Date.now();
+        updateTimeBadges();
     } catch (err) {
         console.warn('تعذر تحميل أسعار الذهب من شعبة الذهب، هيتم استخدام الأسعار الاحتياطية:', err.message);
     }
@@ -2521,6 +2682,10 @@ async function fetchSilverPrices() {
         calculateSilver();
         calculateToolSilver();
         calculateSilverSavings();
+
+        trackPriceChanges('silver', data.silverPrices, 'عيار');
+        lastUpdateTimes.silver = Date.now();
+        updateTimeBadges();
     } catch (err) {
         console.warn('تعذر تحميل أسعار الفضة، هيتم استخدام الأسعار الاحتياطية:', err.message);
     }
@@ -2552,8 +2717,54 @@ async function fetchCurrencyPrices() {
                 sellEl.textContent = data.rates[code].sell.toFixed(2);
             }
         });
+
+        const currencyMids = {};
+        for (const [code, r] of Object.entries(data.rates)) {
+            if (code !== 'egp' && typeof r.mid === 'number') currencyMids[code.toUpperCase()] = r.mid;
+        }
+        trackPriceChanges('currency', currencyMids, 'سعر');
     } catch (err) {
         console.warn('تعذر تحميل أسعار العملات، هيتم استخدام الأسعار الاحتياطية:', err.message);
+    }
+}
+
+// ====== اخبار حقيقية من Google News RSS، بتتحدث تلقائي ======
+function renderNewsList(container, articles) {
+    if (!container) return;
+    container.innerHTML = '';
+    if (!articles.length) {
+        container.innerHTML = '<p style="color:var(--text-muted);font-size:13px;text-align:center;padding:10px 0;">تعذر تحميل الأخبار حاليًا</p>';
+        return;
+    }
+    articles.forEach(a => {
+        const el = document.createElement('a');
+        el.className = 'news-item';
+        el.href = a.link;
+        el.target = '_blank';
+        el.rel = 'noopener noreferrer';
+        const timeText = a.timestamp ? relativeTimeAr(a.timestamp) : '';
+        el.innerHTML = '<span class="news-time">' + timeText + '</span>' +
+            '<h3>' + a.title + '</h3>' +
+            '<span class="news-source">' + a.source + '</span>';
+        container.appendChild(el);
+    });
+}
+
+async function fetchNews() {
+    try {
+        const res = await fetch('/api/news');
+        if (!res.ok) throw new Error('news API error: ' + res.status);
+        const data = await res.json();
+        if (!data.articles) throw new Error('بيانات اخبار ناقصة من الـ API');
+
+        renderNewsList(document.getElementById('news-list-preview'), data.articles.slice(0, 4));
+        renderNewsList(document.getElementById('news-list-full'), data.articles);
+    } catch (err) {
+        console.warn('تعذر تحميل الأخبار:', err.message);
+        const preview = document.getElementById('news-list-preview');
+        const full = document.getElementById('news-list-full');
+        if (preview) preview.innerHTML = '<p style="color:var(--text-muted);font-size:13px;text-align:center;padding:10px 0;">تعذر تحميل الأخبار حاليًا</p>';
+        if (full) full.innerHTML = '<p style="color:var(--text-muted);font-size:13px;text-align:center;padding:10px 0;">تعذر تحميل الأخبار حاليًا</p>';
     }
 }
 
@@ -2561,12 +2772,14 @@ function fetchLivePrices() {
     fetchGoldPrices();
     fetchSilverPrices();
     fetchCurrencyPrices();
+    fetchNews();
 }
 
 fetchLivePrices();
 setInterval(fetchGoldPrices, 10 * 60 * 1000);        // الذهب: كل 10 دقايق (مصدر مجاني بدون حد طلبات)
 setInterval(fetchSilverPrices, 8 * 60 * 60 * 1000);   // الفضة: كل 8 ساعات (يحافظ على حصة GoldAPI الشهرية)
 setInterval(fetchCurrencyPrices, 30 * 60 * 1000);     // العملات: كل 30 دقيقة
+setInterval(fetchNews, 20 * 60 * 1000);               // الاخبار: كل 20 دقيقة
 document.getElementById('refresh-btn')?.addEventListener('click', fetchLivePrices);
 
 // ====== الضغط على كارت ذهب/فضة ينقلك لأداة الحاسبة بنفس العيار ======
@@ -2603,6 +2816,236 @@ document.querySelectorAll('#section-silver .silver-card').forEach(card => {
     card.addEventListener('click', go);
     card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
 });
+
+// جنيه الذهب = 8 جرام عيار 21 (المعيار المتعارف عليه في مصر) -> بيوديك للحاسبة بنفس القيمة دي
+const goldPoundCard = document.getElementById('gold-pound-card');
+if (goldPoundCard) {
+    goldPoundCard.classList.add('clickable-card');
+    goldPoundCard.setAttribute('role', 'button');
+    goldPoundCard.setAttribute('tabindex', '0');
+    goldPoundCard.setAttribute('title', 'اضغط لحساب قيمة الجنيه الذهب في الحاسبة');
+    const goPound = () => {
+        switchTab('tools');
+        switchTool('gold-calc');
+        const weightInput = document.getElementById('tool-gold-weight');
+        const caratSelect = document.getElementById('tool-gold-carat');
+        if (weightInput) weightInput.value = 8;
+        if (caratSelect) caratSelect.value = '21';
+        calculateToolGold();
+    };
+    goldPoundCard.addEventListener('click', goPound);
+    goldPoundCard.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goPound(); } });
+}
+
+// ====== تتبع تغيّر الأسعار محليًا (لعرض نسبة %التغير على كل كارت + توليد اشعارات حقيقية) ======
+const PRICE_HISTORY_KEY = 'dahaby_price_history_v1';
+const NOTIFICATIONS_KEY = 'dahaby_notifications_v1';
+
+function loadPriceHistory() {
+    try { return JSON.parse(localStorage.getItem(PRICE_HISTORY_KEY)) || {}; }
+    catch { return {}; }
+}
+function savePriceHistory(h) {
+    try { localStorage.setItem(PRICE_HISTORY_KEY, JSON.stringify(h)); } catch {}
+}
+function loadNotifications() {
+    try { return JSON.parse(localStorage.getItem(NOTIFICATIONS_KEY)) || []; }
+    catch { return []; }
+}
+function saveNotifications(list) {
+    try { localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(list.slice(0, 20))); } catch {}
+}
+
+function addNotification(iconClass, faIcon, title, desc) {
+    const list = loadNotifications();
+    list.unshift({ iconClass, faIcon, title, desc, time: Date.now(), read: false });
+    saveNotifications(list);
+    renderNotifications();
+}
+
+function renderNotifications() {
+    const container = document.getElementById('section-notifications');
+    if (!container) return;
+    const list = loadNotifications();
+    container.querySelectorAll('.notification-item').forEach(n => n.remove());
+    if (list.length === 0) {
+        const empty = document.createElement('p');
+        empty.style.cssText = 'color:var(--text-muted);font-size:13px;text-align:center;margin-top:20px;';
+        empty.textContent = 'مفيش اشعارات جديدة دلوقتي — هتظهر هنا أي تغيّرات مهمة في الأسعار أول بأول';
+        empty.className = 'notification-item';
+        container.appendChild(empty);
+    } else {
+        list.forEach(n => {
+            const el = document.createElement('div');
+            el.className = 'notification-item';
+            el.innerHTML = '<div class="notification-icon ' + n.iconClass + '"><i class="fa-solid ' + n.faIcon + '"></i></div>' +
+                '<div class="notification-content"><div class="notification-title">' + n.title + '</div>' +
+                '<div class="notification-desc">' + n.desc + '</div>' +
+                '<div class="notification-time">' + relativeTimeAr(n.time) + '</div></div>';
+            container.appendChild(el);
+        });
+    }
+    updateNotifBadge();
+}
+
+function updateNotifBadge() {
+    const list = loadNotifications();
+    const unread = list.filter(n => !n.read).length;
+    const badge = document.getElementById('notif-badge-count');
+    if (badge) {
+        if (unread > 0) { badge.style.display = ''; badge.textContent = unread; }
+        else { badge.style.display = 'none'; }
+    }
+}
+
+function markNotificationsRead() {
+    const list = loadNotifications();
+    list.forEach(n => n.read = true);
+    saveNotifications(list);
+    updateNotifBadge();
+}
+
+function relativeTimeAr(ts) {
+    const diffSec = Math.floor((Date.now() - ts) / 1000);
+    if (diffSec < 60) return 'الآن';
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return 'منذ ' + diffMin + ' دقيقة';
+    const diffHr = Math.floor(diffMin / 60);
+    if (diffHr < 24) return 'منذ ' + diffHr + ' ساعة';
+    const diffDay = Math.floor(diffHr / 24);
+    return 'منذ ' + diffDay + ' يوم';
+}
+
+// بيقارن الأسعار الجديدة بالمخزّنة قبل كده، ويحدّث بادچ % لكل عيار، ويولّد اشعار لو التغيّر كبير
+function trackPriceChanges(metal, priceMap, labelPrefix) {
+    const history = loadPriceHistory();
+    history[metal] = history[metal] || {};
+    for (const [key, val] of Object.entries(priceMap)) {
+        const sellPrice = typeof val === 'object' ? val.sell : val;
+        if (typeof sellPrice !== 'number') continue;
+        const prev = history[metal][key];
+        const badgeEl = document.querySelector('.carat-change-badge[data-metal="' + metal + '"][data-carat="' + key + '"]');
+        if (typeof prev === 'number' && prev > 0) {
+            const pct = ((sellPrice - prev) / prev) * 100;
+            if (badgeEl) {
+                if (Math.abs(pct) < 0.01) {
+                    badgeEl.textContent = '';
+                    badgeEl.className = 'carat-change-badge flat';
+                } else {
+                    const arrow = pct > 0 ? '▲' : '▼';
+                    badgeEl.textContent = arrow + ' ' + Math.abs(pct).toFixed(2) + '%';
+                    badgeEl.className = 'carat-change-badge ' + (pct > 0 ? 'up' : 'down');
+                }
+            }
+            if (Math.abs(pct) >= 0.15) {
+                const dir = pct > 0 ? 'ارتفع' : 'انخفض';
+                const itemLabel = key === 'pound' ? 'الجنيه الذهب' : (labelPrefix + ' ' + key);
+                addNotification(
+                    metal === 'gold' ? 'gold' : 'price-down',
+                    pct > 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down',
+                    'تغيّر سعر ' + itemLabel,
+                    itemLabel + ' ' + dir + ' إلى ' + sellPrice.toLocaleString() + ' جنيه'
+                );
+            }
+        }
+        history[metal][key] = sellPrice;
+    }
+    savePriceHistory(history);
+}
+
+// ====== عرض "آخر تحديث" بشكل نص حي (منذ X دقيقة) ======
+const lastUpdateTimes = { gold: null, silver: null };
+function updateTimeBadges() {
+    const goldBadge = document.getElementById('gold-updated-time');
+    if (goldBadge && lastUpdateTimes.gold) goldBadge.textContent = relativeTimeAr(lastUpdateTimes.gold);
+    const silverBadge = document.getElementById('silver-updated-time');
+    if (silverBadge && lastUpdateTimes.silver) silverBadge.textContent = relativeTimeAr(lastUpdateTimes.silver);
+}
+setInterval(updateTimeBadges, 30 * 1000);
+
+renderNotifications();
+document.querySelector('.drawer-item[onclick*="notifications"]')?.addEventListener('click', () => setTimeout(markNotificationsRead, 800));
+
+// ====== نظام المظهر: فاتح / داكن / تلقائي حسب النظام ======
+const THEME_KEY = 'dahaby_theme_mode';
+const systemDarkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+function applyThemeMode(mode) {
+    if (mode === 'auto') {
+        document.body.classList.toggle('light-mode', !systemDarkQuery.matches);
+    } else {
+        document.body.classList.toggle('light-mode', mode === 'light');
+    }
+    const icon = themeToggleBtn.querySelector('i');
+    icon.className = document.body.classList.contains('light-mode') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+    document.querySelectorAll('.theme-option').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.themeMode === mode);
+    });
+}
+function setThemeMode(mode) {
+    localStorage.setItem(THEME_KEY, mode);
+    applyThemeMode(mode);
+}
+document.querySelectorAll('.theme-option').forEach(btn => {
+    btn.addEventListener('click', () => setThemeMode(btn.dataset.themeMode));
+});
+systemDarkQuery.addEventListener('change', () => {
+    if (localStorage.getItem(THEME_KEY) === 'auto') applyThemeMode('auto');
+});
+setThemeMode(localStorage.getItem(THEME_KEY) || 'auto');
+
+// إلغاء زرار تبديل الوضع القديم اليدوي عشان محدث مع نظام الأوضاع الثلاثة
+themeToggleBtn.onclick = () => {
+    const current = localStorage.getItem(THEME_KEY) || 'auto';
+    const order = ['auto', 'dark', 'light'];
+    const next = order[(order.indexOf(current) + 1) % order.length];
+    setThemeMode(next);
+};
+
+// ====== تقييم التطبيق بالنجوم ======
+const RATING_KEY = 'dahaby_user_rating';
+function renderStars(rating) {
+    document.querySelectorAll('#star-rating i').forEach(star => {
+        const val = Number(star.dataset.star);
+        star.className = val <= rating ? 'fa-solid fa-star filled' : 'fa-regular fa-star';
+    });
+}
+document.querySelectorAll('#star-rating i').forEach(star => {
+    star.addEventListener('click', () => {
+        const val = Number(star.dataset.star);
+        localStorage.setItem(RATING_KEY, val);
+        renderStars(val);
+        const msg = document.getElementById('rate-thanks-msg');
+        if (msg) msg.style.display = 'block';
+    });
+});
+const savedRating = Number(localStorage.getItem(RATING_KEY) || 0);
+if (savedRating > 0) {
+    renderStars(savedRating);
+    const msg = document.getElementById('rate-thanks-msg');
+    if (msg) msg.style.display = 'block';
+}
+
+// ====== مشاركة التطبيق ======
+async function shareApp() {
+    const shareData = {
+        title: 'ذهبي - اسعار الذهب والفضة والعملات',
+        text: 'تابع اسعار الذهب والفضة والعملات لحظة بلحظة مع تطبيق ذهبي',
+        url: window.location.href,
+    };
+    try {
+        if (navigator.share) {
+            await navigator.share(shareData);
+        } else {
+            await navigator.clipboard.writeText(shareData.url);
+            alert('تم نسخ رابط التطبيق، تقدر تلصقه وتبعته لصحابك');
+        }
+    } catch (err) {
+        // المستخدم لغى المشاركة أو حصل خطأ - تجاهل بهدوء
+    }
+}
+document.getElementById('drawer-share-btn')?.addEventListener('click', shareApp);
+document.getElementById('rate-share-btn')?.addEventListener('click', shareApp);
 
 </script>
 
