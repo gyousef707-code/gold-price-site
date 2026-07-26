@@ -1448,7 +1448,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
             <div class="gap-circle-badge">
                 <div class="gap-circle-inner">
                     <span class="gap-label-top">قيمة الفجوة</span>
-                    <span class="gap-number" id="gap-value-number">137.3</span>
+                    <span class="gap-number" id="gap-value-number">1.24</span>
                     <span class="gap-unit">ج.م</span>
                 </div>
             </div>
@@ -1835,7 +1835,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
 
     <div class="ounce-card" style="margin-bottom:14px; padding: 12px;">
         <div class="ounce-header"><span class="badge-change positive">&#9650; 1.24%</span><span>XAG/USD - اونصة الفضة العالمية</span></div>
-        <div class="ounce-price" style="font-size:22px; margin: 4px 0;">$32.45</div>
+        <div class="ounce-price" id="silver-ounce-price" style="font-size:22px; margin: 4px 0;">$32.45</div>
         <div class="ounce-footer"><span class="live-pulse"><span class="update-dot"></span> مباشر</span><span>دولار امريكي</span></div>
     </div>
 
@@ -2470,7 +2470,7 @@ async function fetchGoldPrices() {
             bankEl.textContent = data.bank_usd_rate.toFixed(2);
         }
         if (gapEl && typeof data.gap_value === 'number') {
-            gapEl.textContent = Math.abs(data.gap_value).toFixed(1);
+            gapEl.textContent = Math.abs(data.gap_value).toFixed(2);
         }
 
         calculateToolGold();
@@ -2490,6 +2490,11 @@ async function fetchSilverPrices() {
         if (!data.silverPrices) throw new Error('بيانات فضة ناقصة من الـ API');
 
         Object.assign(silverPrices, data.silverPrices);
+
+        const silverOunceEl = document.getElementById('silver-ounce-price');
+        if (silverOunceEl && typeof data.ounce_usd === 'number') {
+            silverOunceEl.textContent = '$' + data.ounce_usd.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
 
         document.querySelectorAll('#section-silver .silver-card').forEach(card => {
             const caratEl = card.querySelector('.silver-carat-num');
