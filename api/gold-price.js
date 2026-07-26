@@ -26,6 +26,19 @@ function extractPair(text, label) {
   return { sell: Math.max(v1, v2), buy: Math.min(v1, v2) };
 }
 
+// بيرجع رقم واحد بعد التسمية (زي سعر الدولار في البنك)
+function extractOne(text, label) {
+  const idx = text.indexOf(label);
+  if (idx === -1) return null;
+  const after = text.slice(idx + label.length, idx + label.length + 60);
+  const nums = after.match(/[\d,]+\.?\d*/g);
+  if (!nums || nums.length < 1) return null;
+  const v = parseFloat(nums[0].replace(/,/g, ''));
+  return isNaN(v) ? null : v;
+}
+
+const GRAMS_PER_OUNCE = 31.1034768;
+
 module.exports = async function handler(req, res) {
   try {
     const response = await fetch('https://banklive.net/en/gold-price-today-in-egypt', {
@@ -72,6 +85,18 @@ module.exports = async function handler(req, res) {
     const ounceMatch = text.match(/XAU\/USD\s*\$?\s*([\d,]+\.?\d*)/);
     const ounce_usd = ounceMatch ? parseFloat(ounceMatch[1].replace(/,/g, '')) : null;
 
+    // سعر الدولار الرسمي في البنوك (من نفس الصفحة)
+    const bank_usd_rate = extractOne(text, 'USD (Bank)');
+
+    // "دولار الصاغة" = سعر الدولار الضمني المحسوب من سعر عيار 24 المحلي مقابل سعر الأونصة العالمية
+    let implied_usd_rate = null;
+    let gap_value = null;
+    if (ounce_usd && bank_usd_rate) {
+      const pureGramUsd = (ounce_usd / GRAMS_PER_OUNCE) * GOLD_PURITY[24];
+      implied_usd_rate = Number((k24.sell / pureGramUsd).toFixed(2));
+      gap_value = Number((k24.sell - bank_usd_rate * pureGramUsd).toFixed(1));
+    }
+
     // كاش 10 دقايق - مصدر عام مجاني بدون حد طلبات
     res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=1200');
 
@@ -80,6 +105,9 @@ module.exports = async function handler(req, res) {
       ounce_usd,
       pound: pound || null,
       caratPrices,
+      bank_usd_rate,
+      implied_usd_rate,
+      gap_value,
       updated_at: new Date().toISOString(),
     });
   } catch (err) {
