@@ -94,7 +94,8 @@ module.exports = async function handler(req, res) {
     if (ounce_usd && bank_usd_rate) {
       const pureGramUsd = (ounce_usd / GRAMS_PER_OUNCE) * GOLD_PURITY[24];
       implied_usd_rate = Number((k24.sell / pureGramUsd).toFixed(2));
-      gap_value = Number((k24.sell - bank_usd_rate * pureGramUsd).toFixed(1));
+      // قيمة الفجوة = الفرق المباشر بين دولار الصاغة (الضمني) ودولار البنك، بنفس وحدة الجنيه/دولار
+      gap_value = Number((implied_usd_rate - bank_usd_rate).toFixed(2));
     }
 
     // كاش 10 دقايق - مصدر عام مجاني بدون حد طلبات
