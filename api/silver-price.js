@@ -1,10 +1,7 @@
 // api/silver-price.js
-// الفضة مش منشورة عند الشعبة العامة للذهب، فبتفضل جايه من GoldAPI.io
-// المفتاح بيتقرأ من متغير بيئة على Vercel، مش مكتوب في الكود ولا ظاهر للفرونت اند
-
 const GRAMS_PER_OUNCE = 31.1034768;
 const SILVER_PURITY = { 999: 0.999, 925: 0.925, 900: 0.900, 800: 0.800, 720: 0.720, 500: 0.500 };
-const SPREAD = 0.0035; // هامش الفرق بين سعر البيع والشراء
+const SPREAD = 0.0035;
 
 module.exports = async function handler(req, res) {
   try {
@@ -16,7 +13,11 @@ module.exports = async function handler(req, res) {
     const response = await fetch('https://www.goldapi.io/api/XAG/USD', {
       headers: { 'x-access-token': apiKey, 'Content-Type': 'application/json' },
     });
-    if (!response.ok) throw new Error('فشل الاتصال بـ GoldAPI.io');
+
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`فشل الاتصال بـ GoldAPI.io - Status: ${response.status} - ${body}`);
+    }
 
     const data = await response.json();
 
@@ -33,7 +34,6 @@ module.exports = async function handler(req, res) {
       };
     }
 
-    // كاش 8 ساعات عشان نفضل جوه حد الـ 100 طلب/شهر بتاع الخطة المجانية
     res.setHeader('Cache-Control', 's-maxage=28800, stale-while-revalidate=3600');
 
     return res.status(200).json({
