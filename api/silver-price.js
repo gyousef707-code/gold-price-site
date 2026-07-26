@@ -34,7 +34,6 @@ module.exports = async function handler(req, res) {
     }
 
     // كاش 8 ساعات عشان نفضل جوه حد الـ 100 طلب/شهر بتاع الخطة المجانية
-    // (8 ساعات = حوالي 90 طلب في الشهر بدل آلاف لو كل زيارة بتعمل طلب جديد)
     res.setHeader('Cache-Control', 's-maxage=28800, stale-while-revalidate=3600');
 
     return res.status(200).json({
