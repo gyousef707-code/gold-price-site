@@ -12,15 +12,16 @@ function stripTags(html) {
     .replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/g, ' ')
     .replace(/&amp;/g, '&')
+    .replace(/[-+]?\d+(?:\.\d+)?%/g, ' ') // شيل نسب التغيير زي "0.09%" أو "-1.2%" بالكامل عشان متتلخبطش مع الأسعار
     .replace(/\s+/g, ' ');
 }
 
-// بيرجع أول رقم بعد التسمية (سعر الجرام بالجنيه)، متجاهل نسب التغيير %
+// بيرجع أول رقم بعد التسمية (سعر الجرام بالجنيه)
 function extractOne(text, label) {
   const idx = text.indexOf(label);
   if (idx === -1) return null;
   const after = text.slice(idx + label.length, idx + label.length + 150);
-  const nums = after.match(/[\d,]+\.?\d*(?!%)/g);
+  const nums = after.match(/[\d,]+\.?\d*/g);
   if (!nums || nums.length < 1) return null;
   const v = parseFloat(nums[0].replace(/,/g, ''));
   return isNaN(v) ? null : v;
