@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gold-app-v1';
+const CACHE_NAME = 'gold-app-v2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -7,11 +7,18 @@ const urlsToCache = [
   '/manifest.json',
   '/icons/icon-16.png',
   '/icons/icon-32.png',
+  '/icons/icon-48.png',
+  '/icons/icon-72.png',
   '/icons/icon-96.png',
+  '/icons/icon-128.png',
+  '/icons/icon-144.png',
+  '/icons/icon-152.png',
+  '/icons/icon-180.png',
   '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  '/icons/icon-512.png',
+  '/icons/icon-mask-192.png',
+  '/icons/icon-mask-512.png'
 ];
-
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -19,7 +26,6 @@ self.addEventListener('install', event => {
   );
   self.skipWaiting();
 });
-
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
@@ -29,7 +35,6 @@ self.addEventListener('fetch', event => {
       })
   );
 });
-
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
