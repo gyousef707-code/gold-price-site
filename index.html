@@ -389,6 +389,16 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     position: relative;
     z-index: 1;
 }
+@keyframes tickUpFlash {
+    0% { color: var(--success); text-shadow: 0 0 12px rgba(63,185,80,0.6); }
+    100% { color: var(--gold-bright); text-shadow: none; }
+}
+@keyframes tickDownFlash {
+    0% { color: var(--danger); text-shadow: 0 0 12px rgba(248,81,73,0.6); }
+    100% { color: var(--gold-bright); text-shadow: none; }
+}
+.ounce-price.tick-up { animation: tickUpFlash 1s ease; }
+.ounce-price.tick-down { animation: tickDownFlash 1s ease; }
 .updated-time-badge {
     margin-inline-start: auto;
     font-size: 11px;
@@ -533,7 +543,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     direction: rtl;
 }
 .gold-carat-num {
-    font-size: 26px;
+    font-size: 29px;
     font-weight: 800;
     background: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-bright) 50%, var(--gold-dark) 100%);
     -webkit-background-clip: text;
@@ -560,7 +570,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     margin-bottom: 2px;
 }
 .gold-v-value {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 800;
 }
 .sell-price { color: var(--success); }
@@ -952,7 +962,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     min-width: 0;
 }
 .currency-card-name {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--text-color);
     line-height: 1.3;
@@ -995,7 +1005,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     font-weight: 500;
 }
 .currency-card-price-value {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 700;
     color: var(--text-color);
 }
@@ -1038,7 +1048,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     direction: rtl;
 }
 .silver-carat-num {
-    font-size: 24px;
+    font-size: 27px;
     font-weight: 800;
     background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 50%, #a0a0a0 100%);
     -webkit-background-clip: text;
@@ -1065,7 +1075,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     margin-bottom: 2px;
 }
 .silver-v-value {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 800;
 }
 
@@ -1304,24 +1314,24 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
 @media (max-width: 400px) {
     .gold-cards-grid { gap: 8px; }
     .gold-card { padding: 8px 4px; border-radius: 12px; }
-    .gold-carat-num { font-size: 21px; }
+    .gold-carat-num { font-size: 24px; }
     .gold-carat-label { font-size: 11px; }
-    .gold-v-value { font-size: 14px; }
+    .gold-v-value { font-size: 16px; }
     .gold-v-label { font-size: 10px; }
     .gold-card-label { font-size: 10px; }
     .silver-cards-grid { gap: 8px; }
     .silver-card { padding: 8px 4px; border-radius: 12px; }
-    .silver-carat-num { font-size: 19px; }
+    .silver-carat-num { font-size: 22px; }
     .silver-carat-label { font-size: 11px; }
-    .silver-v-value { font-size: 14px; }
+    .silver-v-value { font-size: 16px; }
     .silver-v-label { font-size: 10px; }
     .sub-cards-row { gap: 5px; }
     .sub-card { padding: 6px 2px; }
     .sub-card-val { font-size: 12px; }
     .currency-card-new { padding: 8px 10px; }
     .currency-card-flag { width: 28px; height: 28px; font-size: 16px; }
-    .currency-card-name { font-size: 13px; }
-    .currency-card-price-value { font-size: 14px; }
+    .currency-card-name { font-size: 14px; }
+    .currency-card-price-value { font-size: 15px; }
     .converter-input { font-size: 16px; }
     .converter-code { font-size: 12px; }
     .converter-flag { font-size: 18px; }
@@ -1450,10 +1460,20 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
     <section class="global-ounce-section">
         <div class="ounce-card clickable-card" style="padding: 12px;" onclick="document.getElementById('tradingview-gold').scrollIntoView({behavior:'smooth', block:'start'})" role="button" tabindex="0" title="اضغط لعرض الرسم البياني">
             <div class="ounce-header">
-                <span class="badge-change negative" id="gold-ounce-change">&#9660; 2.05%</span>
-                <span>XAU/USD - سعر الاونصة العالمية</span>
+                <span>XAU/USD - سعر الاونصة العالمية (لحظي)</span>
             </div>
-            <div class="ounce-price" style="font-size: 32px; margin: 4px 0;">$4,048.67</div>
+            <div class="tradingview-widget-container" style="margin: 4px 0; padding: 4px; background: transparent; border: none;">
+                <div class="tradingview-widget-container__widget" style="height:auto;"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
+                {
+                    "symbol": "OANDA:XAUUSD",
+                    "width": "100%",
+                    "locale": "ar",
+                    "colorTheme": "dark",
+                    "isTransparent": true
+                }
+                </script>
+            </div>
             <div class="ounce-footer">
                 <span class="live-pulse"><span class="update-dot"></span> مباشر</span>
                 <span class="market-status-badge" id="gold-market-status"></span>
@@ -1976,8 +1996,19 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
     <div class="section-title-bar" style="margin-bottom:14px;"><h2><i class="fa-solid fa-gem"></i> اسعار الفضة</h2></div>
 
     <div class="ounce-card clickable-card" style="margin-bottom:14px; padding: 12px;" onclick="document.getElementById('tradingview-silver').scrollIntoView({behavior:'smooth', block:'start'})" role="button" tabindex="0" title="اضغط لعرض الرسم البياني">
-        <div class="ounce-header"><span class="badge-change positive">&#9650; 1.24%</span><span>XAG/USD - اونصة الفضة العالمية</span></div>
-        <div class="ounce-price" id="silver-ounce-price" style="font-size:28px; margin: 4px 0;">$32.45</div>
+        <div class="ounce-header"><span>XAG/USD - اونصة الفضة العالمية (لحظي)</span></div>
+        <div class="tradingview-widget-container" style="margin: 4px 0; padding: 4px; background: transparent; border: none;">
+            <div class="tradingview-widget-container__widget" style="height:auto;"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
+            {
+                "symbol": "OANDA:XAGUSD",
+                "width": "100%",
+                "locale": "ar",
+                "colorTheme": "dark",
+                "isTransparent": true
+            }
+            </script>
+        </div>
         <div class="ounce-footer"><span class="live-pulse"><span class="update-dot"></span> مباشر</span><span class="market-status-badge" id="silver-market-status"></span><span>دولار امريكي</span><span class="updated-time-badge" id="silver-updated-time"></span></div>
     </div>
 
@@ -2685,7 +2716,15 @@ async function fetchGoldPrices() {
 
         const ouncePriceEl = document.querySelector('#section-prices .ounce-price');
         if (ouncePriceEl && typeof data.ounce_usd === 'number') {
-            ouncePriceEl.textContent = '$' + data.ounce_usd.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            const prevOunce = parseFloat(ouncePriceEl.dataset.rawValue || '0');
+            const newOunce = data.ounce_usd;
+            ouncePriceEl.textContent = '$' + newOunce.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            if (prevOunce && Math.abs(newOunce - prevOunce) > 0.001) {
+                ouncePriceEl.classList.remove('tick-up', 'tick-down');
+                void ouncePriceEl.offsetWidth; // إعادة تشغيل الأنيميشن
+                ouncePriceEl.classList.add(newOunce > prevOunce ? 'tick-up' : 'tick-down');
+            }
+            ouncePriceEl.dataset.rawValue = newOunce;
         }
 
         const ounceChangeEl = document.getElementById('gold-ounce-change');
@@ -2845,7 +2884,7 @@ function fetchLivePrices() {
 }
 
 fetchLivePrices();
-setInterval(fetchGoldPrices, 60 * 1000);              // الذهب والاونصة: كل دقيقة (اقرب للايف)
+setInterval(fetchGoldPrices, 5 * 1000);               // الذهب والاونصة: كل 5 ثواني (تحديث لحظي زي تريدنج فيو)
 setInterval(fetchSilverPrices, 8 * 60 * 60 * 1000);   // الفضة: كل 8 ساعات (يحافظ على حصة GoldAPI الشهرية)
 setInterval(fetchCurrencyPrices, 5 * 60 * 1000);      // العملات: كل 5 دقايق
 setInterval(fetchNews, 20 * 60 * 1000);               // الاخبار: كل 20 دقيقة
