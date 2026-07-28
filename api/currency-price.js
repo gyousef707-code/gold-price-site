@@ -1,4 +1,3 @@
-
 // api/currency-price.js
 // أسعار العملات مقابل الجنيه المصري - من نفس مصدر أسعار الذهب والفضة (banklive.net/en/currencies)
 // المصدر بيرجع سعر واحد (mid) لكل عملة، فبنحسب البيع والشراء بهامش بسيط حواليه
@@ -37,6 +36,7 @@ module.exports = async function handler(req, res) {
   try {
     const response = await fetch('https://banklive.net/en/currencies', {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DahabySite/1.0)' },
+      cache: 'no-store',
     });
     if (!response.ok) throw new Error('تعذر الوصول لصفحة أسعار العملات على banklive.net');
 
@@ -59,7 +59,8 @@ module.exports = async function handler(req, res) {
       throw new Error('لم يتم العثور على أسعار كافية للعملات - شكل الموقع ممكن يكون اتغيّر');
     }
 
-    res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=1200');
+    // كاش قصير عشان يفضل قريب من اللايف
+    res.setHeader('Cache-Control', 's-maxage=120, stale-while-revalidate=180');
 
     return res.status(200).json({
       source: 'banklive.net',
