@@ -2475,11 +2475,12 @@ drawerOverlay.addEventListener('click', closeDrawer);
 const themeToggleBtn = document.getElementById('theme-toggle');
 // ملحوظة: منطق تبديل المظهر (فاتح/داكن/تلقائي) بيتحدد لاحقًا في نظام الأوضاع الثلاثة بآخر الملف
 
+// ====== زرار التحديث: تحديث فوري وحقيقي للصفحة عند الضغط ======
 const refreshBtn = document.getElementById('refresh-btn');
 refreshBtn.addEventListener('click', () => {
     const icon = refreshBtn.querySelector('i');
     icon.style.transform = 'rotate(360deg)';
-    setTimeout(() => { icon.style.transform = 'rotate(0deg)'; }, 600);
+    setTimeout(() => { location.reload(); }, 300);
 });
 
 const caratPrices = {
@@ -2896,7 +2897,6 @@ setInterval(fetchGoldPrices, 5 * 1000);               // الذهب والاون
 setInterval(fetchSilverPrices, 8 * 60 * 60 * 1000);   // الفضة: كل 8 ساعات (يحافظ على حصة GoldAPI الشهرية)
 setInterval(fetchCurrencyPrices, 5 * 60 * 1000);      // العملات: كل 5 دقايق
 setInterval(fetchNews, 20 * 60 * 1000);               // الاخبار: كل 20 دقيقة
-document.getElementById('refresh-btn')?.addEventListener('click', fetchLivePrices);
 
 // ====== الضغط على كارت ذهب/فضة ينقلك لأداة الحاسبة بنفس العيار ======
 function goToCalculator(kind, carat) {
