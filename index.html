@@ -30,6 +30,7 @@
     --info: #58a6ff;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
+html { overflow-x: hidden; width: 100%; max-width: 100vw; }
 body {
     background-color: var(--bg-color);
     color: var(--text-color);
@@ -38,6 +39,8 @@ body {
     padding-bottom: 70px;
     direction: rtl;
     overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
 }
 body.light-mode {
     --bg-color: #f6f8fa;
@@ -694,10 +697,15 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     padding: 12px;
     margin-bottom: 14px;
     overflow: hidden;
+    max-width: 100%;
 }
 .tradingview-widget-container__widget {
     width: 100%;
     height: 350px;
+    max-width: 100%;
+}
+.tradingview-widget-container iframe {
+    max-width: 100% !important;
 }
 
 /* CHART */
@@ -2428,6 +2436,26 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
 </nav>
 
 <script>
+// ====== حماية عرض الموبايل: بعض سكريبتات TradingView الخارجية بتقدر تغيّر meta viewport
+// أو تحقن iframes بعرض ثابت، وده اللي بيخلي الموبايل يفتح "مكبَّر" شبه شاشة الكمبيوتر.
+// السطور دي بتتأكد إن الـ viewport يفضل صح دايمًا، وإن أي iframe محدش يعدي عرض الشاشة.
+function enforceMobileViewport() {
+    let vp = document.querySelector('meta[name="viewport"]');
+    if (!vp) {
+        vp = document.createElement('meta');
+        vp.setAttribute('name', 'viewport');
+        document.head.appendChild(vp);
+    }
+    vp.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+    document.querySelectorAll('iframe').forEach(f => {
+        f.style.maxWidth = '100%';
+    });
+}
+enforceMobileViewport();
+window.addEventListener('load', enforceMobileViewport);
+// أي سكريبت خارجي (زي TradingView) ممكن يحقن الـ iframe/meta بعد التحميل بلحظات، فبنعيد التأكيد كذا مرة في أول 10 ثواني بس (مش استنزاف بطارية مستمر)
+[500, 1500, 3000, 6000, 10000].forEach(delay => setTimeout(enforceMobileViewport, delay));
+
 // ====== تنقل مع دعم زرار الرجوع (Back) عشان ميقفلش التطبيق ======
 function applyView(tabName, toolId) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
