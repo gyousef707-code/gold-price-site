@@ -368,10 +368,11 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     font-weight: 700;
     font-size: 12px;
 }
+.badge-change:empty { display: none; }
 .badge-change.negative { color: var(--danger); background: rgba(248,81,73,0.12); }
 .badge-change.positive { color: var(--success); background: rgba(63,185,80,0.12); }
 .ounce-price {
-    font-size: 38px;
+    font-size: 42px;
     font-weight: 800;
     color: var(--gold-bright);
     margin: 6px 0;
@@ -543,7 +544,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     direction: rtl;
 }
 .gold-carat-num {
-    font-size: 29px;
+    font-size: 32px;
     font-weight: 800;
     background: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-bright) 50%, var(--gold-dark) 100%);
     -webkit-background-clip: text;
@@ -565,12 +566,12 @@ body.light-mode .swap-btn { background: #f3f4f6; }
 }
 .gold-v-row:last-child { border-bottom: none; }
 .gold-v-label {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--text-muted);
     margin-bottom: 2px;
 }
 .gold-v-value {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 800;
 }
 .sell-price { color: var(--success); }
@@ -596,19 +597,19 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     box-shadow: 0 4px 14px rgba(227,179,65,0.1);
 }
 .sub-card-title {
-    font-size: 9px;
+    font-size: 10px;
     color: var(--text-muted);
     display: block;
     margin-bottom: 2px;
 }
 .sub-card-val {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--gold-bright);
     display: block;
 }
 .sub-card-unit {
-    font-size: 8px;
+    font-size: 9px;
     color: var(--text-muted);
 }
 
@@ -659,7 +660,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     margin-bottom: 2px;
 }
 .md-val {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 700;
     color: var(--gold-bright);
 }
@@ -683,7 +684,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     text-align: center;
 }
 .gap-label-top { font-size: 10px; color: var(--text-muted); }
-.gap-number { font-size: 18px; font-weight: 800; color: var(--text-color); }
+.gap-number { font-size: 19px; font-weight: 800; color: var(--text-color); }
 .gap-unit { font-size: 10px; color: var(--danger); font-weight: 700; }
 
 /* TradingView */
@@ -747,7 +748,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
 .calc-group { flex: 1; }
 .calc-group label {
     display: block;
-    font-size: 11px;
+    font-size: 12px;
     color: var(--text-muted);
     margin-bottom: 6px;
     font-weight: 600;
@@ -760,7 +761,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     background: var(--card-bg-elevated);
     color: var(--text-color);
     font-family: 'Cairo', sans-serif;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     outline: none;
     transition: 0.3s;
@@ -785,12 +786,12 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     margin-top: 4px;
 }
 .calc-result-label {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--text-muted);
     margin-bottom: 4px;
 }
 .calc-result-value {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 800;
     color: var(--gold-bright);
 }
@@ -857,7 +858,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
 }
 .converter-code {
     font-weight: 700;
-    font-size: 14px;
+    font-size: 15px;
     color: var(--text-color);
     white-space: nowrap;
 }
@@ -871,7 +872,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     background: transparent;
     border: none;
     color: var(--text-color);
-    font-size: 18px;
+    font-size: 19px;
     font-weight: 700;
     text-align: right;
     outline: none;
@@ -948,6 +949,9 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     transform: translateX(-2px);
     box-shadow: 0 4px 14px rgba(227,179,65,0.08);
 }
+.currency-card-new:active {
+    transform: translateX(-2px) scale(0.98);
+}
 .currency-card-left {
     display: flex;
     align-items: center;
@@ -962,7 +966,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     min-width: 0;
 }
 .currency-card-name {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 700;
     color: var(--text-color);
     line-height: 1.3;
@@ -971,7 +975,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     text-overflow: ellipsis;
 }
 .currency-card-code {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--text-muted);
     font-weight: 500;
 }
@@ -1005,7 +1009,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     font-weight: 500;
 }
 .currency-card-price-value {
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 700;
     color: var(--text-color);
 }
@@ -1048,7 +1052,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     direction: rtl;
 }
 .silver-carat-num {
-    font-size: 27px;
+    font-size: 30px;
     font-weight: 800;
     background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 50%, #a0a0a0 100%);
     -webkit-background-clip: text;
@@ -1070,12 +1074,12 @@ body.light-mode .swap-btn { background: #f3f4f6; }
 }
 .silver-v-row:last-child { border-bottom: none; }
 .silver-v-label {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--text-muted);
     margin-bottom: 2px;
 }
 .silver-v-value {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 800;
 }
 
@@ -1107,13 +1111,13 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     display: block;
 }
 .tool-card h3 {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--text-color);
     margin-bottom: 4px;
 }
 .tool-card p {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--text-muted);
 }
 
@@ -1144,8 +1148,8 @@ body.light-mode .swap-btn { background: #f3f4f6; }
 .notification-icon.price-down { background: rgba(248,81,73,0.12); color: var(--danger); }
 .notification-icon.news { background: rgba(88,166,255,0.12); color: var(--info); }
 .notification-content { flex: 1; }
-.notification-title { font-size: 13px; font-weight: 700; color: var(--text-color); margin-bottom: 2px; }
-.notification-desc { font-size: 11px; color: var(--text-muted); }
+.notification-title { font-size: 14px; font-weight: 700; color: var(--text-color); margin-bottom: 2px; }
+.notification-desc { font-size: 12px; color: var(--text-muted); }
 .notification-time { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
 
 /* NEWS */
@@ -1167,14 +1171,14 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
     font-weight: 600;
 }
 .news-item h3 {
-    font-size: 13px;
+    font-size: 14px;
     margin: 0 0 6px 0;
     color: var(--text-color);
     font-weight: 600;
     line-height: 1.5;
 }
 .news-source {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--text-muted);
     font-weight: 500;
 }
@@ -1198,7 +1202,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
     align-items: center;
     color: var(--text-muted);
     text-decoration: none;
-    font-size: 10px;
+    font-size: 11px;
     gap: 3px;
     transition: 0.3s;
     padding: 4px 12px;
@@ -1208,7 +1212,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
     background: none;
     font-family: 'Cairo', sans-serif;
 }
-.nav-item i { font-size: 18px; transition: 0.3s; }
+.nav-item i { font-size: 19px; transition: 0.3s; }
 .nav-item.active { color: var(--gold-primary); }
 .nav-item.active i { transform: translateY(-2px); }
 .nav-item:hover:not(.active) { color: var(--text-color); }
@@ -1314,26 +1318,26 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
 @media (max-width: 400px) {
     .gold-cards-grid { gap: 8px; }
     .gold-card { padding: 8px 4px; border-radius: 12px; }
-    .gold-carat-num { font-size: 24px; }
+    .gold-carat-num { font-size: 26px; }
     .gold-carat-label { font-size: 11px; }
-    .gold-v-value { font-size: 16px; }
-    .gold-v-label { font-size: 10px; }
+    .gold-v-value { font-size: 18px; }
+    .gold-v-label { font-size: 11px; }
     .gold-card-label { font-size: 10px; }
     .silver-cards-grid { gap: 8px; }
     .silver-card { padding: 8px 4px; border-radius: 12px; }
-    .silver-carat-num { font-size: 22px; }
+    .silver-carat-num { font-size: 24px; }
     .silver-carat-label { font-size: 11px; }
-    .silver-v-value { font-size: 16px; }
-    .silver-v-label { font-size: 10px; }
+    .silver-v-value { font-size: 18px; }
+    .silver-v-label { font-size: 11px; }
     .sub-cards-row { gap: 5px; }
     .sub-card { padding: 6px 2px; }
-    .sub-card-val { font-size: 12px; }
+    .sub-card-val { font-size: 13px; }
     .currency-card-new { padding: 8px 10px; }
     .currency-card-flag { width: 28px; height: 28px; font-size: 16px; }
-    .currency-card-name { font-size: 14px; }
-    .currency-card-price-value { font-size: 15px; }
-    .converter-input { font-size: 16px; }
-    .converter-code { font-size: 12px; }
+    .currency-card-name { font-size: 15px; }
+    .currency-card-price-value { font-size: 16px; }
+    .converter-input { font-size: 17px; }
+    .converter-code { font-size: 13px; }
     .converter-flag { font-size: 18px; }
 }
 
@@ -1359,11 +1363,11 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
     .gold-cards-grid { grid-template-columns: repeat(6, 1fr); gap: 14px; }
     .silver-cards-grid { grid-template-columns: repeat(6, 1fr); gap: 14px; }
     .gold-card, .silver-card { padding: 16px 8px; }
-    .gold-carat-num { font-size: 22px; }
-    .gold-v-value { font-size: 15px; }
+    .gold-carat-num { font-size: 24px; }
+    .gold-v-value { font-size: 17px; }
 
     .ounce-card { padding: 20px 26px !important; }
-    .ounce-price { font-size: 34px !important; }
+    .ounce-price { font-size: 38px !important; }
 
     .currency-list-new, .converter-box { max-width: 700px; margin-left: auto; margin-right: auto; }
 
@@ -1461,19 +1465,9 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
         <div class="ounce-card clickable-card" style="padding: 12px;" onclick="document.getElementById('tradingview-gold').scrollIntoView({behavior:'smooth', block:'start'})" role="button" tabindex="0" title="اضغط لعرض الرسم البياني">
             <div class="ounce-header">
                 <span>XAU/USD - سعر الاونصة العالمية (لحظي)</span>
+                <span class="badge-change" id="gold-ounce-change"></span>
             </div>
-            <div class="tradingview-widget-container" style="margin: 4px 0; padding: 4px; background: transparent; border: none;">
-                <div class="tradingview-widget-container__widget" style="height:auto;"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
-                {
-                    "symbol": "OANDA:XAUUSD",
-                    "width": "100%",
-                    "locale": "ar",
-                    "colorTheme": "dark",
-                    "isTransparent": true
-                }
-                </script>
-            </div>
+            <div class="ounce-price" id="gold-ounce-price">$4,078.85</div>
             <div class="ounce-footer">
                 <span class="live-pulse"><span class="update-dot"></span> مباشر</span>
                 <span class="market-status-badge" id="gold-market-status"></span>
@@ -1996,19 +1990,11 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
     <div class="section-title-bar" style="margin-bottom:14px;"><h2><i class="fa-solid fa-gem"></i> اسعار الفضة</h2></div>
 
     <div class="ounce-card clickable-card" style="margin-bottom:14px; padding: 12px;" onclick="document.getElementById('tradingview-silver').scrollIntoView({behavior:'smooth', block:'start'})" role="button" tabindex="0" title="اضغط لعرض الرسم البياني">
-        <div class="ounce-header"><span>XAG/USD - اونصة الفضة العالمية (لحظي)</span></div>
-        <div class="tradingview-widget-container" style="margin: 4px 0; padding: 4px; background: transparent; border: none;">
-            <div class="tradingview-widget-container__widget" style="height:auto;"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
-            {
-                "symbol": "OANDA:XAGUSD",
-                "width": "100%",
-                "locale": "ar",
-                "colorTheme": "dark",
-                "isTransparent": true
-            }
-            </script>
+        <div class="ounce-header">
+            <span>XAG/USD - اونصة الفضة العالمية (لحظي)</span>
+            <span class="badge-change" id="silver-ounce-change"></span>
         </div>
+        <div class="ounce-price" id="silver-ounce-price">$51.20</div>
         <div class="ounce-footer"><span class="live-pulse"><span class="update-dot"></span> مباشر</span><span class="market-status-badge" id="silver-market-status"></span><span>دولار امريكي</span><span class="updated-time-badge" id="silver-updated-time"></span></div>
     </div>
 
@@ -2568,6 +2554,28 @@ function calculateConverter() {
     let result = amount * (currencyRates[from] / currencyRates[to]);
     document.getElementById('conv-to-input').value = result.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 }
+
+// ====== الضغط على أي عملة في القايمة تحت بيحطها اتوماتيك في كارت "تحويل من" فوق ======
+function selectConverterFromCurrency(code) {
+    const fromSelect = document.getElementById('conv-from');
+    if (!fromSelect) return;
+    const hasOption = [...fromSelect.options].some(o => o.value === code);
+    if (!hasOption) return;
+    fromSelect.value = code;
+    updateConverterFrom();
+    document.querySelector('.converter-box')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+document.querySelectorAll('#section-currencies .currency-card-new').forEach(card => {
+    const codeEl = card.querySelector('.currency-card-code');
+    if (!codeEl) return;
+    const code = codeEl.textContent.trim().toLowerCase();
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('title', 'اضغط لاستخدام ' + codeEl.textContent.trim() + ' في المحول');
+    card.addEventListener('click', () => selectConverterFromCurrency(code));
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectConverterFromCurrency(code); } });
+});
 
 function calculateSilver() {
     const weight = parseFloat(document.getElementById('calc-silver-weight').value) || 0;
