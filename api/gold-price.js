@@ -44,9 +44,16 @@ const GRAMS_PER_OUNCE = 31.1034768;
 
 module.exports = async function handler(req, res) {
   try {
-    const response = await fetch('https://banklive.net/en/gold-price-today-in-egypt', {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DahabySite/1.0)' },
-    });
+    const [response, currenciesRes] = await Promise.all([
+      fetch('https://banklive.net/en/gold-price-today-in-egypt', {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DahabySite/1.0)' },
+        cache: 'no-store',
+      }),
+      fetch('https://banklive.net/en/currencies', {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DahabySite/1.0)' },
+        cache: 'no-store',
+      }),
+    ]);
     if (!response.ok) throw new Error('تعذر الوصول لموقع banklive.net');
 
     const html = await response.text();
@@ -93,8 +100,18 @@ module.exports = async function handler(req, res) {
     const changeMatch = rawText.match(/XAU\/USD\s*\$?\s*[\d,]+\.?\d*\s*([-+]?\d+\.?\d*)%/);
     const ounce_change_percent = changeMatch ? parseFloat(changeMatch[1]) : null;
 
-    // سعر الدولار الرسمي في البنوك (من نفس الصفحة)
-    const bank_usd_rate = extractOne(text, 'USD (Bank)');
+    // سعر الدولار الرسمي في البنوك — بناخده من نفس صفحة العملات (banklive.net/en/currencies)
+    // اللي هي المصدر الصحيح، بدل صفحة الذهب اللي كان بيتأخر تحديثها أحيانًا
+    let bank_usd_rate = null;
+    if (currenciesRes.ok) {
+      const currenciesHtml = await currenciesRes.text();
+      const currenciesText = stripTagsKeepPercent(currenciesHtml).replace(/\s+/g, ' ');
+      bank_usd_rate = extractOne(currenciesText, 'USDEGP');
+    }
+    if (!bank_usd_rate) {
+      // احتياطي فقط لو صفحة العملات فشلت لأي سبب
+      bank_usd_rate = extractOne(text, 'USD (Bank)');
+    }
 
     // "دولار الصاغة" = سعر الدولار الضمني المحسوب من سعر عيار 24 المحلي مقابل سعر الأونصة العالمية
     let implied_usd_rate = null;
@@ -106,8 +123,8 @@ module.exports = async function handler(req, res) {
       gap_value = Number((implied_usd_rate - bank_usd_rate).toFixed(2));
     }
 
-    // كاش 10 دقايق - مصدر عام مجاني بدون حد طلبات
-    res.setHeader('Cache-Control', 's-maxage=600, stale-while-revalidate=1200');
+    // كاش قصير (45 ثانية) عشان الاسعار تفضل قريبة من اللايف بدل ما تفضل ثابتة لمدة طويلة
+    res.setHeader('Cache-Control', 's-maxage=45, stale-while-revalidate=60');
 
     return res.status(200).json({
       source: 'banklive.net',
