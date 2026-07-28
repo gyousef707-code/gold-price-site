@@ -707,694 +707,10 @@ body.light-mode .swap-btn { background: #f3f4f6; }
 .tradingview-widget-container iframe {
     max-width: 100% !important;
 }
-
-/* CHART */
-.chart-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border-gold);
-    border-radius: 18px;
-    padding: 16px;
-}
-.chart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-}
-.chart-periods { display: flex; gap: 4px; }
-.period-btn {
-    padding: 4px 10px;
-    border-radius: 8px;
-    border: none;
-    background: transparent;
-    color: var(--text-muted);
-    font-family: 'Cairo', sans-serif;
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
-}
-.period-btn.active {
-    background: rgba(227,179,65,0.15);
-    color: var(--gold-primary);
-}
-
-/* CALCULATOR */
-.calc-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border-gold);
-    border-radius: 18px;
-    padding: 16px;
-    margin-bottom: 14px;
-}
-.calc-row {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 12px;
-}
-.calc-group { flex: 1; }
-.calc-group label {
-    display: block;
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-bottom: 6px;
-    font-weight: 600;
-}
-.calc-input {
-    width: 100%;
-    padding: 10px 14px;
-    border-radius: 12px;
-    border: 1px solid var(--border-subtle);
-    background: var(--card-bg-elevated);
-    color: var(--text-color);
-    font-family: 'Cairo', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    outline: none;
-    transition: 0.3s;
-}
-.calc-input:focus {
-    border-color: var(--gold-primary);
-    box-shadow: 0 0 0 3px rgba(227,179,65,0.1);
-}
-.calc-select {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: left 12px center;
-    padding-left: 14px;
-}
-.calc-result-box {
-    background: linear-gradient(135deg, rgba(227,179,65,0.08) 0%, rgba(227,179,65,0.02) 100%);
-    border: 1px solid var(--border-gold);
-    border-radius: 14px;
-    padding: 16px;
-    text-align: center;
-    margin-top: 4px;
-}
-.calc-result-label {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-bottom: 4px;
-}
-.calc-result-value {
-    font-size: 24px;
-    font-weight: 800;
-    color: var(--gold-bright);
-}
-.calc-result-unit {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 2px;
-}
-
-/* ====== CURRENCIES - NEW DESIGN (FIXED) ====== */
-.converter-box {
-    background: var(--card-bg);
-    border: 1px solid var(--border-gold);
-    border-radius: 18px;
-    padding: 16px;
-    margin-bottom: 16px;
-}
-.converter-label {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-    display: block;
-    font-weight: 600;
-}
-.converter-row {
-    display: flex;
-    align-items: center;
-    background: var(--card-bg-elevated);
-    border: 1px solid var(--border-subtle);
-    border-radius: 14px;
-    padding: 10px 14px;
-    transition: 0.3s;
-    overflow: hidden;
-    min-height: 52px;
-}
-.converter-row:focus-within {
-    border-color: var(--gold-primary);
-    box-shadow: 0 0 0 3px rgba(227,179,65,0.08);
-}
-.converter-select-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-    cursor: pointer;
-    position: relative;
-    padding-left: 8px;
-    border-left: 1px solid var(--border-subtle);
-    margin-left: 10px;
-}
-.converter-select-wrapper select {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
-    z-index: 2;
-}
-.converter-flag {
-    font-size: 20px;
-    line-height: 1;
-    flex-shrink: 0;
-}
-.converter-code {
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--text-color);
-    white-space: nowrap;
-}
-.converter-select-arrow {
-    font-size: 10px;
-    color: var(--text-muted);
-    flex-shrink: 0;
-}
-.converter-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: var(--text-color);
-    font-size: 18px;
-    font-weight: 700;
-    text-align: right;
-    outline: none;
-    font-family: 'Cairo', sans-serif;
-    padding: 0;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.converter-input::placeholder {
-    color: var(--text-muted);
-    opacity: 0.5;
-}
-.converter-divider {
-    position: relative;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 4px 0;
-}
-.converter-divider::before {
-    content: '';
-    position: absolute;
-    left: 0; right: 0;
-    height: 1px;
-    background: var(--border-subtle);
-}
-.swap-btn {
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    background: var(--card-bg-elevated);
-    border: 1px solid var(--border-gold);
-    color: var(--gold-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 1;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    font-size: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    flex-shrink: 0;
-}
-.swap-btn:hover {
-    background: var(--gold-primary);
-    color: #000;
-    transform: rotate(180deg);
-    box-shadow: 0 4px 14px rgba(227,179,65,0.3);
-}
-.swap-btn:active {
-    transform: rotate(180deg) scale(0.92);
-}
-
-/* Currency list new cards - FLAG NEXT TO NAME */
-.currency-list-new {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-.currency-card-new {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--card-bg);
-    border: 1px solid var(--border-subtle);
-    border-radius: 12px;
-    padding: 10px 12px;
-    transition: all 0.25s ease;
-    cursor: pointer;
-}
-.currency-card-new:hover {
-    border-color: var(--border-gold);
-    transform: translateX(-2px);
-    box-shadow: 0 4px 14px rgba(227,179,65,0.08);
-}
-.currency-card-left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
-    min-width: 0;
-}
-.currency-card-info {
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-    min-width: 0;
-}
-.currency-card-name {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text-color);
-    line-height: 1.3;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.currency-card-code {
-    font-size: 11px;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-.currency-card-flag {
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    background: var(--card-bg-elevated);
-    border: 1px solid var(--border-subtle);
-    flex-shrink: 0;
-}
-.currency-card-right {
-    display: flex;
-    gap: 10px;
-    text-align: center;
-    flex-shrink: 0;
-}
-.currency-card-price-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 42px;
-}
-.currency-card-price-label {
-    font-size: 10px;
-    color: var(--text-muted);
-    margin-bottom: 1px;
-    font-weight: 500;
-}
-.currency-card-price-value {
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--text-color);
-}
-.currency-card-price-value.sell { color: var(--success); }
-.currency-card-price-value.buy { color: var(--danger); }
-
-/* ====== Silver Cards - Vertical ====== */
-.silver-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    margin-bottom: 12px;
-}
-.silver-card {
-    background: linear-gradient(145deg, var(--card-bg) 0%, rgba(22,27,34,0.9) 100%);
-    border: 1px solid rgba(192,192,192,0.25);
-    border-radius: 16px;
-    padding: 12px 6px;
-    text-align: center;
-    transition: all 0.25s ease;
-}
-.silver-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(192,192,192,0.1);
-    border-color: rgba(192,192,192,0.5);
-}
-.silver-card-icon-top {
-    text-align: center;
-    font-size: 18px;
-    margin-bottom: 4px;
-    opacity: 0.85;
-    color: #c9d1d9;
-}
-.silver-carat-wrap {
-    display: flex;
-    align-items: baseline;
-    justify-content: center;
-    gap: 4px;
-    margin-bottom: 10px;
-    direction: rtl;
-}
-.silver-carat-num {
-    font-size: 27px;
-    font-weight: 800;
-    background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 50%, #a0a0a0 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1;
-}
-.silver-carat-label {
-    font-size: 12px;
-    color: #c0c0c0;
-    font-weight: 600;
-}
-.silver-v-row {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 5px 0;
-    border-bottom: 1px dashed var(--border-subtle);
-}
-.silver-v-row:last-child { border-bottom: none; }
-.silver-v-label {
-    font-size: 10px;
-    color: var(--text-muted);
-    margin-bottom: 2px;
-}
-.silver-v-value {
-    font-size: 18px;
-    font-weight: 800;
-}
-
-/* TOOLS */
-.tools-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 14px;
-}
-.tool-card {
-    background: linear-gradient(145deg, var(--card-bg) 0%, rgba(22,27,34,0.9) 100%);
-    border: 1px solid var(--border-gold);
-    border-radius: 16px;
-    padding: 18px 12px;
-    text-align: center;
-    cursor: pointer;
-    transition: 0.3s;
-}
-.tool-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(227,179,65,0.15);
-    border-color: var(--gold-primary);
-}
-.tool-card i {
-    font-size: 28px;
-    color: var(--gold-primary);
-    margin-bottom: 8px;
-    display: block;
-}
-.tool-card h3 {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text-color);
-    margin-bottom: 4px;
-}
-.tool-card p {
-    font-size: 10px;
-    color: var(--text-muted);
-}
-
-/* NOTIFICATIONS */
-.notification-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    background: var(--card-bg);
-    border: 1px solid var(--border-subtle);
-    border-radius: 14px;
-    padding: 14px 16px;
-    margin-bottom: 8px;
-    transition: 0.3s;
-}
-.notification-item:hover { border-color: var(--border-gold); }
-.notification-icon {
-    width: 36px; height: 36px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    flex-shrink: 0;
-}
-.notification-icon.gold { background: rgba(227,179,65,0.12); color: var(--gold-primary); }
-.notification-icon.price-up { background: rgba(63,185,80,0.12); color: var(--success); }
-.notification-icon.price-down { background: rgba(248,81,73,0.12); color: var(--danger); }
-.notification-icon.news { background: rgba(88,166,255,0.12); color: var(--info); }
-.notification-content { flex: 1; }
-.notification-title { font-size: 13px; font-weight: 700; color: var(--text-color); margin-bottom: 2px; }
-.notification-desc { font-size: 11px; color: var(--text-muted); }
-.notification-time { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
-
-/* NEWS */
-.news-item {
-    background: var(--card-bg);
-    border: 1px solid var(--border-subtle);
-    border-radius: 14px;
-    padding: 14px;
-    margin-bottom: 8px;
-    transition: 0.3s;
-}
-.news-item:hover { border-color: var(--border-gold); }
-a.news-item { display: block; text-decoration: none; cursor: pointer; }
-.news-time {
-    font-size: 10px;
-    color: var(--gold-primary);
-    display: block;
-    margin-bottom: 4px;
-    font-weight: 600;
-}
-.news-item h3 {
-    font-size: 13px;
-    margin: 0 0 6px 0;
-    color: var(--text-color);
-    font-weight: 600;
-    line-height: 1.5;
-}
-.news-source {
-    font-size: 10px;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-/* BOTTOM NAV */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0; right: 0;
-    background: linear-gradient(180deg, rgba(13,17,23,0.95) 0%, var(--card-bg) 100%);
-    display: flex;
-    justify-content: space-around;
-    padding: 8px 0 12px;
-    border-top: 1px solid var(--border-gold);
-    z-index: 100;
-    backdrop-filter: blur(12px);
-}
-.nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: var(--text-muted);
-    text-decoration: none;
-    font-size: 10px;
-    gap: 3px;
-    transition: 0.3s;
-    padding: 4px 12px;
-    border-radius: 10px;
-    cursor: pointer;
-    border: none;
-    background: none;
-    font-family: 'Cairo', sans-serif;
-}
-.nav-item i { font-size: 18px; transition: 0.3s; }
-.nav-item.active { color: var(--gold-primary); }
-.nav-item.active i { transform: translateY(-2px); }
-.nav-item:hover:not(.active) { color: var(--text-color); }
-
-/* Contact Section */
-.contact-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border-gold);
-    border-radius: 18px;
-    padding: 20px;
-    text-align: center;
-    margin-bottom: 14px;
-}
-.contact-card i {
-    font-size: 40px;
-    color: var(--gold-primary);
-    margin-bottom: 10px;
-}
-.contact-card h3 {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text-color);
-    margin-bottom: 6px;
-}
-.contact-card p {
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-bottom: 4px;
-}
-.contact-card a {
-    color: var(--gold-primary);
-    text-decoration: none;
-    font-weight: 600;
-}
-.contact-card a:hover {
-    text-decoration: underline;
-}
-.policy-text { text-align: right; }
-.policy-text h3 {
-    font-size: 14px;
-    color: var(--gold-primary);
-    margin: 14px 0 6px;
-}
-.policy-text p {
-    font-size: 13px;
-    line-height: 1.9;
-    color: var(--text-muted);
-    margin-bottom: 4px;
-}
-.theme-options {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-.theme-option {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--card-bg-elevated);
-    border: 1px solid var(--border-subtle);
-    border-radius: 12px;
-    padding: 12px 16px;
-    color: var(--text-color);
-    font-family: 'Cairo', sans-serif;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-.theme-option i { font-size: 17px; color: var(--text-muted); width: 20px; }
-.theme-option.active {
-    border-color: var(--gold-primary);
-    background: rgba(227,179,65,0.08);
-}
-.theme-option.active i { color: var(--gold-primary); }
-.theme-option.active::after {
-    content: '\f00c';
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900;
-    margin-inline-start: auto;
-    color: var(--gold-primary);
-    font-size: 13px;
-}
-.star-rating {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    font-size: 30px;
-    color: var(--text-muted);
-}
-.star-rating i { cursor: pointer; transition: transform 0.15s ease, color 0.15s ease; }
-.star-rating i:hover { transform: scale(1.15); }
-.star-rating i.filled { color: var(--gold-primary); }
-
-/* EFFECTS */
-.glow-effect { animation: glow 2.5s infinite alternate; }
-@keyframes glow {
-    from { box-shadow: 0 0 2px rgba(227,179,65,0.2); }
-    to { box-shadow: 0 0 10px rgba(227,179,65,0.5); }
-}
-.spin-effect i { transition: transform 0.6s ease; }
-
-/* Responsive */
-@media (max-width: 400px) {
-    .gold-cards-grid { gap: 8px; }
-    .gold-card { padding: 8px 4px; border-radius: 12px; }
-    .gold-carat-num { font-size: 24px; }
-    .gold-carat-label { font-size: 11px; }
-    .gold-v-value { font-size: 16px; }
-    .gold-v-label { font-size: 10px; }
-    .gold-card-label { font-size: 10px; }
-    .silver-cards-grid { gap: 8px; }
-    .silver-card { padding: 8px 4px; border-radius: 12px; }
-    .silver-carat-num { font-size: 22px; }
-    .silver-carat-label { font-size: 11px; }
-    .silver-v-value { font-size: 16px; }
-    .silver-v-label { font-size: 10px; }
-    .sub-cards-row { gap: 5px; }
-    .sub-card { padding: 6px 2px; }
-    .sub-card-val { font-size: 12px; }
-    .currency-card-new { padding: 8px 10px; }
-    .currency-card-flag { width: 28px; height: 28px; font-size: 16px; }
-    .currency-card-name { font-size: 14px; }
-    .currency-card-price-value { font-size: 15px; }
-    .converter-input { font-size: 16px; }
-    .converter-code { font-size: 12px; }
-    .converter-flag { font-size: 18px; }
-}
-
-/* ====== DESKTOP LAYOUT ====== */
-@media (min-width: 900px) {
-    .main-content {
-        max-width: 1100px;
-        padding: 24px 18px 40px;
-    }
-    /* محاذاة الهيدر مع عرض المحتوى بدل ما الايقونات تفضل ملزّقة في طرف الشاشة */
-    .app-header {
-        padding-left: max(18px, calc((100vw - 1100px) / 2 + 18px));
-        padding-right: max(18px, calc((100vw - 1100px) / 2 + 18px));
-    }
-    .bottom-nav {
-        padding-left: max(0px, calc((100vw - 1100px) / 2));
-        padding-right: max(0px, calc((100vw - 1100px) / 2));
-    }
-    .nav-item { padding: 6px 28px; }
-    .nav-item span { font-size: 11px; }
-    .nav-item i { font-size: 20px; }
-
-    .gold-cards-grid { grid-template-columns: repeat(6, 1fr); gap: 14px; }
-    .silver-cards-grid { grid-template-columns: repeat(6, 1fr); gap: 14px; }
-    .gold-card, .silver-card { padding: 16px 8px; }
-    .gold-carat-num { font-size: 22px; }
-    .gold-v-value { font-size: 15px; }
-
-    .ounce-card { padding: 20px 26px !important; }
-    .ounce-price { font-size: 34px !important; }
-
-    .currency-list-new, .converter-box { max-width: 700px; margin-left: auto; margin-right: auto; }
-
-    /* الدرج بيبقى شبه هيدر ثانوي بدل قائمة موبايل ضيقة */
-    .drawer { width: 320px; right: -320px; }
-
-    .tradingview-widget-container { max-width: 100%; }
-
-    .gap-card-container { max-width: 700px; margin: 0 auto; }
-}
-
-@media (min-width: 1300px) {
-    .main-content { max-width: 1280px; }
-    .app-header {
-        padding-left: max(18px, calc((100vw - 1280px) / 2 + 18px));
-        padding-right: max(18px, calc((100vw - 1280px) / 2 + 18px));
-    }
-    .bottom-nav {
-        padding-left: max(0px, calc((100vw - 1280px) / 2));
-        padding-right: max(0px, calc((100vw - 1280px) / 2));
-    }
-    .gold-cards-grid { grid-template-columns: repeat(7, 1fr); }
-    .silver-cards-grid { grid-template-columns: repeat(6, 1fr); }
+/* حجز مساحة أدنى للحاوية لحد ما ويدجت TradingView يتحمّل فعليًا، عشان مايحصلش قفزة/قص في التخطيط */
+#silver-symbol-widget-container,
+#tradingview-silver {
+    min-height: 90px;
 }
 </style>
 </head>
@@ -2005,18 +1321,8 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
 
     <div class="ounce-card clickable-card" style="margin-bottom:14px; padding: 12px;" onclick="document.getElementById('tradingview-silver').scrollIntoView({behavior:'smooth', block:'start'})" role="button" tabindex="0" title="اضغط لعرض الرسم البياني">
         <div class="ounce-header"><span>XAG/USD - اونصة الفضة العالمية (لحظي)</span></div>
-        <div class="tradingview-widget-container" style="margin: 4px 0; padding: 4px; background: transparent; border: none;">
-            <div class="tradingview-widget-container__widget" style="height:auto;"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
-            {
-                "symbol": "OANDA:XAGUSD",
-                "width": "100%",
-                "locale": "ar",
-                "colorTheme": "dark",
-                "isTransparent": true
-            }
-            </script>
-        </div>
+        <!-- ويدجت السعر اللحظي هنا بيتحقن ديناميكيًا بس أول ما تبويب الفضة يتفتح فعليًا (شوف ensureSilverWidgetsLoaded بالأسفل) -->
+        <div class="tradingview-widget-container" id="silver-symbol-widget-container" style="margin: 4px 0; padding: 4px; background: transparent; border: none;"></div>
         <div class="ounce-footer"><span class="live-pulse"><span class="update-dot"></span> مباشر</span><span class="market-status-badge" id="silver-market-status"></span><span>دولار امريكي</span><span class="updated-time-badge" id="silver-updated-time"></span></div>
     </div>
 
@@ -2121,26 +1427,8 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
 
     <section class="tradingview-section" style="margin-top:14px;">
         <div class="section-title-bar"><h2><i class="fa-solid fa-chart-area"></i> رسم بياني الفضة (TradingView)</h2></div>
-        <div class="tradingview-widget-container">
-            <div class="tradingview-widget-container__widget" id="tradingview-silver"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-            {
-                "autosize": false,
-                "width": "100%",
-                "height": "350",
-                "symbol": "OANDA:XAGUSD",
-                "interval": "60",
-                "timezone": "Africa/Cairo",
-                "theme": "dark",
-                "style": "1",
-                "locale": "ar",
-                "enable_publishing": false,
-                "allow_symbol_change": true,
-                "calendar": false,
-                "support_host": "https://www.tradingview.com"
-            }
-            </script>
-        </div>
+        <!-- الرسم البياني كمان بيتحقن ديناميكيًا بنفس المنطق -->
+        <div class="tradingview-widget-container" id="tradingview-silver"></div>
     </section>
 
     <div class="calc-card" style="margin-top:14px;">
@@ -2456,6 +1744,47 @@ window.addEventListener('load', enforceMobileViewport);
 // أي سكريبت خارجي (زي TradingView) ممكن يحقن الـ iframe/meta بعد التحميل بلحظات، فبنعيد التأكيد كذا مرة في أول 10 ثواني بس (مش استنزاف بطارية مستمر)
 [500, 1500, 3000, 6000, 10000].forEach(delay => setTimeout(enforceMobileViewport, delay));
 
+// ====== تحميل كسول لويدجت TradingView بتاع الفضة ======
+// المشكلة: ويدجت TradingView بيقيس عرض الحاوية وقت ما سكريبته يشتغل. لو الحاوية كانت
+// display:none (زي قسم الفضة قبل ما تدوس عليه)، عرضها بيبقى صفر، فالويدجت بيرجع لعرض
+// ثابت بالبكسل بدل النسبي، وده اللي بيكبّر الصفحة كلها ويعمل القصّ/التهييسة اللي في الصورة.
+// الحل: نأجل حقن كود الويدجت (div + script) لحد أول لحظة يبقى فيها القسم ظاهر فعليًا.
+let silverWidgetsLoaded = false;
+function injectTradingViewWidget(container, scriptSrc, config) {
+    if (!container) return;
+    const widgetDiv = document.createElement('div');
+    widgetDiv.className = 'tradingview-widget-container__widget';
+    container.appendChild(widgetDiv);
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.async = true;
+    script.src = scriptSrc;
+    script.text = JSON.stringify(config);
+    container.appendChild(script);
+}
+function ensureSilverWidgetsLoaded() {
+    if (silverWidgetsLoaded) return;
+    const silverSection = document.getElementById('section-silver');
+    // لو القسم لسه مش ظاهر فعليًا (عرضه صفر)، منستناش نحقن حاجة دلوقتي
+    if (!silverSection || silverSection.offsetWidth === 0) return;
+    silverWidgetsLoaded = true;
+    injectTradingViewWidget(
+        document.getElementById('silver-symbol-widget-container'),
+        'https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js',
+        { symbol: 'OANDA:XAGUSD', width: '100%', locale: 'ar', colorTheme: 'dark', isTransparent: true }
+    );
+    injectTradingViewWidget(
+        document.getElementById('tradingview-silver'),
+        'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js',
+        {
+            autosize: false, width: '100%', height: '350', symbol: 'OANDA:XAGUSD', interval: '60',
+            timezone: 'Africa/Cairo', theme: 'dark', style: '1', locale: 'ar',
+            enable_publishing: false, allow_symbol_change: true, calendar: false,
+            support_host: 'https://www.tradingview.com'
+        }
+    );
+}
+
 // ====== تنقل مع دعم زرار الرجوع (Back) عشان ميقفلش التطبيق ======
 function applyView(tabName, toolId) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -2469,6 +1798,7 @@ function applyView(tabName, toolId) {
         const toolEl = document.getElementById('tool-' + toolId);
         if (toolEl) toolEl.style.display = 'block';
     }
+    if (tabName === 'silver') ensureSilverWidgetsLoaded();
 }
 
 function navigateTo(tabName, toolId, opts) {
