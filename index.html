@@ -1058,6 +1058,62 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     padding: 20px 0;
 }
 
+/* ====== Crypto Coin Detail Page ====== */
+.crypto-detail-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-color);
+    font-family: 'Cairo', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-bottom: 14px;
+    transition: 0.25s;
+}
+.crypto-detail-back:hover { border-color: var(--border-gold); color: var(--gold-primary); }
+.crypto-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+.crypto-detail-icon {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--card-bg-elevated);
+    border: 1px solid var(--border-subtle);
+    object-fit: contain;
+}
+.crypto-detail-info h2 {
+    font-size: 20px;
+    color: var(--text-color);
+    margin: 0 0 2px;
+}
+.crypto-detail-symbol-badge {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+.crypto-detail-prices {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+}
+.crypto-detail-price-box { display: flex; flex-direction: column; gap: 2px; }
+.crypto-detail-price-label { font-size: 11px; color: var(--text-muted); }
+.crypto-detail-price-value { font-size: 18px; font-weight: 700; color: var(--gold-bright); }
+
 /* ====== Silver Cards - Vertical ====== */
 .silver-cards-grid {
     display: grid;
@@ -2174,6 +2230,38 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
     </div>
 </div>
 
+<!-- ====== CRYPTO COIN DETAIL PAGE (شارت TradingView لكل عملة) ====== -->
+<div class="section" id="section-crypto-detail">
+    <button class="crypto-detail-back" onclick="navigateTo('crypto', null)"><i class="fa-solid fa-arrow-right"></i> رجوع لقائمة العملات الرقمية</button>
+
+    <div class="crypto-detail-header">
+        <img id="crypto-detail-icon" class="crypto-detail-icon" src="" alt="">
+        <div class="crypto-detail-info">
+            <h2 id="crypto-detail-name">—</h2>
+            <span class="crypto-detail-symbol-badge" id="crypto-detail-symbol">—</span>
+        </div>
+    </div>
+
+    <div class="crypto-detail-prices">
+        <div class="crypto-detail-price-box">
+            <div class="crypto-detail-price-label">السعر بالجنيه</div>
+            <div class="crypto-detail-price-value" id="crypto-detail-price-egp">—</div>
+        </div>
+        <div class="crypto-detail-price-box">
+            <div class="crypto-detail-price-label">السعر بالدولار</div>
+            <div class="crypto-detail-price-value" id="crypto-detail-price-usd">—</div>
+        </div>
+        <span class="badge-change" id="crypto-detail-change"></span>
+    </div>
+
+    <section class="tradingview-section" style="margin-top:14px;">
+        <div class="section-title-bar"><h2><i class="fa-solid fa-chart-area"></i> الرسم البياني (TradingView)</h2></div>
+        <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget" id="tradingview-crypto"></div>
+        </div>
+    </section>
+</div>
+
 <!-- ====== TOOLS SECTION ====== -->
 <div class="section" id="section-tools">
     <div class="section-title-bar" style="margin-bottom:14px;"><h2><i class="fa-solid fa-toolbox"></i> الادوات</h2></div>
@@ -2515,6 +2603,7 @@ function applyView(tabName, toolId) {
         if (toolEl) toolEl.style.display = 'block';
     }
     if (tabName === 'silver') loadSilverChart();
+    if (tabName === 'crypto-detail' && toolId) loadCryptoChart(toolId);
 }
 
 function navigateTo(tabName, toolId, opts) {
@@ -2972,7 +3061,7 @@ function renderCryptoList(coins) {
         card.className = 'currency-card-new';
         card.setAttribute('role', 'button');
         card.setAttribute('tabindex', '0');
-        card.setAttribute('title', 'اضغط لحساب قيمة ' + coin.name + ' في الحاسبة');
+        card.setAttribute('title', 'اضغط لعرض شارت ' + coin.name);
 
         const changeKnown = typeof coin.change_24h === 'number';
         const isNeg = changeKnown && coin.change_24h < 0;
@@ -2996,7 +3085,7 @@ function renderCryptoList(coins) {
                 '<span class="crypto-card-price-usd">' + formatCryptoPrice(coin.price_usd, '$') + '</span>' +
             '</div>';
 
-        const go = () => goToCryptoCalculator(coin.id);
+        const go = () => goToCryptoChart(coin.id);
         card.addEventListener('click', go);
         card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
 
@@ -3005,6 +3094,83 @@ function renderCryptoList(coins) {
 
     populateCryptoSelect(coins);
     calculateToolCrypto();
+
+    // لو المستخدم فاتح شارت عملة معينة دلوقتي، حدّث الأسعار النصية فيه من غير ما تعيد بناء الشارت نفسه
+    if (currentCryptoDetailId) loadCryptoChart(currentCryptoDetailId);
+}
+
+let currentCryptoDetailId = null; // العملة المفتوحة حاليًا في صفحة الشارت
+let currentCryptoChartId = null;  // العملة اللي الشارت بتاعها متبني فعليًا (عشان منعيدش بناء الشارت غير لما العملة تتغيّر)
+
+function getTradingViewCryptoSymbol(symbol) {
+    const s = (symbol || '').toUpperCase();
+    if (s === 'USDT') return 'BITFINEX:USDTUSD';
+    if (s === 'USDC') return 'BINANCE:USDCUSDT';
+    return 'BINANCE:' + s + 'USDT';
+}
+
+function loadCryptoChart(coinId) {
+    currentCryptoDetailId = coinId;
+    const coin = cryptoCoins[coinId];
+
+    const iconEl = document.getElementById('crypto-detail-icon');
+    const nameEl = document.getElementById('crypto-detail-name');
+    const symbolEl = document.getElementById('crypto-detail-symbol');
+    const egpEl = document.getElementById('crypto-detail-price-egp');
+    const usdEl = document.getElementById('crypto-detail-price-usd');
+    const changeEl = document.getElementById('crypto-detail-change');
+
+    if (coin) {
+        if (iconEl) { iconEl.src = coin.image || ''; iconEl.alt = coin.symbol; }
+        if (nameEl) nameEl.textContent = coin.name;
+        if (symbolEl) symbolEl.textContent = coin.symbol;
+        if (egpEl) egpEl.textContent = formatCryptoPrice(coin.price_egp) + ' ج.م';
+        if (usdEl) usdEl.textContent = formatCryptoPrice(coin.price_usd, '$');
+        if (changeEl) {
+            if (typeof coin.change_24h === 'number') {
+                const isNeg = coin.change_24h < 0;
+                changeEl.className = 'badge-change ' + (isNeg ? 'negative' : 'positive');
+                changeEl.innerHTML = (isNeg ? '&#9660; ' : '&#9650; ') + Math.abs(coin.change_24h).toFixed(2) + '%';
+            } else {
+                changeEl.className = 'badge-change';
+                changeEl.textContent = '';
+            }
+        }
+    }
+
+    // منعيدش بناء الشارت نفسه غير لما العملة المعروضة تتغيّر فعلًا
+    // (نفس المبدأ اللي حل مشكلة تهييسة شارت الفضة - الشارت اللحظي مش لازم يتبنى كل شوية)
+    if (currentCryptoChartId === coinId) return;
+    currentCryptoChartId = coinId;
+
+    const container = document.getElementById('tradingview-crypto');
+    if (!container) return;
+    container.innerHTML = '';
+    const tvSymbol = getTradingViewCryptoSymbol(coin ? coin.symbol : coinId);
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+        autosize: false,
+        width: "100%",
+        height: "350",
+        symbol: tvSymbol,
+        interval: "60",
+        timezone: "Africa/Cairo",
+        theme: "dark",
+        style: "1",
+        locale: "ar",
+        enable_publishing: false,
+        allow_symbol_change: true,
+        calendar: false,
+        support_host: "https://www.tradingview.com"
+    });
+    container.appendChild(script);
+}
+
+function goToCryptoChart(coinId) {
+    navigateTo('crypto-detail', coinId);
 }
 
 function calculateToolCrypto() {
