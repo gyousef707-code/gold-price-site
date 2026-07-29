@@ -1491,7 +1491,9 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
 
     .tradingview-widget-container { max-width: 100%; }
 
-    .gap-card-container { max-width: 700px; margin: 0 auto; }
+    /* كارت "مؤشر الفجوة" ياخد نفس عرض كارت "الجنيه ذهب" بالظبط (عمودين من الـ 6) ويترص تحته على نفس الجنب بدل ما يفضل في النص */
+    .gap-indicator-section { max-width: calc((100% - 70px) / 3 + 14px); margin-right: 0; margin-left: auto; }
+    .gap-card-container { max-width: 100%; margin: 0; }
 }
 
 @media (min-width: 1300px) {
