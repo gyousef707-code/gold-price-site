@@ -1114,6 +1114,109 @@ body.light-mode .swap-btn { background: #f3f4f6; }
 .crypto-detail-price-label { font-size: 11px; color: var(--text-muted); }
 .crypto-detail-price-value { font-size: 18px; font-weight: 700; color: var(--gold-bright); }
 
+/* ====== Crypto Coin Info (وصف + روابط + بيانات) ====== */
+.crypto-info-section { margin-top: 14px; }
+.crypto-info-loading {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    padding: 16px 0;
+}
+.crypto-info-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+.crypto-link-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--card-bg-elevated);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-color);
+    font-family: 'Cairo', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: 0.25s;
+}
+.crypto-link-chip:hover { border-color: var(--border-gold); color: var(--gold-primary); background: rgba(227,179,65,0.08); }
+.crypto-link-chip i { font-size: 11px; color: var(--gold-primary); }
+.crypto-info-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 14px;
+}
+.crypto-info-card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+.crypto-info-card-title i { color: var(--gold-primary); }
+.crypto-info-desc {
+    font-size: 13px;
+    line-height: 1.9;
+    color: var(--text-muted);
+    white-space: pre-line;
+}
+.crypto-info-desc.clamped {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.crypto-info-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+    background: none;
+    border: none;
+    color: var(--gold-primary);
+    font-family: 'Cairo', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+}
+.crypto-info-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+}
+.crypto-info-fact {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background: var(--card-bg-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 8px 12px;
+    min-width: 90px;
+}
+.crypto-info-fact-label { font-size: 10px; color: var(--text-muted); }
+.crypto-info-fact-value { font-size: 13px; font-weight: 700; color: var(--text-color); }
+.crypto-info-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.crypto-info-tag {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gold-primary);
+    background: rgba(227,179,65,0.1);
+    border: 1px solid var(--border-gold);
+    border-radius: 8px;
+    padding: 4px 10px;
+}
+
 /* ====== Silver Cards - Vertical ====== */
 .silver-cards-grid {
     display: grid;
@@ -2260,6 +2363,24 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
             <div class="tradingview-widget-container__widget" id="tradingview-crypto"></div>
         </div>
     </section>
+
+    <section class="crypto-info-section">
+        <div class="section-title-bar"><h2><i class="fa-solid fa-circle-info"></i> معلومات عن العملة</h2></div>
+        <div id="crypto-info-loading" class="crypto-info-loading">جارِ تحميل المعلومات...</div>
+        <div id="crypto-info-content" style="display:none;">
+            <div class="crypto-info-links" id="crypto-info-links"></div>
+            <div class="crypto-info-card">
+                <div class="crypto-info-card-title"><i class="fa-solid fa-book"></i> نبذة عن <span id="crypto-info-name-inline">العملة</span></div>
+                <div class="crypto-info-desc clamped" id="crypto-info-desc">—</div>
+                <button class="crypto-info-toggle" id="crypto-info-toggle-btn" onclick="toggleCryptoDesc()">
+                    <span id="crypto-info-toggle-label">قراءة المزيد</span> <i class="fa-solid fa-chevron-down" id="crypto-info-toggle-icon"></i>
+                </button>
+                <div class="crypto-info-facts" id="crypto-info-facts"></div>
+                <div class="crypto-info-tags" id="crypto-info-tags"></div>
+            </div>
+        </div>
+        <div id="crypto-info-empty" style="display:none;" class="crypto-info-loading">لا تتوفر معلومات إضافية عن هذه العملة حاليًا</div>
+    </section>
 </div>
 
 <!-- ====== TOOLS SECTION ====== -->
@@ -2603,7 +2724,7 @@ function applyView(tabName, toolId) {
         if (toolEl) toolEl.style.display = 'block';
     }
     if (tabName === 'silver') loadSilverChart();
-    if (tabName === 'crypto-detail' && toolId) loadCryptoChart(toolId);
+    if (tabName === 'crypto-detail' && toolId) { loadCryptoChart(toolId); loadCryptoInfo(toolId); }
 }
 
 function navigateTo(tabName, toolId, opts) {
@@ -3171,6 +3292,129 @@ function loadCryptoChart(coinId) {
 
 function goToCryptoChart(coinId) {
     navigateTo('crypto-detail', coinId);
+}
+
+// ====== معلومات العملة الرقمية (وصف، روابط رسمية، تاريخ الاطلاق، تصنيف) ======
+const cryptoInfoCache = {}; // id -> data (بنكاشها عشان منعملش fetch جديد كل مرة نرجع لنفس العملة
+let currentCryptoInfoId = null;
+let cryptoDescExpanded = false;
+
+const CRYPTO_LINK_META = {
+    homepage:  { label: 'الموقع الرسمي',        icon: 'fa-solid fa-globe' },
+    whitepaper:{ label: 'الورقة البيضاء',        icon: 'fa-solid fa-file-lines' },
+    explorer:  { label: 'مستكشف البلوكتشين',     icon: 'fa-solid fa-cube' },
+    forum:     { label: 'المنتدى الرسمي',         icon: 'fa-solid fa-comments' },
+    github:    { label: 'GitHub',                 icon: 'fa-brands fa-github' },
+    subreddit: { label: 'المجتمع',                icon: 'fa-brands fa-reddit-alien' },
+    chat:      { label: 'قناة التواصل',           icon: 'fa-solid fa-message' },
+};
+
+function renderCryptoInfo(data, coinId) {
+    const loadingEl = document.getElementById('crypto-info-loading');
+    const contentEl = document.getElementById('crypto-info-content');
+    const emptyEl = document.getElementById('crypto-info-empty');
+    if (loadingEl) loadingEl.style.display = 'none';
+
+    if (!data || (!data.description && !data.links)) {
+        if (contentEl) contentEl.style.display = 'none';
+        if (emptyEl) emptyEl.style.display = 'block';
+        return;
+    }
+    if (emptyEl) emptyEl.style.display = 'none';
+    if (contentEl) contentEl.style.display = 'block';
+
+    const nameEl = document.getElementById('crypto-info-name-inline');
+    if (nameEl) nameEl.textContent = data.name || (cryptoCoins[coinId] ? cryptoCoins[coinId].name : 'العملة');
+
+    // الروابط
+    const linksContainer = document.getElementById('crypto-info-links');
+    if (linksContainer) {
+        linksContainer.innerHTML = '';
+        const links = data.links || {};
+        Object.keys(CRYPTO_LINK_META).forEach(key => {
+            const url = links[key];
+            if (!url) return;
+            const meta = CRYPTO_LINK_META[key];
+            const a = document.createElement('a');
+            a.className = 'crypto-link-chip';
+            a.href = url;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            a.innerHTML = '<i class="' + meta.icon + '"></i> ' + meta.label;
+            linksContainer.appendChild(a);
+        });
+    }
+
+    // الوصف
+    cryptoDescExpanded = false;
+    const descEl = document.getElementById('crypto-info-desc');
+    const toggleBtn = document.getElementById('crypto-info-toggle-btn');
+    if (descEl) {
+        descEl.textContent = data.description || 'لا يوجد وصف متاح لهذه العملة حاليًا.';
+        descEl.classList.add('clamped');
+    }
+    if (toggleBtn) toggleBtn.style.display = data.description ? 'inline-flex' : 'none';
+    updateCryptoToggleLabel();
+
+    // بيانات إضافية (تاريخ الاطلاق)
+    const factsEl = document.getElementById('crypto-info-facts');
+    if (factsEl) {
+        factsEl.innerHTML = '';
+        if (data.genesis_date) {
+            factsEl.innerHTML += '<div class="crypto-info-fact"><span class="crypto-info-fact-label">تاريخ الاطلاق</span><span class="crypto-info-fact-value">' + data.genesis_date + '</span></div>';
+        }
+    }
+
+    // التصنيفات
+    const tagsEl = document.getElementById('crypto-info-tags');
+    if (tagsEl) {
+        tagsEl.innerHTML = (data.categories || []).map(c => '<span class="crypto-info-tag">' + c + '</span>').join('');
+    }
+}
+
+function updateCryptoToggleLabel() {
+    const labelEl = document.getElementById('crypto-info-toggle-label');
+    const iconEl = document.getElementById('crypto-info-toggle-icon');
+    if (labelEl) labelEl.textContent = cryptoDescExpanded ? 'عرض أقل' : 'قراءة المزيد';
+    if (iconEl) iconEl.className = 'fa-solid ' + (cryptoDescExpanded ? 'fa-chevron-up' : 'fa-chevron-down');
+}
+
+function toggleCryptoDesc() {
+    cryptoDescExpanded = !cryptoDescExpanded;
+    const descEl = document.getElementById('crypto-info-desc');
+    if (descEl) descEl.classList.toggle('clamped', !cryptoDescExpanded);
+    updateCryptoToggleLabel();
+}
+
+async function loadCryptoInfo(coinId) {
+    currentCryptoInfoId = coinId;
+    const loadingEl = document.getElementById('crypto-info-loading');
+    const contentEl = document.getElementById('crypto-info-content');
+    const emptyEl = document.getElementById('crypto-info-empty');
+
+    if (cryptoInfoCache[coinId]) {
+        renderCryptoInfo(cryptoInfoCache[coinId], coinId);
+        return;
+    }
+
+    if (loadingEl) loadingEl.style.display = 'block';
+    if (contentEl) contentEl.style.display = 'none';
+    if (emptyEl) emptyEl.style.display = 'none';
+
+    try {
+        const res = await fetch('/api/crypto-info?id=' + encodeURIComponent(coinId));
+        if (!res.ok) throw new Error('crypto-info API error: ' + res.status);
+        const data = await res.json();
+        // لو المستخدم كان دخل على عملة تانية بسرعة قبل ما الطلب يخلص، منعرضش نتيجة قديمة
+        if (currentCryptoInfoId !== coinId) return;
+        cryptoInfoCache[coinId] = data;
+        renderCryptoInfo(data, coinId);
+    } catch (err) {
+        if (currentCryptoInfoId !== coinId) return;
+        if (loadingEl) loadingEl.style.display = 'none';
+        const emptyElNow = document.getElementById('crypto-info-empty');
+        if (emptyElNow) emptyElNow.style.display = 'block';
+    }
 }
 
 function calculateToolCrypto() {
