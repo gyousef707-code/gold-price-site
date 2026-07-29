@@ -1016,6 +1016,48 @@ body.light-mode .swap-btn { background: #f3f4f6; }
 .currency-card-price-value.sell { color: var(--success); }
 .currency-card-price-value.buy { color: var(--danger); }
 
+/* ====== Crypto Cards (اعلى 10 عملات رقمية) ====== */
+.crypto-card-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: var(--card-bg-elevated);
+    border: 1px solid var(--border-subtle);
+    object-fit: contain;
+}
+.crypto-card-rank {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 700;
+    min-width: 16px;
+    text-align: center;
+    flex-shrink: 0;
+}
+.crypto-card-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    flex-shrink: 0;
+}
+.crypto-card-price-egp {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--gold-bright);
+    white-space: nowrap;
+}
+.crypto-card-price-usd {
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+.crypto-list-loading {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    padding: 20px 0;
+}
+
 /* ====== Silver Cards - Vertical ====== */
 .silver-cards-grid {
     display: grid;
@@ -2101,23 +2143,6 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
         <div class="section-title-bar"><h2><i class="fa-solid fa-chart-area"></i> رسم بياني الفضة (TradingView)</h2></div>
         <div class="tradingview-widget-container">
             <div class="tradingview-widget-container__widget" id="tradingview-silver"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-            {
-                "autosize": false,
-                "width": "100%",
-                "height": "350",
-                "symbol": "OANDA:XAGUSD",
-                "interval": "60",
-                "timezone": "Africa/Cairo",
-                "theme": "dark",
-                "style": "1",
-                "locale": "ar",
-                "enable_publishing": false,
-                "allow_symbol_change": true,
-                "calendar": false,
-                "support_host": "https://www.tradingview.com"
-            }
-            </script>
         </div>
     </section>
 
@@ -2136,6 +2161,16 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
             <div class="calc-result-value" id="calc-silver-result">473.50</div>
             <div class="calc-result-unit">جنيه مصري</div>
         </div>
+    </div>
+</div>
+
+<!-- ====== CRYPTO SECTION ====== -->
+<div class="section" id="section-crypto">
+    <div class="section-title-bar" style="margin-bottom:14px;"><h2><i class="fa-solid fa-coins"></i> اسعار العملات الرقمية</h2></div>
+    <div class="section-title-bar" style="margin-bottom:12px;"><h2 style="font-size:13px;"><i class="fa-solid fa-list"></i> اعلى 10 عملات رقمية مقابل الجنيه المصري</h2></div>
+
+    <div class="currency-list-new" id="crypto-list">
+        <div class="crypto-list-loading">جاري تحميل اسعار العملات الرقمية...</div>
     </div>
 </div>
 
@@ -2410,11 +2445,40 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
     <button class="nav-item active" data-tab="prices"><i class="fa-solid fa-chart-line"></i><span>الاسعار</span></button>
     <button class="nav-item" data-tab="currencies"><i class="fa-solid fa-money-bill-transfer"></i><span>العملات</span></button>
     <button class="nav-item" data-tab="silver"><i class="fa-solid fa-gem"></i><span>الفضة</span></button>
+    <button class="nav-item" data-tab="crypto"><i class="fa-solid fa-coins"></i><span>رقمية</span></button>
     <button class="nav-item" data-tab="tools"><i class="fa-solid fa-toolbox"></i><span>الادوات</span></button>
 </nav>
 
 <script>
 // ====== تنقل مع دعم زرار الرجوع (Back) عشان ميقفلش التطبيق ======
+let silverChartLoaded = false;
+function loadSilverChart() {
+    if (silverChartLoaded) return;
+    silverChartLoaded = true;
+    const container = document.getElementById('tradingview-silver');
+    if (!container) return;
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+        autosize: false,
+        width: "100%",
+        height: "350",
+        symbol: "OANDA:XAGUSD",
+        interval: "60",
+        timezone: "Africa/Cairo",
+        theme: "dark",
+        style: "1",
+        locale: "ar",
+        enable_publishing: false,
+        allow_symbol_change: true,
+        calendar: false,
+        support_host: "https://www.tradingview.com"
+    });
+    container.appendChild(script);
+}
+
 function applyView(tabName, toolId) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -2427,6 +2491,7 @@ function applyView(tabName, toolId) {
         const toolEl = document.getElementById('tool-' + toolId);
         if (toolEl) toolEl.style.display = 'block';
     }
+    if (tabName === 'silver') loadSilverChart();
 }
 
 function navigateTo(tabName, toolId, opts) {
@@ -2845,6 +2910,66 @@ async function fetchCurrencyPrices() {
     }
 }
 
+// ====== اعلى 10 عملات رقمية مقابل الجنيه المصري ======
+function formatCryptoPrice(value, prefix) {
+    if (typeof value !== 'number') return '—';
+    const decimals = value >= 1 ? 2 : (value >= 0.01 ? 4 : 6);
+    return (prefix || '') + value.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
+function renderCryptoList(coins) {
+    const container = document.getElementById('crypto-list');
+    if (!container) return;
+    if (!coins || !coins.length) {
+        container.innerHTML = '<div class="crypto-list-loading">تعذر تحميل اسعار العملات الرقمية حاليًا</div>';
+        return;
+    }
+    container.innerHTML = '';
+    coins.forEach((coin, i) => {
+        const card = document.createElement('div');
+        card.className = 'currency-card-new';
+
+        const changeKnown = typeof coin.change_24h === 'number';
+        const isNeg = changeKnown && coin.change_24h < 0;
+        const changeHtml = changeKnown
+            ? '<span class="badge-change ' + (isNeg ? 'negative' : 'positive') + '">' +
+              (isNeg ? '&#9660; ' : '&#9650; ') + Math.abs(coin.change_24h).toFixed(2) + '%</span>'
+            : '';
+
+        card.innerHTML =
+            '<div class="currency-card-left">' +
+                '<span class="crypto-card-rank">' + (i + 1) + '</span>' +
+                (coin.image ? '<img class="crypto-card-icon" src="' + coin.image + '" alt="' + coin.symbol + '" loading="lazy">' : '') +
+                '<div class="currency-card-info">' +
+                    '<div class="currency-card-name">' + coin.name + '</div>' +
+                    '<div class="currency-card-code">' + coin.symbol + '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="crypto-card-right">' +
+                changeHtml +
+                '<span class="crypto-card-price-egp">' + formatCryptoPrice(coin.price_egp) + ' ج.م</span>' +
+                '<span class="crypto-card-price-usd">' + formatCryptoPrice(coin.price_usd, '$') + '</span>' +
+            '</div>';
+        container.appendChild(card);
+    });
+}
+
+async function fetchCryptoPrices() {
+    try {
+        const res = await fetch('/api/crypto-price');
+        if (!res.ok) throw new Error('crypto API error: ' + res.status);
+        const data = await res.json();
+        if (!data.coins) throw new Error('بيانات عملات رقمية ناقصة من الـ API');
+        renderCryptoList(data.coins);
+    } catch (err) {
+        console.warn('تعذر تحميل اسعار العملات الرقمية:', err.message);
+        const container = document.getElementById('crypto-list');
+        if (container && container.querySelector('.crypto-list-loading')) {
+            container.innerHTML = '<div class="crypto-list-loading">تعذر تحميل اسعار العملات الرقمية حاليًا</div>';
+        }
+    }
+}
+
 // ====== اخبار حقيقية من Google News RSS، بتتحدث تلقائي ======
 function renderNewsList(container, articles) {
     if (!container) return;
@@ -2889,13 +3014,15 @@ function fetchLivePrices() {
     fetchGoldPrices();
     fetchSilverPrices();
     fetchCurrencyPrices();
+    fetchCryptoPrices();
     fetchNews();
 }
 
 fetchLivePrices();
-setInterval(fetchGoldPrices, 5 * 1000);               // الذهب والاونصة: كل 5 ثواني (تحديث لحظي زي تريدنج فيو)
+setInterval(fetchGoldPrices, 30 * 1000);              // الذهب والاونصة: كل 30 ثانية (كفاية جدًا، السعر الفعلي بيتغير كام مرة في اليوم بس)
 setInterval(fetchSilverPrices, 8 * 60 * 60 * 1000);   // الفضة: كل 8 ساعات (يحافظ على حصة GoldAPI الشهرية)
 setInterval(fetchCurrencyPrices, 5 * 60 * 1000);      // العملات: كل 5 دقايق
+setInterval(fetchCryptoPrices, 60 * 1000);            // العملات الرقمية: كل دقيقة (اسعارها بتتحرك اسرع من الذهب والعملات)
 setInterval(fetchNews, 20 * 60 * 1000);               // الاخبار: كل 20 دقيقة
 
 // ====== الضغط على كارت ذهب/فضة ينقلك لأداة الحاسبة بنفس العيار ======
