@@ -34,10 +34,19 @@ const CURRENCIES = {
 
 module.exports = async function handler(req, res) {
   try {
-    const response = await fetch('https://banklive.net/en/currencies', {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DahabySite/1.0)' },
-      cache: 'no-store',
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+
+    let response;
+    try {
+      response = await fetch('https://banklive.net/en/currencies', {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DahabySite/1.0)' },
+        cache: 'no-store',
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timeout);
+    }
     if (!response.ok) throw new Error('تعذر الوصول لصفحة أسعار العملات على banklive.net');
 
     const html = await response.text();
