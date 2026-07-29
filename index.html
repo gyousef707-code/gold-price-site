@@ -2167,7 +2167,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
 <!-- ====== CRYPTO SECTION ====== -->
 <div class="section" id="section-crypto">
     <div class="section-title-bar" style="margin-bottom:14px;"><h2><i class="fa-solid fa-coins"></i> اسعار العملات الرقمية</h2></div>
-    <div class="section-title-bar" style="margin-bottom:12px;"><h2 style="font-size:13px;"><i class="fa-solid fa-list"></i> اعلى 10 عملات رقمية مقابل الجنيه المصري</h2></div>
+    <div class="section-title-bar" style="margin-bottom:12px;"><h2 style="font-size:13px;"><i class="fa-solid fa-list"></i> اعلى 20 عملة رقمية مقابل الجنيه المصري</h2></div>
 
     <div class="currency-list-new" id="crypto-list">
         <div class="crypto-list-loading">جاري تحميل اسعار العملات الرقمية...</div>
@@ -2188,6 +2188,11 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
             <i class="fa-solid fa-gem"></i>
             <h3>حاسبة الفضة</h3>
             <p>احسب قيمة الفضة حسب الوزن والعيار</p>
+        </div>
+        <div class="tool-card" onclick="switchTool('crypto-calc')">
+            <i class="fa-solid fa-coins"></i>
+            <h3>حاسبة العملات الرقمية</h3>
+            <p>احسب قيمة اي عملة رقمية بالجنيه او الدولار</p>
         </div>
         <div class="tool-card" onclick="switchTool('zakat-calc')">
             <i class="fa-solid fa-hand-holding-heart"></i>
@@ -2244,6 +2249,24 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
             <div class="calc-result-box">
                 <div class="calc-result-label">القيمة التقديرية</div>
                 <div class="calc-result-value" id="tool-silver-result">473.50</div>
+                <div class="calc-result-unit">جنيه مصري</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tool-crypto-calc" class="tool-detail" style="display:none;">
+        <div class="calc-card">
+            <div class="section-title-bar" style="margin-bottom:12px;"><h2><i class="fa-solid fa-coins"></i> حاسبة العملات الرقمية</h2></div>
+            <div class="calc-row">
+                <div class="calc-group"><label>العملة الرقمية</label><select class="calc-input calc-select" id="tool-crypto-coin" onchange="calculateToolCrypto()"></select></div>
+                <div class="calc-group"><label>الكمية</label><input type="number" class="calc-input" id="tool-crypto-amount" value="1" step="any" oninput="calculateToolCrypto()"></div>
+            </div>
+            <div class="calc-row">
+                <div class="calc-group"><label>العملة</label><select class="calc-input calc-select" id="tool-crypto-currency" onchange="calculateToolCrypto()"><option value="egp">جنيه مصري</option><option value="usd">دولار امريكي</option></select></div>
+            </div>
+            <div class="calc-result-box">
+                <div class="calc-result-label">القيمة التقديرية</div>
+                <div class="calc-result-value" id="tool-crypto-result">—</div>
                 <div class="calc-result-unit">جنيه مصري</div>
             </div>
         </div>
@@ -2910,11 +2933,27 @@ async function fetchCurrencyPrices() {
     }
 }
 
-// ====== اعلى 10 عملات رقمية مقابل الجنيه المصري ======
+// ====== اعلى 20 عملة رقمية مقابل الجنيه المصري ======
+let cryptoCoins = {}; // id -> {name, symbol, price_usd, price_egp}
+
 function formatCryptoPrice(value, prefix) {
     if (typeof value !== 'number') return '—';
     const decimals = value >= 1 ? 2 : (value >= 0.01 ? 4 : 6);
     return (prefix || '') + value.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+
+function populateCryptoSelect(coins) {
+    const select = document.getElementById('tool-crypto-coin');
+    if (!select) return;
+    const prevValue = select.value;
+    select.innerHTML = '';
+    coins.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = c.name + ' (' + c.symbol + ')';
+        select.appendChild(opt);
+    });
+    if (coins.some(c => c.id === prevValue)) select.value = prevValue;
 }
 
 function renderCryptoList(coins) {
@@ -2924,10 +2963,16 @@ function renderCryptoList(coins) {
         container.innerHTML = '<div class="crypto-list-loading">تعذر تحميل اسعار العملات الرقمية حاليًا</div>';
         return;
     }
+    cryptoCoins = {};
     container.innerHTML = '';
     coins.forEach((coin, i) => {
+        cryptoCoins[coin.id] = coin;
+
         const card = document.createElement('div');
         card.className = 'currency-card-new';
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('title', 'اضغط لحساب قيمة ' + coin.name + ' في الحاسبة');
 
         const changeKnown = typeof coin.change_24h === 'number';
         const isNeg = changeKnown && coin.change_24h < 0;
@@ -2950,8 +2995,44 @@ function renderCryptoList(coins) {
                 '<span class="crypto-card-price-egp">' + formatCryptoPrice(coin.price_egp) + ' ج.م</span>' +
                 '<span class="crypto-card-price-usd">' + formatCryptoPrice(coin.price_usd, '$') + '</span>' +
             '</div>';
+
+        const go = () => goToCryptoCalculator(coin.id);
+        card.addEventListener('click', go);
+        card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+
         container.appendChild(card);
     });
+
+    populateCryptoSelect(coins);
+    calculateToolCrypto();
+}
+
+function calculateToolCrypto() {
+    const select = document.getElementById('tool-crypto-coin');
+    const amountEl = document.getElementById('tool-crypto-amount');
+    const currencyEl = document.getElementById('tool-crypto-currency');
+    const resultEl = document.getElementById('tool-crypto-result');
+    if (!select || !amountEl || !currencyEl || !resultEl) return;
+    const coin = cryptoCoins[select.value];
+    if (!coin) {
+        resultEl.textContent = '—';
+        return;
+    }
+    const amount = parseFloat(amountEl.value) || 0;
+    const currency = currencyEl.value;
+    const price = currency === 'usd' ? coin.price_usd : coin.price_egp;
+    const total = amount * (typeof price === 'number' ? price : 0);
+    resultEl.textContent = total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    document.querySelector('#tool-crypto-calc .calc-result-unit').textContent = currency === 'usd' ? 'دولار امريكي' : 'جنيه مصري';
+}
+
+function goToCryptoCalculator(coinId) {
+    navigateTo('tools', 'crypto-calc');
+    const select = document.getElementById('tool-crypto-coin');
+    if (select && [...select.options].some(o => o.value === coinId)) {
+        select.value = coinId;
+    }
+    calculateToolCrypto();
 }
 
 async function fetchCryptoPrices() {
