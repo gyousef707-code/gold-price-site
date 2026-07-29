@@ -44,19 +44,29 @@ const GRAMS_PER_OUNCE = 31.1034768;
 
 module.exports = async function handler(req, res) {
   try {
-    const [response, currenciesRes] = await Promise.all([
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+
+    // بدل ما نعمل fetch مستقل لصفحة العملات (نفس اللي بيعملها currency-price.js)،
+    // بنستخدم الـ endpoint الداخلي بتاعنا، عشان مفيش تكرار لنفس الـ scrape
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    const baseUrl = `${protocol}://${req.headers.host}`;
+
+    const [response, currencyRes] = await Promise.allSettled([
       fetch('https://banklive.net/en/gold-price-today-in-egypt', {
         headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DahabySite/1.0)' },
         cache: 'no-store',
+        signal: controller.signal,
       }),
-      fetch('https://banklive.net/en/currencies', {
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DahabySite/1.0)' },
-        cache: 'no-store',
-      }),
+      fetch(`${baseUrl}/api/currency-price`, { signal: controller.signal }),
     ]);
-    if (!response.ok) throw new Error('تعذر الوصول لموقع banklive.net');
+    clearTimeout(timeout);
 
-    const html = await response.text();
+    if (response.status !== 'fulfilled' || !response.value.ok) {
+      throw new Error('تعذر الوصول لموقع banklive.net');
+    }
+
+    const html = await response.value.text();
     const rawText = stripTagsKeepPercent(html);
     const text = stripPercents(rawText);
 
@@ -100,16 +110,19 @@ module.exports = async function handler(req, res) {
     const changeMatch = rawText.match(/XAU\/USD\s*\$?\s*[\d,]+\.?\d*\s*([-+]?\d+\.?\d*)%/);
     const ounce_change_percent = changeMatch ? parseFloat(changeMatch[1]) : null;
 
-    // سعر الدولار الرسمي في البنوك — بناخده من نفس صفحة العملات (banklive.net/en/currencies)
-    // اللي هي المصدر الصحيح، بدل صفحة الذهب اللي كان بيتأخر تحديثها أحيانًا
+    // سعر الدولار الرسمي في البنوك — بناخده من الـ endpoint الداخلي /api/currency-price
+    // (بدل ما نعمل fetch جديد لصفحة banklive.net/en/currencies ونكرر نفس الـ scrape)
     let bank_usd_rate = null;
-    if (currenciesRes.ok) {
-      const currenciesHtml = await currenciesRes.text();
-      const currenciesText = stripTagsKeepPercent(currenciesHtml).replace(/\s+/g, ' ');
-      bank_usd_rate = extractOne(currenciesText, 'USDEGP');
+    if (currencyRes.status === 'fulfilled' && currencyRes.value.ok) {
+      try {
+        const currencyData = await currencyRes.value.json();
+        bank_usd_rate = currencyData.rates?.usd?.mid || null;
+      } catch (_) {
+        // تجاهل أي خطأ في قراءة الـ JSON ونروح للاحتياطي تحت
+      }
     }
     if (!bank_usd_rate) {
-      // احتياطي فقط لو صفحة العملات فشلت لأي سبب
+      // احتياطي أخير فقط لو /api/currency-price فشل لأي سبب
       bank_usd_rate = extractOne(text, 'USD (Bank)');
     }
 
