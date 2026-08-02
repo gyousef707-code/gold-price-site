@@ -562,6 +562,54 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     box-shadow: 0 6px 18px rgba(227,179,65,0.12);
     border-color: var(--gold-primary);
 }
+
+/* ====== زرار مشاركة السعر (موجود على كل كارت ذهب وفضة) ====== */
+.card-share-btn {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10.5px;
+    cursor: pointer;
+    transition: 0.2s;
+    z-index: 3;
+    padding: 0;
+}
+.card-share-btn:hover {
+    color: var(--gold-primary);
+    border-color: var(--border-gold);
+    background: rgba(227,179,65,0.14);
+    transform: scale(1.08);
+}
+body.light-mode .card-share-btn { background: rgba(0,0,0,0.04); }
+
+/* ====== توست بسيط لتأكيد نجاح المشاركة/النسخ ====== */
+.app-toast {
+    position: fixed;
+    bottom: 86px;
+    left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: var(--card-bg-elevated);
+    border: 1px solid var(--border-gold);
+    color: var(--text-color);
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 500;
+    opacity: 0;
+    transition: 0.3s ease;
+    pointer-events: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+    max-width: 86%;
+    text-align: center;
+}
+.app-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .gold-card.featured {
     border: 2px solid var(--gold-primary);
     box-shadow: 0 0 16px rgba(227,179,65,0.12);
@@ -1205,6 +1253,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     border-radius: 16px;
     padding: 12px 6px;
     text-align: center;
+    position: relative;
     transition: all 0.25s ease;
 }
 .silver-card:hover {
@@ -1648,7 +1697,6 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
             <div class="ounce-footer">
                 <span class="live-pulse" id="gold-live-pulse"><span class="update-dot"></span> مباشر</span>
                 <span class="market-status-badge" id="gold-market-status"></span>
-                <span>دولار امريكي</span>
                 <span class="updated-time-badge" id="gold-updated-time"></span>
             </div>
         </div>
@@ -1657,6 +1705,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
     <section class="carats-unified-section">
         <div class="gold-cards-grid">
             <div class="gold-card featured">
+                <button class="card-share-btn" onclick="sharePriceCard(event, this)" title="مشاركة السعر" aria-label="مشاركة السعر"><i class="fa-solid fa-share-nodes"></i></button>
                 <div class="gold-card-icon-top"><i class="fa-solid fa-coins"></i></div>
                 <div class="gold-carat-wrap">
                     <span class="gold-carat-label">عيار</span>
@@ -1673,6 +1722,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
                 </div>
             </div>
             <div class="gold-card">
+                <button class="card-share-btn" onclick="sharePriceCard(event, this)" title="مشاركة السعر" aria-label="مشاركة السعر"><i class="fa-solid fa-share-nodes"></i></button>
                 <div class="gold-card-icon-top"><i class="fa-solid fa-coins"></i></div>
                 <div class="gold-carat-wrap">
                     <span class="gold-carat-label">عيار</span>
@@ -1689,6 +1739,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
                 </div>
             </div>
             <div class="gold-card">
+                <button class="card-share-btn" onclick="sharePriceCard(event, this)" title="مشاركة السعر" aria-label="مشاركة السعر"><i class="fa-solid fa-share-nodes"></i></button>
                 <div class="gold-card-icon-top"><i class="fa-solid fa-coins"></i></div>
                 <div class="gold-carat-wrap">
                     <span class="gold-carat-label">عيار</span>
@@ -1705,6 +1756,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
                 </div>
             </div>
             <div class="gold-card">
+                <button class="card-share-btn" onclick="sharePriceCard(event, this)" title="مشاركة السعر" aria-label="مشاركة السعر"><i class="fa-solid fa-share-nodes"></i></button>
                 <div class="gold-card-icon-top"><i class="fa-solid fa-coins"></i></div>
                 <div class="gold-carat-wrap">
                     <span class="gold-carat-label">عيار</span>
@@ -1721,6 +1773,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
                 </div>
             </div>
             <div class="gold-card">
+                <button class="card-share-btn" onclick="sharePriceCard(event, this)" title="مشاركة السعر" aria-label="مشاركة السعر"><i class="fa-solid fa-share-nodes"></i></button>
                 <div class="gold-card-icon-top"><i class="fa-solid fa-coins"></i></div>
                 <div class="gold-carat-wrap">
                     <span class="gold-carat-label">عيار</span>
@@ -1737,6 +1790,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
                 </div>
             </div>
             <div class="gold-card">
+                <button class="card-share-btn" onclick="sharePriceCard(event, this)" title="مشاركة السعر" aria-label="مشاركة السعر"><i class="fa-solid fa-share-nodes"></i></button>
                 <div class="gold-card-icon-top"><i class="fa-solid fa-coins"></i></div>
                 <div class="gold-carat-wrap">
                     <span class="gold-carat-label">عيار</span>
@@ -1753,6 +1807,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
                 </div>
             </div>
             <div class="gold-card" id="gold-pound-card" style="border-color: rgba(227,179,65,0.4); grid-column: span 2;">
+                <button class="card-share-btn" onclick="sharePriceCard(event, this)" title="مشاركة السعر" aria-label="مشاركة السعر"><i class="fa-solid fa-share-nodes"></i></button>
                 <div class="gold-card-icon-top"><i class="fa-solid fa-sack-dollar"></i></div>
                 <div class="gold-carat-wrap" style="margin-bottom: 14px;">
                     <span class="gold-carat-label" style="font-size: 10px;">الجنيه</span>
@@ -2155,11 +2210,12 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
             <span class="badge-change" id="silver-ounce-change"></span>
         </div>
         <div class="ounce-price" id="silver-ounce-price">$51.20</div>
-        <div class="ounce-footer"><span class="live-pulse" id="silver-live-pulse"><span class="update-dot"></span> مباشر</span><span class="market-status-badge" id="silver-market-status"></span><span>دولار امريكي</span><span class="updated-time-badge" id="silver-updated-time"></span></div>
+        <div class="ounce-footer"><span class="live-pulse" id="silver-live-pulse"><span class="update-dot"></span> مباشر</span><span class="market-status-badge" id="silver-market-status"></span><span class="updated-time-badge" id="silver-updated-time"></span></div>
     </div>
 
     <div class="silver-cards-grid">
         <div class="silver-card">
+                <button class="card-share-btn" onclick="sharePriceCard(event, this)" title="مشاركة السعر" aria-label="مشاركة السعر"><i class="fa-solid fa-share-nodes"></i></button>
             <div class="silver-card-icon-top"><i class="fa-solid fa-gem"></i></div>
             <div class="silver-carat-wrap">
                 <span class="silver-carat-label">عيار</span>
@@ -2176,6 +2232,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
             </div>
         </div>
         <div class="silver-card">
+                <button class="card-share-btn" onclick="sharePriceCard(event, this)" title="مشاركة السعر" aria-label="مشاركة السعر"><i class="fa-solid fa-share-nodes"></i></button>
             <div class="silver-card-icon-top"><i class="fa-solid fa-gem"></i></div>
             <div class="silver-carat-wrap">
                 <span class="silver-carat-label">عيار</span>
@@ -2192,6 +2249,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
             </div>
         </div>
         <div class="silver-card">
+                <button class="card-share-btn" onclick="sharePriceCard(event, this)" title="مشاركة السعر" aria-label="مشاركة السعر"><i class="fa-solid fa-share-nodes"></i></button>
             <div class="silver-card-icon-top"><i class="fa-solid fa-gem"></i></div>
             <div class="silver-carat-wrap">
                 <span class="silver-carat-label">عيار</span>
@@ -2208,6 +2266,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
             </div>
         </div>
         <div class="silver-card">
+                <button class="card-share-btn" onclick="sharePriceCard(event, this)" title="مشاركة السعر" aria-label="مشاركة السعر"><i class="fa-solid fa-share-nodes"></i></button>
             <div class="silver-card-icon-top"><i class="fa-solid fa-gem"></i></div>
             <div class="silver-carat-wrap">
                 <span class="silver-carat-label">عيار</span>
@@ -2224,6 +2283,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
             </div>
         </div>
         <div class="silver-card">
+                <button class="card-share-btn" onclick="sharePriceCard(event, this)" title="مشاركة السعر" aria-label="مشاركة السعر"><i class="fa-solid fa-share-nodes"></i></button>
             <div class="silver-card-icon-top"><i class="fa-solid fa-gem"></i></div>
             <div class="silver-carat-wrap">
                 <span class="silver-carat-label">عيار</span>
@@ -2240,6 +2300,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
             </div>
         </div>
         <div class="silver-card">
+                <button class="card-share-btn" onclick="sharePriceCard(event, this)" title="مشاركة السعر" aria-label="مشاركة السعر"><i class="fa-solid fa-share-nodes"></i></button>
             <div class="silver-card-icon-top"><i class="fa-solid fa-gem"></i></div>
             <div class="silver-carat-wrap">
                 <span class="silver-carat-label">عيار</span>
@@ -2984,6 +3045,55 @@ calculateSilverSavings();
 calculateConverter();
 
 // ====== أسعار الذهب اللايف من شعبة الذهب المصرية (egajtd.com) ======
+// ====== مشاركة سعر أي كارت (ذهب أو فضة) لأي حد - واتساب/فيسبوك/أي حاجة ======
+function sharePriceCard(evt, btnEl) {
+    if (evt) evt.stopPropagation();
+    const card = btnEl.closest('.gold-card, .silver-card');
+    if (!card) return;
+    const isGold = card.classList.contains('gold-card');
+    let label, bodyLines;
+    if (card.id === 'gold-pound-card') {
+        label = 'الجنيه الذهب';
+        const priceEl = document.getElementById('gold-pound-price');
+        bodyLines = ['💰 السعر: ' + (priceEl ? priceEl.textContent.trim() : '—') + ' جنيه'];
+    } else {
+        const caratEl = card.querySelector('.gold-carat-num, .silver-carat-num');
+        const caratNum = caratEl ? caratEl.textContent.trim() : '';
+        label = (isGold ? 'الذهب عيار ' : 'الفضة عيار ') + caratNum;
+        const values = card.querySelectorAll('.gold-v-value, .silver-v-value');
+        const sell = values[0] ? values[0].textContent.trim() : '—';
+        const buy = values[1] ? values[1].textContent.trim() : '—';
+        bodyLines = ['💰 البيع: ' + sell + ' جنيه', '💵 الشراء: ' + buy + ' جنيه'];
+    }
+    const text = 'سعر ' + label + ' اليوم:\n' + bodyLines.join('\n') +
+                 '\n\nتابع اسعار الذهب والفضة والعملات لحظة بلحظة على تطبيق ذهبي 👇';
+    const url = window.location.origin + window.location.pathname;
+    if (navigator.share) {
+        navigator.share({ title: 'ذهبي - ' + label, text: text, url: url }).catch(() => {});
+    } else if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text + '\n' + url)
+            .then(() => showToast('اتنسخ السعر - تقدر تلصقه وتبعته لأي حد'))
+            .catch(() => showToast('مقدرش أنسخ السعر، جرب تاني'));
+    } else {
+        showToast('المتصفح ده مش بيدعم المشاركة أو النسخ');
+    }
+}
+
+let toastHideTimer = null;
+function showToast(msg) {
+    let el = document.getElementById('app-toast');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'app-toast';
+        el.className = 'app-toast';
+        document.body.appendChild(el);
+    }
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastHideTimer);
+    toastHideTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
 async function fetchGoldPrices() {
     try {
         const res = await fetch('/api/gold-price');
