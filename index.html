@@ -487,6 +487,14 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     border-radius: 50%;
     animation: pulse-live 1.8s infinite;
 }
+.live-pulse.paused {
+    background: rgba(139,148,158,0.15);
+    color: var(--text-muted);
+}
+.live-pulse.paused .update-dot {
+    background: var(--text-muted);
+    animation: none;
+}
 @keyframes pulse-live {
     0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(63,185,80,0.6); }
     50% { opacity: 0.5; box-shadow: 0 0 0 8px rgba(63,185,80,0); }
@@ -507,8 +515,8 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     color: var(--success);
 }
 .market-status-badge.closed {
-    background: rgba(139,148,158,0.15);
-    color: var(--text-muted);
+    background: rgba(248,81,73,0.12);
+    color: var(--danger);
 }
 .market-status-dot {
     display: inline-block;
@@ -520,7 +528,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     animation: pulse-live 1.8s infinite;
 }
 .market-status-badge.closed .market-status-dot {
-    background: var(--text-muted);
+    background: var(--danger);
 }
 
 /* ====== GOLD CARDS - VERTICAL ====== */
@@ -1628,7 +1636,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
             </div>
             <div class="ounce-price" id="gold-ounce-price">$4,078.85</div>
             <div class="ounce-footer">
-                <span class="live-pulse"><span class="update-dot"></span> مباشر</span>
+                <span class="live-pulse" id="gold-live-pulse"><span class="update-dot"></span> مباشر</span>
                 <span class="market-status-badge" id="gold-market-status"></span>
                 <span>دولار امريكي</span>
                 <span class="updated-time-badge" id="gold-updated-time"></span>
@@ -2154,7 +2162,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
             <span class="badge-change" id="silver-ounce-change"></span>
         </div>
         <div class="ounce-price" id="silver-ounce-price">$51.20</div>
-        <div class="ounce-footer"><span class="live-pulse"><span class="update-dot"></span> مباشر</span><span class="market-status-badge" id="silver-market-status"></span><span>دولار امريكي</span><span class="updated-time-badge" id="silver-updated-time"></span></div>
+        <div class="ounce-footer"><span class="live-pulse" id="silver-live-pulse"><span class="update-dot"></span> مباشر</span><span class="market-status-badge" id="silver-market-status"></span><span>دولار امريكي</span><span class="updated-time-badge" id="silver-updated-time"></span></div>
     </div>
 
     <div class="silver-cards-grid">
@@ -3517,6 +3525,25 @@ function relativeTimeAr(ts) {
     return 'منذ ' + diffDay + ' يوم';
 }
 
+// ====== تاريخ ووقت فعلي واضح (بدل "الآن" بس) عشان يبان للزوار إن السعر محدّث فعلًا ولحظيًا ======
+const ARABIC_WEEKDAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+const ARABIC_MONTHS = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+function formatDateTimeAr(ts) {
+    const cairoNowStr = new Date().toLocaleString('en-US', { timeZone: 'Africa/Cairo', hour12: false });
+    const cairoTsStr = new Date(ts).toLocaleString('en-US', { timeZone: 'Africa/Cairo', hour12: false });
+    const now = new Date(cairoNowStr);
+    const d = new Date(cairoTsStr);
+    let hours = d.getHours();
+    const minutes = d.getMinutes().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'م' : 'ص';
+    hours = hours % 12; if (hours === 0) hours = 12;
+    const timeStr = hours + ':' + minutes + ' ' + ampm;
+    if (d.toDateString() === now.toDateString()) return 'اليوم ' + timeStr;
+    const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1);
+    if (d.toDateString() === yesterday.toDateString()) return 'أمس ' + timeStr;
+    return ARABIC_WEEKDAYS[d.getDay()] + ' ' + d.getDate() + ' ' + ARABIC_MONTHS[d.getMonth()] + ' - ' + timeStr;
+}
+
 // بيقارن الأسعار الجديدة بالمخزّنة قبل كده، ويحدّث بادچ % لكل عيار، ويولّد اشعار لو التغيّر كبير
 function trackPriceChanges(metal, priceMap, labelPrefix) {
     const history = loadPriceHistory();
@@ -3558,22 +3585,23 @@ function trackPriceChanges(metal, priceMap, labelPrefix) {
 const lastUpdateTimes = { gold: null, silver: null };
 function updateTimeBadges() {
     const goldBadge = document.getElementById('gold-updated-time');
-    if (goldBadge && lastUpdateTimes.gold) goldBadge.textContent = relativeTimeAr(lastUpdateTimes.gold);
+    if (goldBadge && lastUpdateTimes.gold) goldBadge.textContent = relativeTimeAr(lastUpdateTimes.gold) + ' · ' + formatDateTimeAr(lastUpdateTimes.gold);
     const silverBadge = document.getElementById('silver-updated-time');
-    if (silverBadge && lastUpdateTimes.silver) silverBadge.textContent = relativeTimeAr(lastUpdateTimes.silver);
+    if (silverBadge && lastUpdateTimes.silver) silverBadge.textContent = relativeTimeAr(lastUpdateTimes.silver) + ' · ' + formatDateTimeAr(lastUpdateTimes.silver);
 }
 setInterval(updateTimeBadges, 30 * 1000);
 
 // ====== حالة السوق العالمي: مفتوح / مغلق ======
-// السوق العالمي (فوركس/معادن) بيقفل من الجمعة بعد الساعة 12 صباحًا (تقريبًا) لحد الأحد الساعة 1 صباحًا بتوقيت القاهرة
+// السوق العالمي (فوركس/معادن) بيفتح الأحد الساعة 11 مساءً (تقريبًا) بتوقيت القاهرة، ويقفل الجمعة الساعة 11 مساءً، ومقفول طول السبت
 function isMarketOpen() {
     const cairoStr = new Date().toLocaleString('en-US', { timeZone: 'Africa/Cairo', hour12: false });
     const cairoDate = new Date(cairoStr);
     const day = cairoDate.getDay(); // 0 = الأحد ... 6 = السبت
     const hour = cairoDate.getHours();
-    if (day === 6) return false; // السبت طول اليوم مغلق
-    if (day === 0 && hour < 1) return false; // الأحد قبل الساعة 1 صباحًا لسه مغلق
-    return true;
+    if (day === 6) return false;               // السبت: مغلق طول اليوم
+    if (day === 0) return hour >= 23;           // الأحد: مغلق لحد الساعة 11 بالليل
+    if (day === 5) return hour < 23;            // الجمعة: بيقفل الساعة 11 بالليل
+    return true;                                // من الإتنين للخميس: مفتوح طول الوقت
 }
 function updateMarketStatus() {
     const open = isMarketOpen();
@@ -3583,6 +3611,18 @@ function updateMarketStatus() {
         if (!el) return;
         el.className = 'market-status-badge ' + (open ? 'open' : 'closed');
         el.innerHTML = '<span class="market-status-dot"></span>' + label;
+    });
+    // لما السوق يكون مغلق، مبينفعش نفضل نقول "مباشر" باللون الأخضر - بيبقى تناقض بصري مربك للزائر
+    ['gold-live-pulse', 'silver-live-pulse'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (open) {
+            el.classList.remove('paused');
+            el.innerHTML = '<span class="update-dot"></span> مباشر';
+        } else {
+            el.classList.add('paused');
+            el.innerHTML = '<span class="update-dot"></span> آخر سعر قبل الإغلاق';
+        }
     });
 }
 updateMarketStatus();
