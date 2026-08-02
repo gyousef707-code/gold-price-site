@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23e3b341'/%3E%3Cstop offset='50%25' stop-color='%23f0c040'/%3E%3Cstop offset='100%25' stop-color='%23b8860b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='48' fill='url(%23g)' stroke='%23161b22' stroke-width='3'/%3E%3Ctext x='50' y='62' font-size='30' text-anchor='middle' fill='%230d1117' font-family='Cairo,serif' font-weight='800'%3Eذهبي%3C/text%3E%3C/svg%3E">
 <meta name="theme-color" content="#0d1117">
+
+<!-- preconnect: بنخلي المتصفح يبدأ يتصل بالسيرفرات دي بدري قبل ما يحتاجها فعليًا، فتقل ثواني التحميل الأول -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="dns-prefetch" href="https://s3.tradingview.com">
+<link rel="dns-prefetch" href="https://flagcdn.com">
+
 <link rel="manifest" href="/manifest.json">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png">
@@ -429,7 +437,9 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     color: var(--text-muted);
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 8px;
+    row-gap: 6px;
     position: relative;
     z-index: 1;
 }
@@ -1782,23 +1792,6 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
         <div class="section-title-bar"><h2><i class="fa-solid fa-chart-area"></i> رسم بياني الذهب (TradingView)</h2></div>
         <div class="tradingview-widget-container">
             <div class="tradingview-widget-container__widget" id="tradingview-gold"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
-            {
-                "autosize": false,
-                "width": "100%",
-                "height": "350",
-                "symbol": "OANDA:XAUUSD",
-                "interval": "60",
-                "timezone": "Africa/Cairo",
-                "theme": "dark",
-                "style": "1",
-                "locale": "ar",
-                "enable_publishing": false,
-                "allow_symbol_change": true,
-                "calendar": false,
-                "support_host": "https://www.tradingview.com"
-            }
-            </script>
         </div>
     </section>
 
@@ -2637,6 +2630,48 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
 
 <script>
 // ====== تنقل مع دعم زرار الرجوع (Back) عشان ميقفلش التطبيق ======
+let goldChartLoaded = false;
+function loadGoldChart() {
+    if (goldChartLoaded) return;
+    goldChartLoaded = true;
+    const container = document.getElementById('tradingview-gold');
+    if (!container) return;
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+        autosize: false,
+        width: "100%",
+        height: "350",
+        symbol: "OANDA:XAUUSD",
+        interval: "60",
+        timezone: "Africa/Cairo",
+        theme: "dark",
+        style: "1",
+        locale: "ar",
+        enable_publishing: false,
+        allow_symbol_change: true,
+        calendar: false,
+        support_host: "https://www.tradingview.com"
+    });
+    container.appendChild(script);
+}
+// بنستنى لحد ما المستخدم يقرب يوصل للرسم البياني بالسكرول قبل ما نحمّله - ده بيسرّع فتح الصفحة الأولانية جدًا
+// (شارت TradingView تقيل نسبيًا، ومفيش داعي نحمّله قبل ما حد يشوفه فعلًا)
+const goldChartObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            loadGoldChart();
+            goldChartObserver.disconnect();
+        }
+    });
+}, { rootMargin: '400px' });
+document.addEventListener('DOMContentLoaded', () => {
+    const el = document.getElementById('tradingview-gold');
+    if (el) goldChartObserver.observe(el);
+});
+
 let silverChartLoaded = false;
 function loadSilverChart() {
     if (silverChartLoaded) return;
@@ -3379,11 +3414,16 @@ async function fetchNews() {
 }
 
 function fetchLivePrices() {
+    // سعر الذهب هو أهم حاجة يشوفها الزائر أول ما الصفحة تفتح، فبنجيبه فورًا من غير منافسة على الشبكة
     fetchGoldPrices();
-    fetchSilverPrices();
-    fetchCurrencyPrices();
-    fetchCryptoPrices();
-    fetchNews();
+    // الباقي (فضة، عملات، رقمية، أخبار) مش ظاهر للمستخدم غالبًا في أول ثانية، فبنأخرهم شوية بسيط
+    // عشان طلب سعر الذهب ياخد الأولوية في الشبكة ويبان أسرع بكتير
+    setTimeout(() => {
+        fetchSilverPrices();
+        fetchCurrencyPrices();
+        fetchCryptoPrices();
+        fetchNews();
+    }, 300);
 }
 
 fetchLivePrices();
