@@ -1,0 +1,156 @@
+// api/gold-price.js
+// يجيب أسعار الذهب اللحظية الفعلية من banklive.net (متابعة مستمرة لأسعار محلات الذهب في مصر)
+// مصدر مجاني بدون مفتاح API وبدون حد شهري للطلبات
+
+function stripTagsKeepPercent(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ');
+}
+
+function stripPercents(text) {
+  return text.replace(/[-+]?\d+(?:\.\d+)?%/g, ' ').replace(/\s+/g, ' ');
+}
+
+// بيرجع أعلى وأقل رقم بعد التسمية (سعر البيع لك وسعر الشراء منك)
+function extractPair(text, label) {
+  const idx = text.indexOf(label);
+  if (idx === -1) return null;
+  const after = text.slice(idx + label.length, idx + label.length + 150);
+  const nums = after.match(/[\d,]+\.?\d*/g);
+  if (!nums || nums.length < 2) return null;
+  const v1 = parseFloat(nums[0].replace(/,/g, ''));
+  const v2 = parseFloat(nums[1].replace(/,/g, ''));
+  if (isNaN(v1) || isNaN(v2)) return null;
+  return { sell: Math.max(v1, v2), buy: Math.min(v1, v2) };
+}
+
+// بيرجع رقم واحد بعد التسمية (زي سعر الدولار في البنك)
+function extractOne(text, label) {
+  const idx = text.indexOf(label);
+  if (idx === -1) return null;
+  const after = text.slice(idx + label.length, idx + label.length + 60);
+  const nums = after.match(/[\d,]+\.?\d*/g);
+  if (!nums || nums.length < 1) return null;
+  const v = parseFloat(nums[0].replace(/,/g, ''));
+  return isNaN(v) ? null : v;
+}
+
+const GRAMS_PER_OUNCE = 31.1034768;
+
+module.exports = async function handler(req, res) {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+
+    // بدل ما نعمل fetch مستقل لصفحة العملات (نفس اللي بيعملها currency-price.js)،
+    // بنستخدم الـ endpoint الداخلي بتاعنا، عشان مفيش تكرار لنفس الـ scrape
+    const protocol = req.headers['x-forwarded-proto'] || 'https';
+    const baseUrl = `${protocol}://${req.headers.host}`;
+
+    const [response, currencyRes] = await Promise.allSettled([
+      fetch('https://banklive.net/en/gold-price-today-in-egypt', {
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; DahabySite/1.0)' },
+        cache: 'no-store',
+        signal: controller.signal,
+      }),
+      fetch(`${baseUrl}/api/currency-price`, { signal: controller.signal }),
+    ]);
+    clearTimeout(timeout);
+
+    if (response.status !== 'fulfilled' || !response.value.ok) {
+      throw new Error('تعذر الوصول لموقع banklive.net');
+    }
+
+    const html = await response.value.text();
+    const rawText = stripTagsKeepPercent(html);
+    const text = stripPercents(rawText);
+
+    const k24 = extractPair(text, 'Gold 24 Karat');
+    const k22 = extractPair(text, 'Gold 22 Karat');
+    const k21 = extractPair(text, 'Gold 21 Karat');
+    const k18 = extractPair(text, 'Gold 18 Karat');
+    const k14 = extractPair(text, 'Gold 14 Karat');
+    const k12 = extractPair(text, 'Gold 12 Karat');
+    const pound = extractPair(text, 'Gold Pound');
+
+    if (!k24) {
+      throw new Error('لم يتم العثور على جدول الأسعار - شكل الموقع ممكن يكون اتغيّر');
+    }
+
+    const caratPrices = { 24: k24 };
+    if (k22) caratPrices[22] = k22;
+    if (k21) caratPrices[21] = k21;
+    if (k18) caratPrices[18] = k18;
+    if (k14) caratPrices[14] = k14;
+    if (k12) caratPrices[12] = k12;
+
+    // أي عيار ناقص (نادر) بنشتقه من عيار 24 بنفس نسبة النقاء
+    const GOLD_PURITY = { 24: 0.999, 22: 0.916, 21: 0.875, 18: 0.750, 14: 0.583, 12: 0.500 };
+    const unitSell = k24.sell / GOLD_PURITY[24];
+    const unitBuy = k24.buy / GOLD_PURITY[24];
+    for (const c of [24, 22, 21, 18, 14, 12]) {
+      if (!caratPrices[c]) {
+        caratPrices[c] = {
+          sell: Math.round(unitSell * GOLD_PURITY[c]),
+          buy: Math.round(unitBuy * GOLD_PURITY[c]),
+        };
+      }
+    }
+
+    // سعر الأونصة العالمية بالدولار
+    const ounceMatch = text.match(/XAU\/USD\s*\$?\s*([\d,]+\.?\d*)/);
+    const ounce_usd = ounceMatch ? parseFloat(ounceMatch[1].replace(/,/g, '')) : null;
+
+    // نسبة تغيّر الأونصة اليومية (زي -0.003% أو +1.2%)
+    const changeMatch = rawText.match(/XAU\/USD\s*\$?\s*[\d,]+\.?\d*\s*([-+]?\d+\.?\d*)%/);
+    const ounce_change_percent = changeMatch ? parseFloat(changeMatch[1]) : null;
+
+    // سعر الدولار الرسمي في البنوك — بناخده من الـ endpoint الداخلي /api/currency-price
+    // (بدل ما نعمل fetch جديد لصفحة banklive.net/en/currencies ونكرر نفس الـ scrape)
+    let bank_usd_rate = null;
+    if (currencyRes.status === 'fulfilled' && currencyRes.value.ok) {
+      try {
+        const currencyData = await currencyRes.value.json();
+        bank_usd_rate = currencyData.rates?.usd?.mid || null;
+      } catch (_) {
+        // تجاهل أي خطأ في قراءة الـ JSON ونروح للاحتياطي تحت
+      }
+    }
+    if (!bank_usd_rate) {
+      // احتياطي أخير فقط لو /api/currency-price فشل لأي سبب
+      bank_usd_rate = extractOne(text, 'USD (Bank)');
+    }
+
+    // "دولار الصاغة" = سعر الدولار الضمني المحسوب من سعر عيار 24 المحلي مقابل سعر الأونصة العالمية
+    let implied_usd_rate = null;
+    let gap_value = null;
+    if (ounce_usd && bank_usd_rate) {
+      const pureGramUsd = (ounce_usd / GRAMS_PER_OUNCE) * GOLD_PURITY[24];
+      implied_usd_rate = Number((k24.sell / pureGramUsd).toFixed(2));
+      // قيمة الفجوة = الفرق المباشر بين دولار الصاغة (الضمني) ودولار البنك، بنفس وحدة الجنيه/دولار
+      gap_value = Number((implied_usd_rate - bank_usd_rate).toFixed(2));
+    }
+
+    // كاش قصير (45 ثانية) عشان الاسعار تفضل قريبة من اللايف بدل ما تفضل ثابتة لمدة طويلة
+    res.setHeader('Cache-Control', 's-maxage=45, stale-while-revalidate=60');
+
+    return res.status(200).json({
+      source: 'banklive.net',
+      ounce_usd,
+      ounce_change_percent,
+      pound: pound || null,
+      caratPrices,
+      bank_usd_rate,
+      implied_usd_rate,
+      gap_value,
+      updated_at: new Date().toISOString(),
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};

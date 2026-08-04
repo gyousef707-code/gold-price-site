@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /api/
 
-Sitemap: https://gold-price-site-chi.vercel.app/sitemap.xml
+Sitemap: https://zahaby1.com/sitemap.xml
