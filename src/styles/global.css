@@ -62,11 +62,21 @@ img { max-width: 100%; display: block; }
 .logo-text {
   font-size: 20px;
   font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 6px;
   background: linear-gradient(135deg, var(--gold-primary) 0%, var(--gold-bright) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+.logo-dot {
+  color: var(--danger);
+  -webkit-text-fill-color: var(--danger);
+  font-size: 9px;
+  animation: pulse 1.6s infinite;
+}
+.logo-link { text-decoration: none; display: flex; align-items: center; }
 .icon-btn {
   width: 40px; height: 40px;
   border-radius: 12px;
@@ -141,28 +151,58 @@ img { max-width: 100%; display: block; }
 
 .section-title { font-size: 17px; font-weight: 700; margin: 22px 0 12px; color: var(--text-color); }
 
-.price-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.price-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
 .price-card {
-  background: linear-gradient(145deg, var(--card-bg) 0%, var(--card-bg-elevated) 100%);
+  position: relative;
+  background: linear-gradient(145deg, var(--card-bg) 0%, rgba(22,27,34,0.9) 100%);
   border: 1px solid var(--border-subtle);
-  border-radius: 14px; padding: 14px;
+  border-radius: 16px; padding: 12px 6px;
+  text-align: center;
+  text-decoration: none;
+  transition: transform .15s ease;
 }
-.price-card .carat-title-top { font-size: 13px; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; }
-.price-card .p-row { display: flex; justify-content: space-between; font-size: 13.5px; margin-bottom: 4px; }
-.price-card .p-label { color: var(--text-muted); }
-.price-card .p-value { font-weight: 800; }
-.price-card .buy-v { color: var(--success); }
-.price-card .sell-v { color: var(--gold-primary); }
+.price-card:active { transform: scale(0.97); }
+.price-card.featured { border: 2px solid var(--gold-primary); box-shadow: 0 0 16px rgba(227,179,65,0.12); }
+.price-card .card-icon-top { color: var(--gold-primary); font-size: 15px; margin-bottom: 6px; }
+.price-card .carat-title-top { font-size: 15px; color: var(--text-color); font-weight: 800; margin-bottom: 8px; }
+.price-card .p-row { display: flex; flex-direction: column; font-size: 11px; margin-bottom: 6px; gap: 2px; }
+.price-card .p-label { color: var(--text-muted); font-size: 10.5px; }
+.price-card .p-value { font-weight: 800; font-size: 14px; }
+.price-card .buy-v { color: var(--danger); }
+.price-card .sell-v { color: var(--success); }
 .price-card a { text-decoration: none; }
+
+@media (min-width: 900px) {
+  .price-cards { grid-template-columns: repeat(6, 1fr); gap: 14px; }
+  .price-card { padding: 16px 8px; }
+  .price-card .carat-title-top { font-size: 17px; }
+  .price-card .p-value { font-size: 15px; }
+}
 
 .ounce-card {
   background: linear-gradient(145deg, var(--card-bg) 0%, var(--card-bg-elevated) 100%);
   border: 1px solid var(--border-gold); border-radius: 14px; padding: 16px; margin-bottom: 14px;
 }
+.ounce-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 .ounce-header { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
-.ounce-value { font-size: 26px; font-weight: 800; color: var(--gold-primary); }
-.live-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--success); margin-inline-start: 8px; }
+.ounce-header-label { font-size: 12.5px; color: var(--text-muted); }
+.ounce-value { font-size: 30px; font-weight: 800; color: var(--gold-primary); text-align: left; }
+.ounce-footer { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.change-badge {
+  display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700;
+  padding: 4px 10px; border-radius: 20px;
+}
+.change-badge.up { color: var(--success); background: rgba(63,185,80,0.12); }
+.change-badge.down { color: var(--danger); background: rgba(248,81,73,0.12); }
+.live-badge {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--success);
+  background: rgba(63,185,80,0.12); padding: 5px 12px; border-radius: 20px;
+}
 .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); animation: pulse 1.6s infinite; }
+.market-badge {
+  font-size: 12px; font-weight: 700; color: var(--success);
+  background: rgba(63,185,80,0.12); padding: 5px 12px; border-radius: 20px;
+}
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
 
 .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 22px; }
@@ -278,6 +318,5 @@ img { max-width: 100%; display: block; }
 .related-article-card i { color: var(--gold-primary); }
 
 @media (min-width: 640px) {
-  .price-cards { grid-template-columns: repeat(3, 1fr); }
   .tools-grid { grid-template-columns: repeat(4, 1fr); }
 }

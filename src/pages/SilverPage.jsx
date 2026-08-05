@@ -20,12 +20,15 @@ export default function SilverPage() {
 
       <section>
         <div className="ounce-card">
-          <div className="ounce-header">
-            XAG/USD - أونصة الفضة العالمية (لحظي)
-            <span className="live-badge"><span className="live-dot" /> مباشر</span>
+          <div className="ounce-top-row">
+            <span className="ounce-header-label">XAG/USD - أونصة الفضة العالمية (لحظي)</span>
           </div>
           <div className="ounce-value">
             {data?.ounce_usd ? `$${Number(data.ounce_usd).toLocaleString('en-US', { maximumFractionDigits: 2 })}` : '—'}
+          </div>
+          <div className="ounce-footer">
+            <span className="live-badge"><span className="live-dot" /> مباشر</span>
+            <span className="market-badge">السوق مفتوح</span>
           </div>
         </div>
 
@@ -37,6 +40,7 @@ export default function SilverPage() {
             const p = data?.silverPrices?.[c];
             return (
               <div key={c} className="price-card">
+                <div className="card-icon-top"><i className="fa-solid fa-gem" /></div>
                 <div className="carat-title-top">عيار {c}</div>
                 <div className="p-row">
                   <span className="p-label">البيع لك</span>

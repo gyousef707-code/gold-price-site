@@ -22,12 +22,21 @@ export default function GoldPage() {
 
       <section>
         <div className="ounce-card">
-          <div className="ounce-header">
-            XAU/USD - سعر الأونصة العالمية (لحظي)
-            <span className="live-badge"><span className="live-dot" /> مباشر</span>
+          <div className="ounce-top-row">
+            {data?.ounce_change_percent != null && (
+              <span className={`change-badge ${Number(data.ounce_change_percent) >= 0 ? 'up' : 'down'}`}>
+                <i className={`fa-solid ${Number(data.ounce_change_percent) >= 0 ? 'fa-caret-up' : 'fa-caret-down'}`} />
+                {Math.abs(Number(data.ounce_change_percent)).toFixed(2)}%
+              </span>
+            )}
+            <span className="ounce-header-label">XAU/USD - سعر الأونصة العالمية (لحظي)</span>
           </div>
           <div className="ounce-value">
             {data?.ounce_usd ? `$${Number(data.ounce_usd).toLocaleString('en-US', { maximumFractionDigits: 2 })}` : '—'}
+          </div>
+          <div className="ounce-footer">
+            <span className="live-badge"><span className="live-dot" /> مباشر</span>
+            <span className="market-badge">السوق مفتوح</span>
           </div>
         </div>
 
@@ -38,7 +47,8 @@ export default function GoldPage() {
           {KARAT_ORDER.map((k) => {
             const p = data?.caratPrices?.[k];
             return (
-              <Link key={k} to={`/gold/${k}`} className="price-card">
+              <Link key={k} to={`/gold/${k}`} className={`price-card${k === '24' ? ' featured' : ''}`}>
+                <div className="card-icon-top"><i className="fa-solid fa-coins" /></div>
                 <div className="carat-title-top">عيار {k}</div>
                 <div className="p-row">
                   <span className="p-label">البيع لك</span>
