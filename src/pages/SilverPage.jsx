@@ -1,7 +1,7 @@
+import { Link } from 'react-router-dom';
 import Seo from '../components/Seo.jsx';
 import TradingViewChart from '../components/TradingViewChart.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
-import NewsList from '../components/NewsList.jsx';
 import useApiData from '../hooks/useApiData.js';
 
 const CARAT_ORDER = ['999', '925', '900', '800', '720', '500'];
@@ -22,7 +22,7 @@ export default function SilverPage() {
   const { data, loading, error } = useApiData('/api/silver-price', { intervalMs: 5 * 60000 });
 
   return (
-    <div className="page-wrap">
+    <div className="main-content">
       <Seo
         title="سعر الفضة اليوم في مصر | ذهبي"
         description="تابع سعر الفضة اليوم في مصر لحظة بلحظة بكل العيارات: 999، 925، 900، 800، 720، 500، بيع وشراء."
@@ -62,19 +62,21 @@ export default function SilverPage() {
                 >
                   <i className="fa-solid fa-share-nodes" />
                 </button>
-                <div className="silver-card-icon-top"><i className="fa-solid fa-gem" /></div>
-                <div className="silver-carat-wrap">
-                  <span className="silver-carat-label">عيار</span>
-                  <span className="silver-carat-num">{c}</span>
-                </div>
-                <div className="silver-v-row">
-                  <span className="silver-v-label">البيع لك</span>
-                  <span className="silver-v-value sell-price">{p ? p.sell.toLocaleString('en-US') : '—'}</span>
-                </div>
-                <div className="silver-v-row">
-                  <span className="silver-v-label">الشراء منك</span>
-                  <span className="silver-v-value buy-price">{p ? p.buy.toLocaleString('en-US') : '—'}</span>
-                </div>
+                <Link to="/blog/gold-vs-silver-investment" style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
+                  <div className="silver-card-icon-top"><i className="fa-solid fa-gem" /></div>
+                  <div className="silver-carat-wrap">
+                    <span className="silver-carat-label">عيار</span>
+                    <span className="silver-carat-num">{c}</span>
+                  </div>
+                  <div className="silver-v-row">
+                    <span className="silver-v-label">البيع لك</span>
+                    <span className="silver-v-value sell-price">{p ? p.sell.toLocaleString('en-US') : '—'}</span>
+                  </div>
+                  <div className="silver-v-row">
+                    <span className="silver-v-label">الشراء منك</span>
+                    <span className="silver-v-value buy-price">{p ? p.buy.toLocaleString('en-US') : '—'}</span>
+                  </div>
+                </Link>
               </div>
             );
           })}
@@ -84,8 +86,6 @@ export default function SilverPage() {
       <TradingViewChart symbol="OANDA:XAGUSD" id="tradingview-silver" />
 
       <RelatedArticles slugs={['gold-vs-silver-investment', 'gold-price-today-egypt', 'best-time-to-buy-gold']} />
-
-      <NewsList />
     </div>
   );
 }

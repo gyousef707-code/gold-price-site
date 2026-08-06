@@ -1,15 +1,22 @@
+import { useRef, useState } from 'react';
 import Seo from '../components/Seo.jsx';
 import CurrencyConverter from '../components/CurrencyConverter.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
-import NewsList from '../components/NewsList.jsx';
 import useApiData from '../hooks/useApiData.js';
 import { CURRENCY_META, CURRENCY_ORDER } from '../data/currencies.js';
 
 export default function CurrenciesPage() {
   const { data, loading, error } = useApiData('/api/currency-price', { intervalMs: 2 * 60000 });
+  const [focusCurrency, setFocusCurrency] = useState('usd');
+  const converterRef = useRef(null);
+
+  const selectCurrency = (code) => {
+    setFocusCurrency(code);
+    converterRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
-    <div className="page-wrap">
+    <div className="main-content">
       <Seo
         title="اسعار العملات اليوم في مصر | ذهبي"
         description="تابع اسعار العملات اليوم بالجنيه المصري لحظة بلحظة، ومحول عملات مجاني بين أكتر من 14 عملة."
@@ -17,16 +24,16 @@ export default function CurrenciesPage() {
         path="/currencies"
       />
 
-      <section>
+      <section ref={converterRef}>
         <div className="section-title-bar">
           <h2><i className="fa-solid fa-right-left" /> محول العملات</h2>
         </div>
-        <CurrencyConverter rates={data?.rates} />
+        <CurrencyConverter rates={data?.rates} initialFrom={focusCurrency} key={focusCurrency} />
       </section>
 
       <section>
         <div className="section-title-bar">
-          <h2><i className="fa-solid fa-list" /> سعر صرف العملات بالجنيه المصري</h2>
+          <h2><i className="fa-solid fa-list" /> سعر صرف العملات بالجنيه المصري (اضغط على أي عملة لتحويلها)</h2>
         </div>
         {loading && <p className="loading-text">جارِ تحميل الأسعار...</p>}
         {error && !loading && <p className="error-text">تعذر تحميل الأسعار حاليًا</p>}
@@ -35,7 +42,12 @@ export default function CurrenciesPage() {
             const r = data?.rates?.[code];
             const meta = CURRENCY_META[code];
             return (
-              <div key={code} className="currency-card-new">
+              <button
+                key={code}
+                type="button"
+                className={`currency-card-new${code === focusCurrency ? ' active' : ''}`}
+                onClick={() => selectCurrency(code)}
+              >
                 <div className="currency-card-left">
                   <div className="currency-card-flag">
                     <img src={`https://flagcdn.com/24x18/${meta.flag}.png`} width="24" height="18" alt={code} style={{ borderRadius: 4 }} />
@@ -55,15 +67,13 @@ export default function CurrenciesPage() {
                     <div className="currency-card-price-value sell">{r ? r.sell.toLocaleString('en-US') : '—'}</div>
                   </div>
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>
       </section>
 
       <RelatedArticles slugs={['gold-price-forecast-2026', 'why-gold-price-differs-shops', 'gold-price-today-egypt']} />
-
-      <NewsList />
     </div>
   );
 }

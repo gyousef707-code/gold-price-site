@@ -1,14 +1,13 @@
 import { Link } from 'react-router-dom';
 import Seo from '../components/Seo.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
-import NewsList from '../components/NewsList.jsx';
 import useApiData from '../hooks/useApiData.js';
 
 export default function CryptoPage() {
   const { data, loading, error } = useApiData('/api/crypto-price', { intervalMs: 60000 });
 
   return (
-    <div className="page-wrap">
+    <div className="main-content">
       <Seo
         title="اسعار العملات الرقمية اليوم | ذهبي"
         description="تابع اعلى 20 عملة رقمية بالجنيه المصري والدولار لحظة بلحظة: بيتكوين، إيثيريوم، تيثر وأكتر."
@@ -52,8 +51,6 @@ export default function CryptoPage() {
       </section>
 
       <RelatedArticles slugs={['gold-vs-silver-investment', 'gold-price-forecast-2026', 'beginners-guide-gold-investment']} />
-
-      <NewsList />
     </div>
   );
 }
