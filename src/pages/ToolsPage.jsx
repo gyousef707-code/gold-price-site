@@ -27,7 +27,7 @@ function scrollToId(id) {
 
 export default function ToolsPage() {
   return (
-    <div className="page-wrap">
+    <div className="main-content">
       <Seo
         title="الأدوات والحاسبات | ذهبي"
         description="كل حاسبات ذهبي في مكان واحد: حاسبة الذهب، الفضة، الزكاة، محول العملات، حاسبة العملات الرقمية، وخطط الادخار."
@@ -40,14 +40,14 @@ export default function ToolsPage() {
       <div className="tools-grid">
         {CARDS.map((c) =>
           c.isLink ? (
-            <Link key={c.anchor} to={c.isLink} className="tool-card-sm">
-              <div className="t-icon"><i className={c.icon} /></div>
+            <Link key={c.anchor} to={c.isLink} className="tool-card">
+              <i className={c.icon} />
               <h3>{c.title}</h3>
               <p>{c.desc}</p>
             </Link>
           ) : (
-            <button key={c.anchor} className="tool-card-sm" onClick={() => scrollToId(c.anchor)} type="button">
-              <div className="t-icon"><i className={c.icon} /></div>
+            <button key={c.anchor} className="tool-card" onClick={() => scrollToId(c.anchor)} type="button">
+              <i className={c.icon} />
               <h3>{c.title}</h3>
               <p>{c.desc}</p>
             </button>

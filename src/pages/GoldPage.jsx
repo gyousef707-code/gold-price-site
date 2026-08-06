@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import Seo from '../components/Seo.jsx';
 import TradingViewChart from '../components/TradingViewChart.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
-import NewsList from '../components/NewsList.jsx';
 import useApiData from '../hooks/useApiData.js';
 
 const KARAT_ORDER = ['24', '22', '21', '18', '14', '12'];
@@ -24,7 +23,7 @@ export default function GoldPage() {
   const changePct = data?.ounce_change_percent != null ? Number(data.ounce_change_percent) : null;
 
   return (
-    <div className="page-wrap">
+    <div className="main-content">
       <Seo
         title="سعر الذهب اليوم في مصر | ذهبي"
         description="تابع سعر الذهب اليوم في مصر لحظة بلحظة: عيار 24 و21 و18 وكل العيارات، بيع وشراء، محدثة أوتوماتيك."
@@ -99,19 +98,28 @@ export default function GoldPage() {
         )}
 
         {data?.gap_value != null && (
-          <div className="ounce-card" style={{ marginBottom: 12 }}>
-            <div className="ounce-header"><span>مؤشر الفجوة السعرية (24)</span></div>
-            <div className="gold-v-row">
-              <span className="gold-v-label">دولار الصاغة</span>
-              <span className="gold-v-value" style={{ fontSize: 16 }}>{data.implied_usd_rate}</span>
+          <div className="gap-indicator-section">
+            <div className="section-title-bar">
+              <h2><i className="fa-solid fa-scale-unbalanced" /> مؤشر الفجوة السعرية (24)</h2>
             </div>
-            <div className="gold-v-row">
-              <span className="gold-v-label">دولار البنك</span>
-              <span className="gold-v-value" style={{ fontSize: 16 }}>{data.bank_usd_rate}</span>
-            </div>
-            <div className="gold-v-row">
-              <span className="gold-v-label">قيمة الفجوة</span>
-              <span className="gold-v-value" style={{ fontSize: 16 }}>{data.gap_value} ج.م</span>
+            <div className="gap-card-container">
+              <div className="dollar-side-boxes">
+                <div className="mini-dollar-box">
+                  <span className="md-title">دولار الصاغة</span>
+                  <span className="md-val">{data.implied_usd_rate}</span>
+                </div>
+                <div className="mini-dollar-box">
+                  <span className="md-title">دولار البنك</span>
+                  <span className="md-val">{data.bank_usd_rate}</span>
+                </div>
+              </div>
+              <div className="gap-circle-badge">
+                <div className="gap-circle-inner">
+                  <span className="gap-label-top">الفجوة</span>
+                  <span className="gap-number">{data.gap_value}</span>
+                  <span className="gap-unit">ج.م</span>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -120,8 +128,6 @@ export default function GoldPage() {
       <TradingViewChart symbol="OANDA:XAUUSD" id="tradingview-gold" />
 
       <RelatedArticles slugs={['gold-price-today-egypt', 'difference-21-24-karat', 'gold-zakat-calculation']} />
-
-      <NewsList />
     </div>
   );
 }

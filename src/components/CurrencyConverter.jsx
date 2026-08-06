@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import { CURRENCY_META, CURRENCY_ORDER } from '../data/currencies.js';
 
-export default function CurrencyConverter({ rates }) {
+export default function CurrencyConverter({ rates, initialFrom = 'usd' }) {
   const [amount, setAmount] = useState(100);
-  const [from, setFrom] = useState('usd');
+  const [from, setFrom] = useState(initialFrom);
   const [to, setTo] = useState('egp');
 
   const allCodes = ['egp', ...CURRENCY_ORDER];

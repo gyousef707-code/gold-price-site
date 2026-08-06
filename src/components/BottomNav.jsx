@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 
 const TABS = [
-  { to: '/', icon: 'fa-solid fa-chart-line', label: 'الاسعار', end: true },
+  { to: '/', icon: 'fa-solid fa-chart-line', label: 'الذهب', end: true },
   { to: '/currencies', icon: 'fa-solid fa-money-bill-transfer', label: 'العملات' },
   { to: '/silver', icon: 'fa-solid fa-gem', label: 'الفضة' },
   { to: '/crypto', icon: 'fa-solid fa-coins', label: 'رقمية' },
