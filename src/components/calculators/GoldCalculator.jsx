@@ -19,33 +19,42 @@ export default function GoldCalculator() {
   }, [data, weight, karat, priceType, currency]);
 
   return (
-    <div className="calc-box" id="tool-gold-calc">
-      <h3 style={{ fontSize: 15, marginBottom: 4 }}>حاسبة الذهب</h3>
-      <p style={{ fontSize: 12.5, color: 'var(--text-muted)', marginBottom: 4 }}>احسب قيمة ذهبك حسب الوزن والعيار</p>
-
-      <div className="calc-label">الوزن (جرام)</div>
-      <input className="calc-input" type="number" value={weight} onChange={(e) => setWeight(Number(e.target.value) || 0)} />
-
-      <div className="calc-label">العيار</div>
-      <select className="calc-select" value={karat} onChange={(e) => setKarat(e.target.value)}>
-        {['24', '22', '21', '18', '14', '12'].map((k) => <option key={k} value={k}>عيار {k}</option>)}
-      </select>
-
-      <div className="calc-label">نوع السعر</div>
-      <select className="calc-select" value={priceType} onChange={(e) => setPriceType(e.target.value)}>
-        <option value="sell">سعر البيع</option>
-        <option value="buy">سعر الشراء</option>
-      </select>
-
-      <div className="calc-label">العملة</div>
-      <select className="calc-select" value={currency} onChange={(e) => setCurrency(e.target.value)}>
-        <option value="egp">جنيه مصري</option>
-        <option value="usd">دولار امريكي</option>
-      </select>
-
+    <div className="calc-card" id="tool-gold-calc">
+      <div className="section-title-bar" style={{ marginBottom: 12 }}>
+        <h2><i className="fa-solid fa-calculator" /> حاسبة الذهب</h2>
+      </div>
+      <div className="calc-row">
+        <div className="calc-group">
+          <label>الوزن (جرام)</label>
+          <input type="number" className="calc-input" value={weight} onChange={(e) => setWeight(Number(e.target.value) || 0)} />
+        </div>
+        <div className="calc-group">
+          <label>العيار</label>
+          <select className="calc-input calc-select" value={karat} onChange={(e) => setKarat(e.target.value)}>
+            {['24', '22', '21', '18', '14', '12'].map((k) => <option key={k} value={k}>عيار {k}</option>)}
+          </select>
+        </div>
+      </div>
+      <div className="calc-row">
+        <div className="calc-group">
+          <label>نوع السعر</label>
+          <select className="calc-input calc-select" value={priceType} onChange={(e) => setPriceType(e.target.value)}>
+            <option value="sell">سعر البيع</option>
+            <option value="buy">سعر الشراء</option>
+          </select>
+        </div>
+        <div className="calc-group">
+          <label>العملة</label>
+          <select className="calc-input calc-select" value={currency} onChange={(e) => setCurrency(e.target.value)}>
+            <option value="egp">جنيه مصري</option>
+            <option value="usd">دولار امريكي</option>
+          </select>
+        </div>
+      </div>
       <div className="calc-result-box">
+        <div className="calc-result-label">القيمة التقديرية</div>
         <div className="calc-result-value">{result != null ? result.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '—'}</div>
-        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{currency === 'egp' ? 'جنيه مصري' : 'دولار امريكي'}</div>
+        <div className="calc-result-unit">{currency === 'egp' ? 'جنيه مصري' : 'دولار امريكي'}</div>
       </div>
     </div>
   );

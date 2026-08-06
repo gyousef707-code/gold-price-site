@@ -17,27 +17,35 @@ export default function CryptoCalculator() {
   }, [coin, qty, currency]);
 
   return (
-    <div className="calc-box" id="tool-crypto-calc">
-      <h3 style={{ fontSize: 15, marginBottom: 4 }}>حاسبة العملات الرقمية</h3>
-      <p style={{ fontSize: 12.5, color: 'var(--text-muted)', marginBottom: 4 }}>احسب قيمة اي عملة رقمية بالجنيه او الدولار</p>
-
-      <div className="calc-label">العملة الرقمية</div>
-      <select className="calc-select" value={coinId} onChange={(e) => setCoinId(e.target.value)}>
-        {coins.map((c) => <option key={c.id} value={c.id}>{c.name} ({c.symbol})</option>)}
-      </select>
-
-      <div className="calc-label">الكمية</div>
-      <input className="calc-input" type="number" value={qty} onChange={(e) => setQty(Number(e.target.value) || 0)} />
-
-      <div className="calc-label">العملة</div>
-      <select className="calc-select" value={currency} onChange={(e) => setCurrency(e.target.value)}>
-        <option value="egp">جنيه مصري</option>
-        <option value="usd">دولار امريكي</option>
-      </select>
-
+    <div className="calc-card" id="tool-crypto-calc">
+      <div className="section-title-bar" style={{ marginBottom: 12 }}>
+        <h2><i className="fa-brands fa-bitcoin" /> حاسبة العملات الرقمية</h2>
+      </div>
+      <div className="calc-row">
+        <div className="calc-group">
+          <label>العملة الرقمية</label>
+          <select className="calc-input calc-select" value={coinId} onChange={(e) => setCoinId(e.target.value)}>
+            {coins.map((c) => <option key={c.id} value={c.id}>{c.name} ({c.symbol})</option>)}
+          </select>
+        </div>
+        <div className="calc-group">
+          <label>الكمية</label>
+          <input type="number" className="calc-input" value={qty} onChange={(e) => setQty(Number(e.target.value) || 0)} />
+        </div>
+      </div>
+      <div className="calc-row">
+        <div className="calc-group">
+          <label>العملة</label>
+          <select className="calc-input calc-select" value={currency} onChange={(e) => setCurrency(e.target.value)}>
+            <option value="egp">جنيه مصري</option>
+            <option value="usd">دولار امريكي</option>
+          </select>
+        </div>
+      </div>
       <div className="calc-result-box">
+        <div className="calc-result-label">القيمة التقديرية</div>
         <div className="calc-result-value">{result != null ? result.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '—'}</div>
-        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{currency === 'egp' ? 'جنيه مصري' : 'دولار امريكي'}</div>
+        <div className="calc-result-unit">{currency === 'egp' ? 'جنيه مصري' : 'دولار امريكي'}</div>
       </div>
     </div>
   );

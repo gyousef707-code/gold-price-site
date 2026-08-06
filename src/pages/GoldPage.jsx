@@ -4,12 +4,24 @@ import TradingViewChart from '../components/TradingViewChart.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
 import NewsList from '../components/NewsList.jsx';
 import useApiData from '../hooks/useApiData.js';
-import { goldKarats } from '../data/gold.js';
 
 const KARAT_ORDER = ['24', '22', '21', '18', '14', '12'];
 
+function sharePriceCard(e, karat, sell, buy) {
+  e.preventDefault();
+  e.stopPropagation();
+  const text = `سعر عيار ${karat} اليوم: البيع ${sell} ج.م - الشراء ${buy} ج.م - عبر تطبيق ذهبي`;
+  if (navigator.share) {
+    navigator.share({ title: 'ذهبي', text }).catch(() => {});
+  } else {
+    navigator.clipboard?.writeText(text);
+    alert('تم نسخ السعر');
+  }
+}
+
 export default function GoldPage() {
   const { data, loading, error } = useApiData('/api/gold-price', { intervalMs: 45000 });
+  const changePct = data?.ounce_change_percent != null ? Number(data.ounce_change_percent) : null;
 
   return (
     <div className="page-wrap">
@@ -20,72 +32,86 @@ export default function GoldPage() {
         path="/"
       />
 
-      <section>
+      <section className="global-ounce-section">
         <div className="ounce-card">
-          <div className="ounce-top-row">
-            {data?.ounce_change_percent != null && (
-              <span className={`change-badge ${Number(data.ounce_change_percent) >= 0 ? 'up' : 'down'}`}>
-                <i className={`fa-solid ${Number(data.ounce_change_percent) >= 0 ? 'fa-caret-up' : 'fa-caret-down'}`} />
-                {Math.abs(Number(data.ounce_change_percent)).toFixed(2)}%
+          <div className="ounce-header">
+            <span>XAU/USD - سعر الاونصة العالمية (لحظي)</span>
+            {changePct != null && (
+              <span className={`badge-change ${changePct >= 0 ? 'positive' : 'negative'}`}>
+                {changePct >= 0 ? '▲' : '▼'} {Math.abs(changePct).toFixed(2)}%
               </span>
             )}
-            <span className="ounce-header-label">XAU/USD - سعر الأونصة العالمية (لحظي)</span>
           </div>
-          <div className="ounce-value">
+          <div className="ounce-price">
             {data?.ounce_usd ? `$${Number(data.ounce_usd).toLocaleString('en-US', { maximumFractionDigits: 2 })}` : '—'}
           </div>
           <div className="ounce-footer">
-            <span className="live-badge"><span className="live-dot" /> مباشر</span>
-            <span className="market-badge">السوق مفتوح</span>
+            <span className="live-pulse"><span className="update-dot" /> مباشر</span>
+            <span className="market-status-badge open"><span className="market-status-dot" /> السوق مفتوح</span>
           </div>
         </div>
+      </section>
 
-        {loading && <p className="loading-text">جارِ تحميل الأسعار...</p>}
-        {error && !loading && <p className="error-text">تعذر تحميل الأسعار حاليًا، حاول تاني بعد شوية.</p>}
+      {loading && <p className="loading-text">جارِ تحميل الأسعار...</p>}
+      {error && !loading && <p className="error-text">تعذر تحميل الأسعار حاليًا، حاول تاني بعد شوية.</p>}
 
-        <div className="price-cards">
+      <section className="carats-unified-section">
+        <div className="gold-cards-grid">
           {KARAT_ORDER.map((k) => {
             const p = data?.caratPrices?.[k];
             return (
-              <Link key={k} to={`/gold/${k}`} className={`price-card${k === '24' ? ' featured' : ''}`}>
-                <div className="card-icon-top"><i className="fa-solid fa-coins" /></div>
-                <div className="carat-title-top">عيار {k}</div>
-                <div className="p-row">
-                  <span className="p-label">البيع لك</span>
-                  <span className="p-value sell-v">{p ? p.sell.toLocaleString('en-US') : '—'}</span>
-                </div>
-                <div className="p-row">
-                  <span className="p-label">الشراء منك</span>
-                  <span className="p-value buy-v">{p ? p.buy.toLocaleString('en-US') : '—'}</span>
-                </div>
-              </Link>
+              <div key={k} className={`gold-card clickable-card${k === '24' ? ' featured' : ''}`}>
+                <button
+                  className="card-share-btn"
+                  title="مشاركة السعر"
+                  aria-label="مشاركة السعر"
+                  onClick={(e) => sharePriceCard(e, k, p?.sell, p?.buy)}
+                >
+                  <i className="fa-solid fa-share-nodes" />
+                </button>
+                <Link to={`/gold/${k}`} style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
+                  <div className="gold-card-icon-top"><i className="fa-solid fa-coins" /></div>
+                  <div className="gold-carat-wrap">
+                    <span className="gold-carat-label">عيار</span>
+                    <span className="gold-carat-num">{k}</span>
+                  </div>
+                  <div className="gold-v-row">
+                    <span className="gold-v-label">البيع لك</span>
+                    <span className="gold-v-value sell-price">{p ? p.sell.toLocaleString('en-US') : '—'}</span>
+                  </div>
+                  <div className="gold-v-row">
+                    <span className="gold-v-label">الشراء منك</span>
+                    <span className="gold-v-value buy-price">{p ? p.buy.toLocaleString('en-US') : '—'}</span>
+                  </div>
+                </Link>
+              </div>
             );
           })}
         </div>
 
         {data?.pound && (
-          <div className="ounce-card" style={{ marginTop: 12 }}>
-            <div className="ounce-header">الجنيه ذهب</div>
-            <div className="ounce-value" style={{ fontSize: 20 }}>
-              {data.pound.sell.toLocaleString('en-US')} جنيه مصري
+          <div className="ounce-card" style={{ marginBottom: 12 }}>
+            <div className="ounce-header"><span>الجنيه ذهب</span></div>
+            <div className="ounce-price" style={{ fontSize: 26 }}>
+              {data.pound.sell.toLocaleString('en-US')} <span style={{ fontSize: 14, color: 'var(--text-muted)' }}>جنيه مصري</span>
             </div>
           </div>
         )}
 
         {data?.gap_value != null && (
-          <div className="ounce-card" style={{ marginTop: 12 }}>
-            <div className="ounce-header">مؤشر الفجوة السعرية (24)</div>
-            <div className="p-row">
-              <span className="p-label">دولار الصاغة</span>
-              <span className="p-value">{data.implied_usd_rate}</span>
+          <div className="ounce-card" style={{ marginBottom: 12 }}>
+            <div className="ounce-header"><span>مؤشر الفجوة السعرية (24)</span></div>
+            <div className="gold-v-row">
+              <span className="gold-v-label">دولار الصاغة</span>
+              <span className="gold-v-value" style={{ fontSize: 16 }}>{data.implied_usd_rate}</span>
             </div>
-            <div className="p-row">
-              <span className="p-label">دولار البنك</span>
-              <span className="p-value">{data.bank_usd_rate}</span>
+            <div className="gold-v-row">
+              <span className="gold-v-label">دولار البنك</span>
+              <span className="gold-v-value" style={{ fontSize: 16 }}>{data.bank_usd_rate}</span>
             </div>
-            <div className="p-row">
-              <span className="p-label">قيمة الفجوة</span>
-              <span className="p-value">{data.gap_value} ج.م</span>
+            <div className="gold-v-row">
+              <span className="gold-v-label">قيمة الفجوة</span>
+              <span className="gold-v-value" style={{ fontSize: 16 }}>{data.gap_value} ج.م</span>
             </div>
           </div>
         )}

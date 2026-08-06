@@ -26,15 +26,27 @@ export default function CryptoCoinPage() {
       <span className="eyebrow">عملات رقمية</span>
       <h1>{info.h1}</h1>
 
-      <div className="live-cta">
-        <div>
-          <p style={{ fontWeight: 700, marginBottom: 4 }}>
-            ${liveCoin ? liveCoin.price_usd.toLocaleString('en-US') : '—'}
-          </p>
-          <p style={{ margin: 0 }}>
-            {liveCoin ? liveCoin.price_egp.toLocaleString('en-US') : '—'} ج.م
-          </p>
+      <div className="crypto-detail-header">
+        {liveCoin?.image && <img className="crypto-detail-icon" src={liveCoin.image} alt={liveCoin.symbol} />}
+        <div className="crypto-detail-info">
+          <h2>{liveCoin?.name || info.h1.split('(')[0]}</h2>
+          <span className="crypto-detail-symbol-badge">{liveCoin?.symbol}</span>
         </div>
+      </div>
+
+      <div className="crypto-detail-prices">
+        <div className="crypto-detail-price-box">
+          <span className="crypto-detail-price-label">السعر بالدولار</span>
+          <span className="crypto-detail-price-value">${liveCoin ? liveCoin.price_usd.toLocaleString('en-US') : '—'}</span>
+        </div>
+        <div className="crypto-detail-price-box">
+          <span className="crypto-detail-price-label">السعر بالجنيه</span>
+          <span className="crypto-detail-price-value">{liveCoin ? liveCoin.price_egp.toLocaleString('en-US') : '—'} ج.م</span>
+        </div>
+      </div>
+
+      <div className="live-cta">
+        <p>احسب قيمة أي كمية من {liveCoin?.name || ''} بسهولة</p>
         <Link to="/tools#tool-crypto-calc" className="btn">احسب القيمة</Link>
       </div>
 

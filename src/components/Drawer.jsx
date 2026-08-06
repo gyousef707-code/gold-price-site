@@ -2,9 +2,9 @@ import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext.jsx';
 
 const THEME_OPTIONS = [
-  { id: 'light', label: 'فاتح' },
-  { id: 'dark', label: 'داكن' },
-  { id: 'auto', label: 'تلقائي' },
+  { id: 'light', label: 'فاتح', icon: 'fa-solid fa-sun' },
+  { id: 'dark', label: 'داكن', icon: 'fa-solid fa-moon' },
+  { id: 'auto', label: 'تلقائي (حسب النظام)', icon: 'fa-solid fa-circle-half-stroke' },
 ];
 
 export default function Drawer({ open, onClose, panel, setPanel }) {
@@ -24,12 +24,13 @@ export default function Drawer({ open, onClose, panel, setPanel }) {
     <>
       <div className={`drawer-overlay ${open ? 'active' : ''}`} onClick={onClose} />
       <aside className={`drawer ${open ? 'active' : ''}`}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
-          <span className="logo-text">ذهبي</span>
-          <button className="icon-btn" onClick={onClose} aria-label="إغلاق">
+        <div className="drawer-header">
+          <h2>ذهبي</h2>
+          <button className="drawer-close" onClick={onClose} aria-label="إغلاق">
             <i className="fa-solid fa-xmark" />
           </button>
         </div>
+        <div className="drawer-body">
 
         <button className="drawer-item" onClick={() => setPanel(panel === 'notifications' ? null : 'notifications')}>
           <i className="fa-regular fa-bell" /> الإشعارات
@@ -57,10 +58,11 @@ export default function Drawer({ open, onClose, panel, setPanel }) {
               {THEME_OPTIONS.map((t) => (
                 <button
                   key={t.id}
-                  className={`theme-mode-btn ${mode === t.id ? 'active' : ''}`}
+                  className={`theme-option ${mode === t.id ? 'active' : ''}`}
                   onClick={() => setMode(t.id)}
                 >
-                  {t.label}
+                  <i className={t.icon} />
+                  <span>{t.label}</span>
                 </button>
               ))}
             </div>
@@ -85,6 +87,7 @@ export default function Drawer({ open, onClose, panel, setPanel }) {
         <Link to="/disclaimer" className="drawer-item" onClick={onClose}>
           <i className="fa-solid fa-triangle-exclamation" /> إخلاء المسؤولية
         </Link>
+        </div>
       </aside>
     </>
   );

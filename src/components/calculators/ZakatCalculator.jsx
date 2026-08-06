@@ -15,31 +15,36 @@ export default function ZakatCalculator() {
   }, [data, weight, karat, priceType]);
 
   return (
-    <div className="calc-box" id="tool-zakat-calc">
-      <h3 style={{ fontSize: 15, marginBottom: 4 }}>حاسبة زكاة الذهب</h3>
-      <p style={{ fontSize: 12.5, color: 'var(--text-muted)', marginBottom: 4 }}>احسب زكاة الذهب (2.5%)</p>
-
-      <div className="calc-label">الوزن المستحق زكاته (جرام)</div>
-      <input className="calc-input" type="number" value={weight} onChange={(e) => setWeight(Number(e.target.value) || 0)} />
-
-      <div className="calc-label">العيار</div>
-      <select className="calc-select" value={karat} onChange={(e) => setKarat(e.target.value)}>
-        {['24', '22', '21', '18', '14', '12'].map((k) => <option key={k} value={k}>عيار {k}</option>)}
-      </select>
-
-      <div className="calc-label">نوع السعر</div>
-      <select className="calc-select" value={priceType} onChange={(e) => setPriceType(e.target.value)}>
-        <option value="sell">سعر البيع</option>
-        <option value="buy">سعر الشراء</option>
-      </select>
-
-      <div className="calc-result-box">
-        <div className="calc-result-value">{result != null ? result.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '—'}</div>
-        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>جنيه مصري (قيمة الزكاة)</div>
+    <div className="calc-card" id="tool-zakat-calc">
+      <div className="section-title-bar" style={{ marginBottom: 12 }}>
+        <h2><i className="fa-solid fa-hand-holding-dollar" /> حاسبة زكاة الذهب</h2>
       </div>
-      <p style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 8 }}>
-        نصاب الزكاة الشرعي التقريبي 85 جرام ذهب عيار 21. استشر جهة دينية موثوقة لتفاصيل حالتك.
-      </p>
+      <div className="calc-row">
+        <div className="calc-group">
+          <label>الوزن المستحق زكاته (جرام)</label>
+          <input type="number" className="calc-input" value={weight} onChange={(e) => setWeight(Number(e.target.value) || 0)} />
+        </div>
+        <div className="calc-group">
+          <label>العيار</label>
+          <select className="calc-input calc-select" value={karat} onChange={(e) => setKarat(e.target.value)}>
+            {['24', '22', '21', '18', '14', '12'].map((k) => <option key={k} value={k}>عيار {k}</option>)}
+          </select>
+        </div>
+      </div>
+      <div className="calc-row">
+        <div className="calc-group">
+          <label>نوع السعر</label>
+          <select className="calc-input calc-select" value={priceType} onChange={(e) => setPriceType(e.target.value)}>
+            <option value="sell">سعر البيع</option>
+            <option value="buy">سعر الشراء</option>
+          </select>
+        </div>
+      </div>
+      <div className="calc-result-box">
+        <div className="calc-result-label">قيمة الزكاة</div>
+        <div className="calc-result-value">{result != null ? result.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '—'}</div>
+        <div className="calc-result-unit">جنيه مصري (2.5%)</div>
+      </div>
     </div>
   );
 }

@@ -18,25 +18,37 @@ export default function CryptoPage() {
 
       <section>
         <div className="section-title-bar">
-          <h2><i className="fa-brands fa-bitcoin" /> أعلى 20 عملة رقمية مقابل الجنيه المصري</h2>
+          <h2><i className="fa-solid fa-coins" /> اعلى 20 عملة رقمية مقابل الجنيه المصري</h2>
         </div>
-        {loading && <p className="loading-text">جارِ تحميل اسعار العملات الرقمية...</p>}
+        {loading && <p className="crypto-list-loading">جارِ تحميل اسعار العملات الرقمية...</p>}
         {error && !loading && <p className="error-text">تعذر تحميل الأسعار حاليًا</p>}
-        {data?.coins?.map((c) => (
-          <Link key={c.id} to={`/crypto/${c.id}`} className="currency-row">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              {c.image && <img src={c.image} alt={c.name} style={{ width: 26, height: 26, borderRadius: '50%' }} />}
-              <div>
-                <div className="currency-name">{c.name}</div>
-                <div className="currency-code">{c.symbol}</div>
-              </div>
-            </div>
-            <div className="currency-vals">
-              <div>{c.price_egp?.toLocaleString('en-US')} ج.م</div>
-              <div>${c.price_usd?.toLocaleString('en-US')}</div>
-            </div>
-          </Link>
-        ))}
+        <div className="currency-list-new">
+          {data?.coins?.map((c, i) => {
+            const changeKnown = typeof c.change_24h === 'number';
+            const isNeg = changeKnown && c.change_24h < 0;
+            return (
+              <Link key={c.id} to={`/crypto/${c.id}`} className="currency-card-new">
+                <div className="currency-card-left">
+                  <span className="crypto-card-rank">{i + 1}</span>
+                  {c.image && <img className="crypto-card-icon" src={c.image} alt={c.symbol} loading="lazy" />}
+                  <div className="currency-card-info">
+                    <div className="currency-card-name">{c.name}</div>
+                    <div className="currency-card-code">{c.symbol}</div>
+                  </div>
+                </div>
+                <div className="crypto-card-right">
+                  {changeKnown && (
+                    <span className={`badge-change ${isNeg ? 'negative' : 'positive'}`}>
+                      {isNeg ? '▼' : '▲'} {Math.abs(c.change_24h).toFixed(2)}%
+                    </span>
+                  )}
+                  <span className="crypto-card-price-egp">{c.price_egp?.toLocaleString('en-US')} ج.م</span>
+                  <span className="crypto-card-price-usd">${c.price_usd?.toLocaleString('en-US')}</span>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
       </section>
 
       <RelatedArticles slugs={['gold-vs-silver-investment', 'gold-price-forecast-2026', 'beginners-guide-gold-investment']} />

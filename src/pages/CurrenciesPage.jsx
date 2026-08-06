@@ -26,29 +26,39 @@ export default function CurrenciesPage() {
 
       <section>
         <div className="section-title-bar">
-          <h2><i className="fa-solid fa-coins" /> اسعار العملات بالجنيه المصري</h2>
+          <h2><i className="fa-solid fa-list" /> سعر صرف العملات بالجنيه المصري</h2>
         </div>
         {loading && <p className="loading-text">جارِ تحميل الأسعار...</p>}
         {error && !loading && <p className="error-text">تعذر تحميل الأسعار حاليًا</p>}
-        {CURRENCY_ORDER.map((code) => {
-          const r = data?.rates?.[code];
-          const meta = CURRENCY_META[code];
-          return (
-            <div key={code} className="currency-row">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <img src={`https://flagcdn.com/24x18/${meta.flag}.png`} alt={code} />
-                <div>
-                  <div className="currency-name">{meta.name}</div>
-                  <div className="currency-code">{code.toUpperCase()}</div>
+        <div className="currency-list-new">
+          {CURRENCY_ORDER.map((code) => {
+            const r = data?.rates?.[code];
+            const meta = CURRENCY_META[code];
+            return (
+              <div key={code} className="currency-card-new">
+                <div className="currency-card-left">
+                  <div className="currency-card-flag">
+                    <img src={`https://flagcdn.com/24x18/${meta.flag}.png`} width="24" height="18" alt={code} style={{ borderRadius: 4 }} />
+                  </div>
+                  <div className="currency-card-info">
+                    <div className="currency-card-name">{meta.name}</div>
+                    <div className="currency-card-code">{code.toUpperCase()}</div>
+                  </div>
+                </div>
+                <div className="currency-card-right">
+                  <div className="currency-card-price-box">
+                    <div className="currency-card-price-label">شراء</div>
+                    <div className="currency-card-price-value buy">{r ? r.buy.toLocaleString('en-US') : '—'}</div>
+                  </div>
+                  <div className="currency-card-price-box">
+                    <div className="currency-card-price-label">بيع</div>
+                    <div className="currency-card-price-value sell">{r ? r.sell.toLocaleString('en-US') : '—'}</div>
+                  </div>
                 </div>
               </div>
-              <div className="currency-vals">
-                <div>شراء {r ? r.buy.toLocaleString('en-US') : '—'}</div>
-                <div>بيع {r ? r.sell.toLocaleString('en-US') : '—'}</div>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </section>
 
       <RelatedArticles slugs={['gold-price-forecast-2026', 'why-gold-price-differs-shops', 'gold-price-today-egypt']} />

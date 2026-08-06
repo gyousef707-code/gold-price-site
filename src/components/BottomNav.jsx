@@ -1,11 +1,11 @@
 import { NavLink } from 'react-router-dom';
 
 const TABS = [
-  { to: '/', icon: 'fa-solid fa-coins', label: 'ذهب', end: true },
-  { to: '/currencies', icon: 'fa-solid fa-money-bill-transfer', label: 'عملات' },
-  { to: '/silver', icon: 'fa-solid fa-circle-dollar-to-slot', label: 'فضة' },
-  { to: '/crypto', icon: 'fa-brands fa-bitcoin', label: 'رقمية' },
-  { to: '/tools', icon: 'fa-solid fa-toolbox', label: 'أدوات' },
+  { to: '/', icon: 'fa-solid fa-chart-line', label: 'الاسعار', end: true },
+  { to: '/currencies', icon: 'fa-solid fa-money-bill-transfer', label: 'العملات' },
+  { to: '/silver', icon: 'fa-solid fa-gem', label: 'الفضة' },
+  { to: '/crypto', icon: 'fa-solid fa-coins', label: 'رقمية' },
+  { to: '/tools', icon: 'fa-solid fa-toolbox', label: 'الادوات' },
 ];
 
 export default function BottomNav() {

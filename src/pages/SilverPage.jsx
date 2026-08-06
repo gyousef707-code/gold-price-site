@@ -6,6 +6,18 @@ import useApiData from '../hooks/useApiData.js';
 
 const CARAT_ORDER = ['999', '925', '900', '800', '720', '500'];
 
+function sharePriceCard(e, carat, sell, buy) {
+  e.preventDefault();
+  e.stopPropagation();
+  const text = `سعر فضة عيار ${carat} اليوم: البيع ${sell} ج.م - الشراء ${buy} ج.م - عبر تطبيق ذهبي`;
+  if (navigator.share) {
+    navigator.share({ title: 'ذهبي', text }).catch(() => {});
+  } else {
+    navigator.clipboard?.writeText(text);
+    alert('تم نسخ السعر');
+  }
+}
+
 export default function SilverPage() {
   const { data, loading, error } = useApiData('/api/silver-price', { intervalMs: 5 * 60000 });
 
@@ -18,37 +30,50 @@ export default function SilverPage() {
         path="/silver"
       />
 
-      <section>
+      <section className="global-ounce-section">
         <div className="ounce-card">
-          <div className="ounce-top-row">
-            <span className="ounce-header-label">XAG/USD - أونصة الفضة العالمية (لحظي)</span>
+          <div className="ounce-header">
+            <span>XAG/USD - اونصة الفضة العالمية (لحظي)</span>
           </div>
-          <div className="ounce-value">
+          <div className="ounce-price">
             {data?.ounce_usd ? `$${Number(data.ounce_usd).toLocaleString('en-US', { maximumFractionDigits: 2 })}` : '—'}
           </div>
           <div className="ounce-footer">
-            <span className="live-badge"><span className="live-dot" /> مباشر</span>
-            <span className="market-badge">السوق مفتوح</span>
+            <span className="live-pulse"><span className="update-dot" /> مباشر</span>
+            <span className="market-status-badge open"><span className="market-status-dot" /> السوق مفتوح</span>
           </div>
         </div>
+      </section>
 
-        {loading && <p className="loading-text">جارِ تحميل الأسعار...</p>}
-        {error && !loading && <p className="error-text">تعذر تحميل الأسعار حاليًا، حاول تاني بعد شوية.</p>}
+      {loading && <p className="loading-text">جارِ تحميل الأسعار...</p>}
+      {error && !loading && <p className="error-text">تعذر تحميل الأسعار حاليًا، حاول تاني بعد شوية.</p>}
 
-        <div className="price-cards">
+      <section className="carats-unified-section">
+        <div className="silver-cards-grid">
           {CARAT_ORDER.map((c) => {
             const p = data?.silverPrices?.[c];
             return (
-              <div key={c} className="price-card">
-                <div className="card-icon-top"><i className="fa-solid fa-gem" /></div>
-                <div className="carat-title-top">عيار {c}</div>
-                <div className="p-row">
-                  <span className="p-label">البيع لك</span>
-                  <span className="p-value sell-v">{p ? p.sell.toLocaleString('en-US') : '—'}</span>
+              <div key={c} className="silver-card clickable-card">
+                <button
+                  className="card-share-btn"
+                  title="مشاركة السعر"
+                  aria-label="مشاركة السعر"
+                  onClick={(e) => sharePriceCard(e, c, p?.sell, p?.buy)}
+                >
+                  <i className="fa-solid fa-share-nodes" />
+                </button>
+                <div className="silver-card-icon-top"><i className="fa-solid fa-gem" /></div>
+                <div className="silver-carat-wrap">
+                  <span className="silver-carat-label">عيار</span>
+                  <span className="silver-carat-num">{c}</span>
                 </div>
-                <div className="p-row">
-                  <span className="p-label">الشراء منك</span>
-                  <span className="p-value buy-v">{p ? p.buy.toLocaleString('en-US') : '—'}</span>
+                <div className="silver-v-row">
+                  <span className="silver-v-label">البيع لك</span>
+                  <span className="silver-v-value sell-price">{p ? p.sell.toLocaleString('en-US') : '—'}</span>
+                </div>
+                <div className="silver-v-row">
+                  <span className="silver-v-label">الشراء منك</span>
+                  <span className="silver-v-value buy-price">{p ? p.buy.toLocaleString('en-US') : '—'}</span>
                 </div>
               </div>
             );
