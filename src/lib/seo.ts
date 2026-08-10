@@ -1,4 +1,4 @@
-const SITE_URL = "https://zahaby1.com";
+const SITE_URL = "https://www.zahaby1.com";
 
 export function seoMeta({
   title,
