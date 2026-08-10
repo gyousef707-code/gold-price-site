@@ -1,70 +1,36 @@
-# ذهبي — نسخة React (v2)
+# Zahaby Gold Refinement
 
-مشروع React + Vite + React Router (BrowserRouter) الجديد للموقع، مبني على نفس محتوى وتصميم موقعك الحالي.
+أريد بعض التعليقات التي سوف أرسلها لك، وأريدك إذا رأيت شيء يريد التعديل عدله لكي يكون التطبيق مثالي علشان خاطر نرفع المشروع على Git Hub. .Please apply the following UI/UX enhancements and logic updates to the Zahaby application:
 
-## المتطلبات
-- Node.js 18 أو أحدث (لو حابب تجرب محليًا؛ Vercel هيعمل build تلقائي حتى من غير ما تجرب محليًا).
+1. Gold Carats Order: Reorder the gold carats grid/list in descending order from largest to smallest, starting with 24 Carat first, followed by 22, 21, 18, 14, and 12.
 
-## التجربة محليًا (اختياري)
-```bash
-npm install
+2. Price Gap Card Layout: Keep the Sagh dollar and Bank dollar boxes and their icons fully intact. Make them compact, and position the circular gap indicator strictly side-by-side with the dollar boxes (not underneath them) in a clean, professional layout.
+
+3. Grid Layout: Fix the CSS grid/flexbox layout for all gold and coin cards so they align uniformly on all screens.
+
+4. Gold Calculator: Right-align the text in the weight input field.
+
+5. Most Traded Badge: Style and position the "الأكثر تداولا" badge prominently on top of the 21-carat card.
+
+6. Global Ounce Live Ticker: In the Global Gold and Silver Ounce card, ensure that the price numbers fit cleanly within the container and update/animate live in real-time, matching the behavior of a TradingView ticker.
+
+This project was built with [Lovable](https://lovable.dev).
+
+## Build with Lovable
+
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/38c2c36b-7fad-4bbb-b590-7dc83d03960c).
+
+- **Ship faster**: describe what you want to build and Lovable handles the code.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+
+## Development
+
+Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+
+```sh
+git clone <this-repository-url>
+cd <repository-name>
+npm i
 npm run dev
 ```
-هيفتح على `http://localhost:5173`.
-
-## البناء للنشر
-```bash
-npm run build
-```
-هيطلعلك فولدر `dist/` جاهز للنشر (Vercel بيعمل الخطوة دي تلقائيًا لما تربط الريبو).
-
-## إزاي تنشره على Vercel
-
-### الطريقة المقترحة: استبدال محتوى الريبو الحالي
-1. في الريبو بتاعك `gold-price-site` على GitHub، **احذف** كل الملفات القديمة ما عدا مجلد `.git`:
-   - `index.html`, `about.html`, `contact.html`, `privacy.html`, `terms.html`, `404.html`
-   - مجلدات `gold/`, `crypto/`, `blog/` (القديمة، لأن المحتوى بتاعها اتنقل لداخل React كبيانات)
-   - `assets/` القديم (لو مكرر مع اللي جوه المشروع الجديد)
-   - **سيب** مجلد `api/` زي ما هو تمامًا (سيرفرلس فنكشنز بتاعة Vercel، شغالة زي ما هي بدون أي تعديل)
-2. ارفع كل ملفات المشروع الجديد ده (المرفق) في نفس الريبو، في الـ root.
-3. اعمل `git commit` و `git push`.
-4. Vercel هيكتشف تلقائيًا إنه مشروع Vite ويعمل build وينشر.
-
-### تأكد من إعدادات Vercel (Project Settings → General)
-- **Framework Preset:** Vite
-- **Build Command:** `npm run build` (افتراضي)
-- **Output Directory:** `dist` (افتراضي)
-
-### ربط الدومين الجديد
-في Vercel → Project → Settings → Domains → أضف `zahaby1.com` واتبع تعليمات الـ DNS (CNAME أو A record حسب مزود الدومين بتاعك).
-
-## هيكل المشروع
-```
-src/
-  components/     مكونات مشتركة (هيدر، درج جانبي، شريط تنقل سفلي، حاسبات...)
-  pages/          كل صفحة = route (الرئيسية، الفضة، العملات، إلخ)
-  data/           محتوى مُستخرج من صفحاتك القديمة (عيارات، عملات رقمية، مقالات، صفحات ثابتة)
-  context/        إدارة الوضع الداكن/الفاتح
-  hooks/          hook موحّد لجلب البيانات من /api
-  styles/         ملف CSS واحد فيه كل الـ theme variables
-api/              سيرفرلس فنكشنز (بدون تغيير عن الأصل)
-public/           الأيقونات، manifest.json، sitemap.xml، robots.txt، sw.js
-```
-
-## اللي اتنفذ من الطلب الأصلي
-- ✅ التحويل الكامل لـ React Router (BrowserRouter) بروابط نضيفة حقيقية لكل الصفحات المطلوبة
-- ✅ `vercel.json` بالـ rewrites الصحيحة
-- ✅ ترتيب محتوى صفحات الذهب/الفضة/العملات/الرقمية حسب المطلوب بالظبط
-- ✅ صفحة الأدوات بالتنظيم والترتيب والكروت المصغّرة (3 في الصف)
-- ✅ الوضع الداكن الافتراضي مع تبديل فاتح/داكن يشتغل على كل الصفحات بألوان محددة
-- ✅ صفحات العيارات المنفصلة `/gold/:karat` وصفحات العملات الرقمية `/crypto/:coin`
-- ✅ المدونة `/blog` و `/blog/:slug`
-- ✅ SEO: title/description/keywords/OG منفصلة لكل صفحة + sitemap.xml شامل كل الروابط
-- ✅ مفيش أي مساحة إعلانية ظاهرة (فيه `<AdSlot>` مخفي جاهز لـ AdSense بعدين)
-- ✅ شريط تنقل سفلي بـ 5 تابات وأزرار "رجوع" بالمتصفح بتشتغل صح
-- ✅ القائمة الجانبية اتنضفت زي ما طلبت بالظبط
-
-## حاجات تحتاج مراجعة منك
-- محتوى صفحة "إخلاء المسؤولية" (`/disclaimer`) كتبته من الصفر لأنها ملهاش نسخة قديمة على الموقع — راجعه وعدّله لو حابب.
-- تأكد إن `api/*.js` شغالة زي ما هي على Vercel بعد النشر (هي نفسها من غير أي تعديل).
-- الـ Service Worker (`sw.js`) اتنقل زي ما هو؛ لو فيه أي cache قديم لملفات HTML القديمة، ممكن تحتاج تزود رقم النسخة جواه عشان يعمل تحديث عند الزوار القدامى.
