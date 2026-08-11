@@ -3,42 +3,68 @@ import useApiData from '../../hooks/useApiData.js';
 import NumberInput from '../NumberInput.jsx';
 import { useLang } from '../../context/LangContext.jsx';
 
-export default function SilverCalculator() {
-  const { t } = useLang();
-  const { data } = useApiData('/api/public/silver-price', { intervalMs: 5 * 60000 });
-  const [weight, setWeight] = useState(10);
-  const [karat, setKarat] = useState('925');
-  const [priceType, setPriceType] = useState('sell');
-  const [currency, setCurrency] = useState('egp');
+const CONFIG = {
+  gold: {
+    id: 'tool-gold-savings',
+    titleKey: 'calc.savings.gold',
+    icon: 'fa-solid fa-piggy-bank',
+    endpoint: '/api/public/gold-price',
+    intervalMs: 60000,
+    karats: ['24', '22', '21', '18'],
+    priceMap: (data, karat) => data?.caratPrices?.[karat],
+    unitLabelKey: 'calc.weightGold',
+  },
+  silver: {
+    id: 'tool-silver-savings',
+    titleKey: 'calc.savings.silver',
+    icon: 'fa-solid fa-coins',
+    endpoint: '/api/public/silver-price',
+    intervalMs: 5 * 60000,
+    karats: ['999', '925', '900', '800'],
+    priceMap: (data, karat) => data?.silverPrices?.[karat],
+    unitLabelKey: 'calc.weightSilver',
+  },
+};
 
-  const result = useMemo(() => {
-    const p = data?.silverPrices?.[karat];
+export default function SavingsCalculator({ metal }) {
+  const { t } = useLang();
+  const cfg = CONFIG[metal];
+  const { data } = useApiData(cfg.endpoint, { intervalMs: cfg.intervalMs });
+  const [monthly, setMonthly] = useState(1000);
+  const [months, setMonths] = useState(60);
+  const [karat, setKarat] = useState(cfg.karats[metal === 'gold' ? 2 : 1]);
+  const [priceType, setPriceType] = useState('sell');
+
+  const total = monthly * months;
+
+  const weight = useMemo(() => {
+    const p = cfg.priceMap(data, karat);
     if (!p) return null;
-    const perGram = p[priceType];
-    const egp = perGram * weight;
-    if (currency === 'egp') return egp;
-    if (data?.bank_usd_rate) return egp / data.bank_usd_rate;
-    return null;
-  }, [data, weight, karat, priceType, currency]);
+    return total / p[priceType];
+  }, [data, karat, priceType, total, cfg]);
 
   return (
-    <div className="calc-card" id="tool-silver-calc">
+    <div className="calc-card" id={cfg.id}>
       <div className="section-title-bar" style={{ marginBottom: 12 }}>
-        <h2><i className="fa-solid fa-gem" /> {t('calc.silver.title')}</h2>
+        <h2><i className={cfg.icon} /> {t(cfg.titleKey)}</h2>
       </div>
       <div className="calc-row">
         <div className="calc-group">
-          <label>{t('calc.weight')}</label>
-          <NumberInput value={weight} onChange={setWeight} />
+          <label>{t('calc.monthly')}</label>
+          <NumberInput value={monthly} onChange={setMonthly} />
         </div>
+        <div className="calc-group">
+          <label>{t('calc.months')}</label>
+          <NumberInput value={months} onChange={setMonths} />
+        </div>
+      </div>
+      <div className="calc-row">
         <div className="calc-group">
           <label>{t('calc.karat')}</label>
           <select className="calc-input calc-select" value={karat} onChange={(e) => setKarat(e.target.value)}>
-            {['999', '925', '900', '800', '720', '500'].map((k) => <option key={k} value={k}>{t('calc.karatOption')} {k}</option>)}
+            {cfg.karats.map((k) => <option key={k} value={k}>{t('calc.karatOption')} {k}</option>)}
           </select>
         </div>
-      </div>
-      <div className="calc-row">
         <div className="calc-group">
           <label>{t('calc.priceType')}</label>
           <select className="calc-input calc-select" value={priceType} onChange={(e) => setPriceType(e.target.value)}>
@@ -46,18 +72,16 @@ export default function SilverCalculator() {
             <option value="buy">{t('calc.buyPrice')}</option>
           </select>
         </div>
-        <div className="calc-group">
-          <label>{t('calc.currency')}</label>
-          <select className="calc-input calc-select" value={currency} onChange={(e) => setCurrency(e.target.value)}>
-            <option value="egp">{t('calc.egp')}</option>
-            <option value="usd">{t('calc.usd')}</option>
-          </select>
-        </div>
       </div>
       <div className="calc-result-box">
-        <div className="calc-result-label">{t('calc.result')}</div>
-        <div className="calc-result-value">{result != null ? result.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '—'}</div>
-        <div className="calc-result-unit">{currency === 'egp' ? t('calc.egp') : t('calc.usd')}</div>
+        <div className="calc-result-label">{t('calc.savedTotal')}</div>
+        <div className="calc-result-value">{total.toLocaleString('en-US')}</div>
+        <div className="calc-result-unit">{t('calc.egp')}</div>
+      </div>
+      <div className="calc-result-box" style={{ marginTop: 8 }}>
+        <div className="calc-result-label">{t(cfg.unitLabelKey)}</div>
+        <div className="calc-result-value">{weight != null ? weight.toLocaleString('en-US', { maximumFractionDigits: 2 }) : '—'}</div>
+        <div className="calc-result-unit">{t('calc.gram')}</div>
       </div>
     </div>
   );
