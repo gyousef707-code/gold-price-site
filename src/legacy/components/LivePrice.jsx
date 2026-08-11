@@ -1,77 +1,44 @@
 import { useEffect, useRef, useState } from 'react';
-import useLiveTick from '../hooks/useLiveTick.js';
 
-// رقم حى: بيتحرك بس لما السعر الحقيقى يتغير (زى تريدنج فيو) + وميض أخضر/أحمر
+// رقم حى: بيتبدل فورًا لما السعر الحقيقى يتغير (من غير أى دوران أو أرقام بتلف)
 export default function LivePrice({
   value: rawValue,
   decimals = 2,
   prefix = '',
   suffix = '',
   className = '',
-  duration = 700,
   placeholder = '—',
-  live = false,
-  volatility = 0,
-  tickMs = 0,
+  // eslint-disable-next-line no-unused-vars
+  duration,
+  // eslint-disable-next-line no-unused-vars
+  live,
+  // eslint-disable-next-line no-unused-vars
+  volatility,
+  // eslint-disable-next-line no-unused-vars
+  tickMs,
 }) {
-  // شريط حى زى تريدنج فيو: الرقم بيتحرك بين كل تحديث حقيقى والتانى
-  const ticked = useLiveTick(typeof rawValue === 'number' ? rawValue : null, {
-    volatility: volatility || 0.00012,
-    intervalMs: tickMs || 2400,
-    enabled: live && typeof rawValue === 'number',
-  });
-  const value = live && typeof ticked === 'number' ? ticked : rawValue;
-  const animMs = live ? Math.min(duration, tickMs || 2400) : duration;
-
-
-  const [display, setDisplay] = useState(typeof value === 'number' ? value : null);
+  const value = typeof rawValue === 'number' && !Number.isNaN(rawValue) ? rawValue : null;
   const [dir, setDir] = useState(null);
-  const prevRef = useRef(typeof value === 'number' ? value : null);
-  const rafRef = useRef(null);
-
+  const prevRef = useRef(value);
 
   useEffect(() => {
-    if (typeof value !== 'number' || Number.isNaN(value)) return;
+    if (value == null) return undefined;
     const from = prevRef.current;
-
-    if (from == null) {
-      prevRef.current = value;
-      setDisplay(value);
-      return;
-    }
-    if (from === value) return;
-
+    prevRef.current = value;
+    if (from == null || from === value) return undefined;
     setDir(value > from ? 'up' : 'down');
-    const start = performance.now();
+    const timer = setTimeout(() => setDir(null), 900);
+    return () => clearTimeout(timer);
+  }, [value]);
 
-    const step = (now) => {
-      const t = Math.min(1, (now - start) / animMs);
-      const eased = 1 - Math.pow(1 - t, 3);
-      setDisplay(from + (value - from) * eased);
-      if (t < 1) rafRef.current = requestAnimationFrame(step);
-      else {
-        prevRef.current = value;
-        setDisplay(value);
-      }
-    };
-
-    rafRef.current = requestAnimationFrame(step);
-    const flashTimer = setTimeout(() => setDir(null), animMs + 400);
-
-    return () => {
-      cancelAnimationFrame(rafRef.current);
-      clearTimeout(flashTimer);
-    };
-  }, [value, animMs]);
-
-  if (display == null) {
+  if (value == null) {
     return <span className={`live-price ${className}`}>{placeholder}</span>;
   }
 
   return (
     <span className={`live-price ${dir ? `tick-${dir}` : ''} ${className}`}>
       {prefix}
-      {display.toLocaleString('en-US', {
+      {value.toLocaleString('en-US', {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals,
       })}
