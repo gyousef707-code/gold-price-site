@@ -160,11 +160,11 @@ export default function GoldPage() {
               <div className="dollar-side-boxes">
                 <div className="mini-dollar-box">
                   <div className="md-title">{t('gap.shops')}</div>
-                  <div className="md-value">{data.implied_usd_rate} ج.م</div>
+                  <div className="md-value">{Number(data.implied_usd_rate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م</div>
                 </div>
                 <div className="mini-dollar-box">
                   <div className="md-title">{t('gap.bank')}</div>
-                  <div className="md-value">{data.bank_usd_rate} ج.م</div>
+                  <div className="md-value">{Number(data.bank_usd_rate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م</div>
                 </div>
               </div>
               <GapGauge value={data.gap_value} max={10} label={t('gap.value')} />
