@@ -1,3 +1,6 @@
+دي النسخة النظيفة الكاملة لملف `src/legacy/context/LangContext.jsx` — امسح القديم كله والصق ده:
+
+```jsx
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 const LangContext = createContext(null);
@@ -57,7 +60,7 @@ export const DICT = {
     'rate.title': 'قيّم تطبيق ذهبي',
     'rate.thanks': 'شكرًا لتقييمك! ⭐',
     'notifications.title': 'الإشعارات',
-        'calc.gold.title': 'حاسبة الذهب',
+    'calc.gold.title': 'حاسبة الذهب',
     'calc.silver.title': 'حاسبة الفضة',
     'calc.zakat.title': 'حاسبة زكاة الذهب',
     'calc.crypto.title': 'حاسبة العملات الرقمية',
@@ -87,7 +90,6 @@ export const DICT = {
     'conv.from': 'من',
     'conv.to': 'إلى',
     'conv.swap': 'عكس العملتين',
-
   },
   en: {
     'app.name': 'Zahaby',
@@ -143,7 +145,7 @@ export const DICT = {
     'rate.title': 'Rate Zahaby',
     'rate.thanks': 'Thanks for rating! ⭐',
     'notifications.title': 'Notifications',
-        'calc.gold.title': 'Gold calculator',
+    'calc.gold.title': 'Gold calculator',
     'calc.silver.title': 'Silver calculator',
     'calc.zakat.title': 'Gold zakat calculator',
     'calc.crypto.title': 'Crypto calculator',
@@ -173,7 +175,6 @@ export const DICT = {
     'conv.from': 'From',
     'conv.to': 'To',
     'conv.swap': 'Swap currencies',
-
   },
 };
 
@@ -200,3 +201,6 @@ export function LangProvider({ children }) {
 export function useLang() {
   return useContext(LangContext) || { lang: 'ar', setLang: () => {}, t: (k) => DICT.ar[k] ?? k };
 }
+```
+
+الصقه كامل مكان الملف القديم، ولو ظهر أي خطأ بعد الاستبدال ابعتلي نصه.
