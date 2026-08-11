@@ -5,6 +5,7 @@ import Drawer from './Drawer.jsx';
 import BottomNav from './BottomNav.jsx';
 import Footer from './Footer.jsx';
 import ScrollToTop from './ScrollToTop.jsx';
+import useBackClose from '../hooks/useBackClose.js';
 
 export default function Layout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -14,6 +15,15 @@ export default function Layout() {
     setDrawerOpen(false);
     setPanel(null);
   };
+
+  useBackClose(drawerOpen, () => {
+    if (panel) {
+      setPanel(null);
+      return true;
+    }
+    closeDrawer();
+    return false;
+  });
 
   return (
     <>
