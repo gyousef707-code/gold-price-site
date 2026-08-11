@@ -1,6 +1,3 @@
-دي النسخة النظيفة الكاملة لملف `src/legacy/context/LangContext.jsx` — امسح القديم كله والصق ده:
-
-```jsx
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 const LangContext = createContext(null);
@@ -201,6 +198,3 @@ export function LangProvider({ children }) {
 export function useLang() {
   return useContext(LangContext) || { lang: 'ar', setLang: () => {}, t: (k) => DICT.ar[k] ?? k };
 }
-```
-
-الصقه كامل مكان الملف القديم، ولو ظهر أي خطأ بعد الاستبدال ابعتلي نصه.
