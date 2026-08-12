@@ -107,13 +107,21 @@ export async function sendPushToAll(payload: {
 
 type Snapshot = {
   k21: number | null;
+  k24: number | null;
   ounce: number | null;
   pound: number | null;
   usd: number | null;
   btc: number | null;
 };
 
-const EMPTY_SNAPSHOT: Snapshot = { k21: null, ounce: null, pound: null, usd: null, btc: null };
+const EMPTY_SNAPSHOT: Snapshot = {
+  k21: null,
+  k24: null,
+  ounce: null,
+  pound: null,
+  usd: null,
+  btc: null,
+};
 
 function pct(a: number, b: number) {
   if (!a || !b) return 0;
@@ -143,6 +151,12 @@ export function buildChangeMessage(prev: Snapshot, now: Snapshot) {
       `عيار 21: ${prev.k21.toLocaleString("en-US")} ← ${now.k21.toLocaleString("en-US")} ج.م (${d > 0 ? "+" : ""}${d.toFixed(0)})`,
     );
   }
+  if (prev.k24 && now.k24 && prev.k24 !== now.k24) {
+    const d = now.k24 - prev.k24;
+    lines.push(
+      `عيار 24: ${prev.k24.toLocaleString("en-US")} ← ${now.k24.toLocaleString("en-US")} ج.م (${d > 0 ? "+" : ""}${d.toFixed(0)})`,
+    );
+  }
   if (prev.ounce && now.ounce && Math.abs(pct(prev.ounce, now.ounce)) >= 0.05) {
     const p = pct(prev.ounce, now.ounce);
     lines.push(
@@ -168,6 +182,7 @@ export function buildChangeMessage(prev: Snapshot, now: Snapshot) {
 export function computeSnapshot(gold: any, currency: any, crypto: any): Snapshot {
   return {
     k21: gold?.caratPrices?.["21"]?.sell ?? null,
+    k24: gold?.caratPrices?.["24"]?.sell ?? null,
     ounce: gold?.ounce_usd ?? null,
     pound: gold?.pound?.sell ?? null,
     usd: currency?.rates?.usd?.sell ?? null,
