@@ -85,7 +85,7 @@ export default function GoldPage() {
       {loading && <p className="loading-text">{t('loading')}</p>}
       {error && !loading && <p className="error-text">{t('error')}</p>}
 
-      <section className="carats-unified-section">
+      <section className="carats-unified-section gold-carats-section">
         <div className="gold-cards-grid">
           {KARAT_ORDER.map((k) => {
             const p = data?.caratPrices?.[k];
