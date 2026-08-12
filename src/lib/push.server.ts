@@ -142,41 +142,48 @@ export async function saveSnapshot(snap: Snapshot) {
   await upstash("SET", "push:last-snapshot", JSON.stringify(snap));
 }
 
-export function buildChangeMessage(prev: Snapshot, now: Snapshot) {
-  const lines: string[] = [];
+// -------- دورة الإشعارات: عيار 21 ← عيار 24 ← الدولار ← تكرار --------
 
-  if (prev.k21 && now.k21 && prev.k21 !== now.k21) {
+export const ROTATION_ORDER = ["k21", "k24", "usd"] as const;
+export type RotationKey = (typeof ROTATION_ORDER)[number];
+
+export async function getRotationIndex(): Promise<number> {
+  const raw = await upstash("GET", "push:rotation-index");
+  const n = raw ? parseInt(raw, 10) : 0;
+  return Number.isFinite(n) ? n : 0;
+}
+
+export async function saveRotationIndex(n: number) {
+  await upstash("SET", "push:rotation-index", String(n % ROTATION_ORDER.length));
+}
+
+// كل استدعاء يبني رسالة على معدن واحد بس (حسب الدور الحالي)، مش كل التغييرات مع بعض
+export function buildChangeMessage(prev: Snapshot, now: Snapshot, which: RotationKey) {
+  if (which === "k21") {
+    if (!prev.k21 || !now.k21 || prev.k21 === now.k21) return null;
     const d = now.k21 - prev.k21;
-    lines.push(
-      `عيار 21: ${prev.k21.toLocaleString("en-US")} ← ${now.k21.toLocaleString("en-US")} ج.م (${d > 0 ? "+" : ""}${d.toFixed(0)})`,
-    );
+    return {
+      title: "سعر عيار 21",
+      body: `عيار 21: ${prev.k21.toLocaleString("en-US")} ← ${now.k21.toLocaleString("en-US")} ج.م (${d > 0 ? "+" : ""}${d.toFixed(0)})`,
+    };
   }
-  if (prev.k24 && now.k24 && prev.k24 !== now.k24) {
+
+  if (which === "k24") {
+    if (!prev.k24 || !now.k24 || prev.k24 === now.k24) return null;
     const d = now.k24 - prev.k24;
-    lines.push(
-      `عيار 24: ${prev.k24.toLocaleString("en-US")} ← ${now.k24.toLocaleString("en-US")} ج.م (${d > 0 ? "+" : ""}${d.toFixed(0)})`,
-    );
-  }
-  if (prev.ounce && now.ounce && Math.abs(pct(prev.ounce, now.ounce)) >= 0.05) {
-    const p = pct(prev.ounce, now.ounce);
-    lines.push(
-      `الأونصة: $${now.ounce.toLocaleString("en-US", { maximumFractionDigits: 2 })} (${p > 0 ? "+" : ""}${p.toFixed(2)}%)`,
-    );
-  }
-  if (prev.usd && now.usd && prev.usd !== now.usd) {
-    lines.push(`الدولار: ${now.usd.toLocaleString("en-US")} ج.م للبيع`);
-  }
-  if (prev.btc && now.btc && Math.abs(pct(prev.btc, now.btc)) >= 0.3) {
-    const p = pct(prev.btc, now.btc);
-    lines.push(
-      `البيتكوين: $${now.btc.toLocaleString("en-US", { maximumFractionDigits: 0 })} (${p > 0 ? "+" : ""}${p.toFixed(2)}%)`,
-    );
+    return {
+      title: "سعر عيار 24",
+      body: `عيار 24: ${prev.k24.toLocaleString("en-US")} ← ${now.k24.toLocaleString("en-US")} ج.م (${d > 0 ? "+" : ""}${d.toFixed(0)})`,
+    };
   }
 
-  if (!lines.length) return null;
-
-  const title = lines.length === 1 ? "تغيّر سعر" : "تحديث الأسعار";
-  return { title, body: lines.join(" • ") };
+  // which === "usd"
+  if (!prev.usd || !now.usd || prev.usd === now.usd) return null;
+  const d = now.usd - prev.usd;
+  return {
+    title: "سعر الدولار",
+    body: `الدولار: ${prev.usd.toLocaleString("en-US")} ← ${now.usd.toLocaleString("en-US")} ج.م للبيع (${d > 0 ? "+" : ""}${d.toFixed(2)})`,
+  };
 }
 
 export function computeSnapshot(gold: any, currency: any, crypto: any): Snapshot {
