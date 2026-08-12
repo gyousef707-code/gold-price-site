@@ -18,24 +18,50 @@ function push(list, item) {
   return next;
 }
 
-// إشعارات المتصفح/الهاتف الحقيقية
-export function ensureNotificationPermission() {
-  try {
-    if (typeof window === 'undefined' || !('Notification' in window)) return;
-    if (Notification.permission === 'default') Notification.requestPermission().catch(() => {});
-  } catch {
-    /* تجاهل */
-  }
+// -------- Push حقيقي (Service Worker + اشتراك مخزّن على السيرفر) --------
+// ده اللي بيخلي الإشعار يوصل حتى لو التطبيق مقفول تمامًا على الموبايل،
+// لأن السيرفر (مش المتصفح) هو اللي بيبعت الإشعار عن طريق الـ push service بتاع النظام.
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; i++) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
 }
 
-function systemNotify(title, body) {
+export async function subscribeToPush() {
   try {
-    if (typeof window === 'undefined' || !('Notification' in window)) return;
-    if (Notification.permission !== 'granted') return;
-    if (document.visibilityState === 'visible') return; // ما نزعجش المستخدم وهو فاتح التطبيق
-    new Notification(title, { body, icon: '/logo.png', badge: '/logo.png', tag: title });
+    if (typeof window === 'undefined') return false;
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false;
+
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') return false;
+
+    const reg = await navigator.serviceWorker.register('/sw.js');
+    await navigator.serviceWorker.ready;
+
+    const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+    if (!vapidKey) return false; // السيرفر مش مظبوط لسه (متغير VITE_VAPID_PUBLIC_KEY)
+
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) {
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidKey),
+      });
+    }
+
+    await fetch('/api/push/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(sub.toJSON()),
+    });
+
+    return true;
   } catch {
-    /* تجاهل */
+    return false;
   }
 }
 
@@ -51,7 +77,7 @@ export default function useNotifications() {
   useEffect(() => {
     let cancelled = false;
     setItems(read(KEY, []));
-    ensureNotificationPermission();
+    subscribeToPush(); // يسجّل Service Worker ويخزّن الاشتراك على السيرفر (Push حقيقي حتى لو التطبيق مقفول)
 
     async function tick() {
       try {
@@ -73,9 +99,10 @@ export default function useNotifications() {
 
         let list = read(KEY, []);
         const at = Date.now();
+        // ملاحظة: بس بتحدّث قائمة الإشعارات جوه التطبيق (الصفحة). الإشعار الحقيقي
+        // (اللي بيوصل حتى لو التطبيق مقفول) بيتبعت من السيرفر عن طريق /api/push/check
         const add = (type, title, body) => {
           list = push(list, { id: `${type}-${at}`, type, title, body, at });
-          systemNotify(title, body);
         };
 
         if (prev.k21 && now.k21 && prev.k21 !== now.k21) {
