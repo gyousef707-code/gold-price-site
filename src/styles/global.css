@@ -2182,3 +2182,56 @@ input.calc-input[inputmode='decimal'] {
 @media (min-width: 900px) {
     .ounce-price { font-size: 38px !important; }
 }
+
+/* ==========================================================================
+   ديسكتوب فقط: كارت "جنيه الذهب" جنب كارت "مؤشر الفجوة السعرية" في نفس الصف
+   (لا يوجد أي تأثير على شاشات الموبايل — كل القواعد هنا داخل min-width:900px
+   ومربوطة بكلاس gold-carats-section الخاص بصفحة الذهب فقط)
+   ========================================================================== */
+@media (min-width: 900px) {
+    .gold-carats-section {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 14px;
+    }
+    /* بيفك الديف بتاع شبكة العيارات عشان كارت الجنيه يبقى في نفس شبكة القسم ككل */
+    .gold-carats-section .gold-cards-grid {
+        display: contents;
+    }
+
+    /* كارت جنيه الذهب: ياخد تلت الصف التاني ويترص جنب كارت الفجوة */
+    .gold-carats-section .gold-card.pound-card {
+        grid-column: span 2;
+        grid-row: 2;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 22px 16px;
+    }
+    .gold-carats-section .gold-card.pound-card .gold-card-icon-top { font-size: 26px; margin-bottom: 10px; }
+    .gold-carats-section .gold-card.pound-card .pound-wrap { min-height: 0; margin-bottom: 12px; }
+    .gold-carats-section .gold-card.pound-card .pound-title { font-size: 17px; }
+    .gold-carats-section .gold-card.pound-card .gold-v-row {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        max-width: 220px;
+        padding: 7px 0;
+    }
+    .gold-carats-section .gold-card.pound-card .gold-v-label { margin-bottom: 0; font-size: 12.5px; }
+    .gold-carats-section .gold-card.pound-card .gold-v-value { font-size: 19px; }
+
+    /* كارت مؤشر الفجوة السعرية: باقي الصف التاني، جنب كارت الجنيه، بنفس الارتفاع */
+    .gold-carats-section .gap-card {
+        grid-column: span 4;
+        grid-row: 2;
+        margin-top: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .gold-carats-section .gap-card .gap-card-container { flex: 1; }
+}
