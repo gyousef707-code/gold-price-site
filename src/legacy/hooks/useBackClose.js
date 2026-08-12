@@ -26,7 +26,14 @@ export default function useBackClose(active, onBack) {
     window.addEventListener("popstate", onPop);
     return () => {
       window.removeEventListener("popstate", onPop);
-      if (!popped.current && window.history.state?.__overlay) window.history.back();
+      // بنأخّر تنضيف نقطة التاريخ شوية: لو الإغلاق حصل بسبب الضغط على رابط
+      // (زي "اتصل بنا") في نفس اللحظة، ده بيدّي وقت لانتقال الصفحة إنه
+      // يسجّل نفسه الأول، بدل ما نلغيه بالغلط بـ history.back().
+      if (!popped.current && window.history.state?.__overlay) {
+        setTimeout(() => {
+          if (window.history.state?.__overlay) window.history.back();
+        }, 0);
+      }
     };
   }, [active, push]);
 }
