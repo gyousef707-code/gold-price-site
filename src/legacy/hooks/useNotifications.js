@@ -32,37 +32,64 @@ function urlBase64ToUint8Array(base64String) {
 }
 
 export async function subscribeToPush() {
+  if (typeof window === 'undefined') {
+    return { ok: false, reason: 'الصفحة لسه بتحمّل، جرّب تاني.' };
+  }
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    return { ok: false, reason: 'المتصفح ده مش بيدعم الإشعارات الحقيقية (Push). جرّب Chrome محدّث.' };
+  }
+
+  let permission;
   try {
-    if (typeof window === 'undefined') return false;
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false;
+    permission = await Notification.requestPermission();
+  } catch (e) {
+    return { ok: false, reason: `فشل طلب الإذن: ${e?.message || e}` };
+  }
+  if (permission !== 'granted') {
+    return { ok: false, reason: `الإذن مرفوض أو معلّق (${permission}). فعّل الإشعارات لموقعنا من إعدادات المتصفح وجرّب تاني.` };
+  }
 
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') return false;
-
-    const reg = await navigator.serviceWorker.register('/sw.js');
+  let reg;
+  try {
+    reg = await navigator.serviceWorker.register('/sw.js');
     await navigator.serviceWorker.ready;
+  } catch (e) {
+    return { ok: false, reason: `فشل تسجيل Service Worker: ${e?.message || e}` };
+  }
 
-    const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
-    if (!vapidKey) return false; // السيرفر مش مظبوط لسه (متغير VITE_VAPID_PUBLIC_KEY)
+  const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+  if (!vapidKey) {
+    return { ok: false, reason: 'السيرفر مش مظبوط لسه (متغير VITE_VAPID_PUBLIC_KEY مش موجود في الـ build).' };
+  }
 
-    let sub = await reg.pushManager.getSubscription();
+  let sub;
+  try {
+    sub = await reg.pushManager.getSubscription();
     if (!sub) {
       sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(vapidKey),
       });
     }
+  } catch (e) {
+    return { ok: false, reason: `فشل الاشتراك في الـ Push: ${e?.message || e}` };
+  }
 
-    await fetch('/api/push/subscribe', {
+  try {
+    const res = await fetch('/api/push/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(sub.toJSON()),
     });
-
-    return true;
-  } catch {
-    return false;
+    if (!res.ok) {
+      const bodyText = await res.text().catch(() => '');
+      return { ok: false, reason: `السيرفر رفض حفظ الاشتراك (كود ${res.status}). ${bodyText.slice(0, 200)}` };
+    }
+  } catch (e) {
+    return { ok: false, reason: `تعذّر الاتصال بالسيرفر لحفظ الاشتراك: ${e?.message || e}` };
   }
+
+  return { ok: true };
 }
 
 function pct(a, b) {
