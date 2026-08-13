@@ -21,7 +21,7 @@ self.addEventListener("push", (event) => {
   const options = {
     body: payload.body || "",
     icon: "/icons/icon-192.png",
-    badge: "/icons/icon-96.png",
+    badge: "/icons/badge-monochrome.png",
     tag: payload.tag || "price-update",
     renotify: true,
     dir: "rtl",
