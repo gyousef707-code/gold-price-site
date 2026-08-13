@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { Link } from '@/lib/router-compat.jsx';
 import { useLang } from '../context/LangContext.jsx';
-import useNotifications, { absoluteTime, relativeTime } from '../hooks/useNotifications.js';
+import useNotifications, { absoluteTime, relativeTime, subscribeToPush } from '../hooks/useNotifications.js';
 
 const ICONS = {
   gold: 'fa-solid fa-coins',
@@ -12,6 +13,13 @@ const ICONS = {
 export default function NotificationsPage() {
   const { t, lang } = useLang();
   const { items, clear } = useNotifications();
+  const [pushStatus, setPushStatus] = useState(null); // null | 'loading' | { ok, reason }
+
+  const handleEnablePush = async () => {
+    setPushStatus('loading');
+    const result = await subscribeToPush();
+    setPushStatus(result);
+  };
 
   return (
     <div className="page-wrap">
@@ -25,6 +33,36 @@ export default function NotificationsPage() {
           <button type="button" className="notif-clear" onClick={clear}>
             <i className="fa-regular fa-trash-can" /> {lang === 'en' ? 'Clear' : 'مسح الكل'}
           </button>
+        )}
+      </div>
+
+      <div style={{ margin: '12px 0', padding: '14px 16px', borderRadius: 12, border: '1px solid var(--border-gold, #444)' }}>
+        <button
+          type="button"
+          onClick={handleEnablePush}
+          disabled={pushStatus === 'loading'}
+          style={{
+            padding: '10px 18px',
+            borderRadius: 10,
+            border: 'none',
+            fontWeight: 700,
+            cursor: 'pointer',
+            background: 'var(--gold-primary, #d4af37)',
+            color: '#161b22',
+          }}
+        >
+          <i className="fa-solid fa-bell" />{' '}
+          {pushStatus === 'loading'
+            ? (lang === 'en' ? 'Enabling…' : 'جاري التفعيل…')
+            : (lang === 'en' ? 'Enable push notifications' : 'فعّل إشعارات الجهاز ده')}
+        </button>
+
+        {pushStatus && pushStatus !== 'loading' && (
+          <p style={{ marginTop: 10, fontWeight: 600, color: pushStatus.ok ? '#3fb950' : '#f85149' }}>
+            {pushStatus.ok
+              ? (lang === 'en' ? '✅ Enabled successfully on this device.' : '✅ اتفعّلت بنجاح على الجهاز ده.')
+              : `❌ ${pushStatus.reason}`}
+          </p>
         )}
       </div>
 
