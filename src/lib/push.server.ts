@@ -158,6 +158,7 @@ export async function saveRotationIndex(n: number) {
 }
 
 // كل استدعاء يبني رسالة على معدن واحد بس (حسب الدور الحالي)، مش كل التغييرات مع بعض
+// ملحوظة: الدولار له شرط إضافي (تغيّر 0.1% على الأقل) عشان ما يبعتش مع أي تغيّر تافه
 export function buildChangeMessage(prev: Snapshot, now: Snapshot, which: RotationKey) {
   if (which === "k21") {
     if (!prev.k21 || !now.k21 || prev.k21 === now.k21) return null;
@@ -177,8 +178,8 @@ export function buildChangeMessage(prev: Snapshot, now: Snapshot, which: Rotatio
     };
   }
 
-  // which === "usd"
-  if (!prev.usd || !now.usd || prev.usd === now.usd) return null;
+  // which === "usd" — بس لو التغيّر 0.1% أو أكتر (مش أي فرق شعرة)
+  if (!prev.usd || !now.usd || Math.abs(pct(prev.usd, now.usd)) < 0.1) return null;
   const d = now.usd - prev.usd;
   return {
     title: "سعر الدولار",
