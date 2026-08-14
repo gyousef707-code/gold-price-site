@@ -104,7 +104,22 @@ export default function useNotifications() {
   useEffect(() => {
     let cancelled = false;
     setItems(read(KEY, []));
-    subscribeToPush(); // يسجّل Service Worker ويخزّن الاشتراك على السيرفر (Push حقيقي حتى لو التطبيق مقفول)
+
+    // متصفحات الموبايل بترفض بصمت أي طلب إذن إشعارات لو حصل من غير "لمسة
+    // حقيقية" من المستخدم (تدبير أمان من المتصفح نفسه، مش من كودنا).
+    // فبدل ما نطلب الإذن فورًا وقت فتح الصفحة، بنستنى أول لمسة/كليك حقيقي
+    // في أي حتة في الصفحة (سكرول، دوسة عادية...) ووقتها بس نطلب الإذن —
+    // كده التجربة تفضل تلقائية بالكامل من غير أي زرار إضافي في الشكل.
+    let done = false;
+    const trySubscribe = () => {
+      if (done) return;
+      done = true;
+      window.removeEventListener('pointerdown', trySubscribe);
+      window.removeEventListener('keydown', trySubscribe);
+      subscribeToPush();
+    };
+    window.addEventListener('pointerdown', trySubscribe, { once: true });
+    window.addEventListener('keydown', trySubscribe, { once: true });
 
     async function tick() {
       try {
@@ -184,6 +199,8 @@ export default function useNotifications() {
     return () => {
       cancelled = true;
       clearInterval(id);
+      window.removeEventListener('pointerdown', trySubscribe);
+      window.removeEventListener('keydown', trySubscribe);
     };
   }, []);
 
