@@ -11,10 +11,12 @@ import {
   saveRotationIndex,
   ROTATION_ORDER,
 } from "@/lib/push.server";
+import { sendTelegramMessage } from "@/lib/telegram.server";
 
-// ده الـ endpoint اللي هيتنادى من خدمة cron خارجية (زي cron-job.org) كل دقيقة أو اتنين.
-// بيقارن الأسعار الحالية بآخر نسخة محفوظة في Redis، ولو فيه تغيّر يبعت Push حقيقي
-// لكل الأجهزة المشتركة — حتى لو التطبيق مقفول تمامًا على موبايلاتهم.
+// ده الـ endpoint اللي بينده عليه cron خارجي كل دقيقة. كل مرة بيفحص معدن واحد بس
+// بالتبادل (عيار 21 ← عيار 24 ← الدولار ← تكرار)، ولو فيه تغيّر حقيقي يبعت:
+// 1) Push حقيقي لكل الأجهزة المشتركة (حتى لو التطبيق مقفول)
+// 2) رسالة على قناة تيليجرام (لو المتغيرات مظبوطة)
 export const Route = createFileRoute("/api/push/check")({
   server: {
     handlers: {
@@ -35,20 +37,26 @@ export const Route = createFileRoute("/api/push/check")({
           const now = computeSnapshot(gold, currency, crypto);
           const prev = await getSnapshot();
 
-          // كل تشغيلة بتاخد دور واحد بس من الدورة: عيار 21 ← عيار 24 ← الدولار ← تكرار
-          const rotationIndex = await getRotationIndex();
-          const which = ROTATION_ORDER[rotationIndex % ROTATION_ORDER.length]!;
+          const idx = await getRotationIndex();
+          const which = ROTATION_ORDER[idx % ROTATION_ORDER.length]!;
           const message = buildChangeMessage(prev, now, which);
 
           let result = { sent: 0, removed: 0, total: 0 };
+          let telegramSent = false;
           if (message) {
             result = await sendPushToAll({ ...message, url: "/", tag: "price-update" });
+            try {
+              await sendTelegramMessage(`💰 <b>${message.title}</b>\n${message.body}\n\n🔗 zahaby1.com`);
+              telegramSent = true;
+            } catch {
+              // فشل تيليجرام ما يوقفش باقي العملية (ممكن المتغيرات لسه مش مظبوطة)
+            }
           }
 
           await saveSnapshot(now);
-          await saveRotationIndex(rotationIndex + 1);
+          await saveRotationIndex(idx + 1);
 
-          return jsonOk({ changed: !!message, which, message, ...result });
+          return jsonOk({ changed: !!message, which, message, telegramSent, ...result });
         } catch (e) {
           return jsonErr(e);
         }
