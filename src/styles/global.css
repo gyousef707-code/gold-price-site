@@ -24,6 +24,16 @@ body {
     direction: rtl;
     overflow-x: hidden;
 }
+/* مسافة أمان بسيطة بين محتوى الصفحة وحواف الشاشة — على الموبايل والكمبيوتر مع بعض.
+   الهيدر والقايمة السفلية بره <main> فمش بيتأثروا، بيفضلوا عرض الشاشة كامل زي ما هما. */
+main {
+    padding-inline: 12px;
+}
+@media (min-width: 700px) {
+    main {
+        padding-inline: 24px;
+    }
+}
 body.light-mode {
     --bg-color: #f6f8fa;
     --card-bg: #ffffff;
@@ -2261,3 +2271,4 @@ input.calc-input[inputmode='decimal'] {
     }
     .gold-carats-section .gap-card .gap-card-container { flex: 1; }
 }
+
