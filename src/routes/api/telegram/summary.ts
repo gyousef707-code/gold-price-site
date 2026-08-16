@@ -25,31 +25,48 @@ export const Route = createFileRoute("/api/telegram/summary")({
             return jsonErr(new Error("تعذر جلب أسعار الذهب"), 502);
           }
 
+          // علامة فرض اتجاه لليمين (RLM) — بتتحط في أول كل سطر عشان نضمن إن
+          // الرمز/الإيموجي يفضل ظاهر على أقصى اليمين على كل الأجهزة، حتى
+          // لو السطر بدأ برقم أو رمز مش عربي
+          const RLM = "\u200F";
+          const rtl = (s: string) => `${RLM}${s}`;
+
           const carat = (k: string) => (gold as any)?.caratPrices?.[k]?.sell;
+          const carat21 = (gold as any)?.caratPrices?.["21"];
           const time = new Date().toLocaleTimeString("ar-EG", {
             timeZone: "Africa/Cairo",
             hour: "2-digit",
             minute: "2-digit",
           });
+          const fmt = (n: number, opts?: Intl.NumberFormatOptions) =>
+            Number(n).toLocaleString("en-US", opts);
 
           const lines = [
-            `📊 <b>ملخص أسعار الذهب</b> — ${time}`,
+            rtl(`✨ <b>ذهبي | أسعار الذهب الآن</b> ✨`),
             "",
-            carat("24") ? `🥇 عيار 24: ${Number(carat("24")).toLocaleString("en-US")} ج.م` : null,
-            carat("22") ? `🥇 عيار 22: ${Number(carat("22")).toLocaleString("en-US")} ج.م` : null,
-            carat("21") ? `🥇 عيار 21: ${Number(carat("21")).toLocaleString("en-US")} ج.م` : null,
-            carat("18") ? `🥇 عيار 18: ${Number(carat("18")).toLocaleString("en-US")} ج.م` : null,
+            carat("24") ? rtl(`🥇 عيار 24: ${fmt(carat("24"))} جنيه`) : null,
+            carat("21") ? rtl(`🥇 عيار 21: ${fmt(carat("21"))} جنيه`) : null,
+            carat("18") ? rtl(`🥇 عيار 18: ${fmt(carat("18"))} جنيه`) : null,
+            "",
             (gold as any)?.pound?.sell
-              ? `💰 الجنيه الذهب: ${Number((gold as any).pound.sell).toLocaleString("en-US")} ج.م`
+              ? rtl(`💰 جنيه الذهب: ${fmt((gold as any).pound.sell)} جنيه`)
               : null,
             (gold as any)?.ounce_usd
-              ? `🌍 الأونصة العالمية: $${Number((gold as any).ounce_usd).toLocaleString("en-US", { maximumFractionDigits: 2 })}`
-              : null,
-            (currency as any)?.rates?.usd?.sell
-              ? `💵 الدولار: ${Number((currency as any).rates.usd.sell).toLocaleString("en-US")} ج.م للبيع`
+              ? rtl(`🌍 الأونصة العالمية: $${fmt((gold as any).ounce_usd, { maximumFractionDigits: 2 })}`)
               : null,
             "",
-            "🔗 zahaby1.com",
+            carat21?.buy ? rtl(`⭐ سعر الشراء: ${fmt(carat21.buy)} جنيه`) : null,
+            carat21?.sell ? rtl(`⭐ سعر البيع: ${fmt(carat21.sell)} جنيه`) : null,
+            "",
+            (currency as any)?.rates?.usd?.sell
+              ? rtl(`💵 سعر الدولار: ${fmt((currency as any).rates.usd.sell)} جنيه`)
+              : null,
+            (gold as any)?.implied_usd_rate
+              ? rtl(`💵 دولار الصاغة: ${fmt((gold as any).implied_usd_rate)} جنيه`)
+              : null,
+            "",
+            rtl(`🕐 الساعة ${time}`),
+            rtl(`🔗 zahaby1.com`),
           ].filter(Boolean);
 
           await sendTelegramMessage(lines.join("\n"));
