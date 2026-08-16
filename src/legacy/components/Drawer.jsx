@@ -114,6 +114,15 @@ export default function Drawer({ open, onClose, panel, setPanel }) {
             <RatingStars compact />
           </div>
 
+          <a
+            href="https://t.me/zahaby1"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="drawer-item"
+            onClick={onClose}
+          >
+            <i className="fa-brands fa-telegram" /> {t('drawer.telegram')}
+          </a>
           <Link to="/contact" className="drawer-item" onClick={onClose}>
             <i className="fa-regular fa-envelope" /> {t('drawer.contact')}
           </Link>
