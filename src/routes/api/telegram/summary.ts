@@ -44,30 +44,41 @@ export const Route = createFileRoute("/api/telegram/summary")({
           const lines = [
             rtl(`✨ <b>ذهبي | أسعار الذهب الآن</b> ✨`),
             "",
-            carat("24") ? rtl(`🥇 عيار 24: ${fmt(carat("24"))} جنيه`) : null,
-            carat("21") ? rtl(`🥇 عيار 21: ${fmt(carat("21"))} جنيه`) : null,
-            carat("18") ? rtl(`🥇 عيار 18: ${fmt(carat("18"))} جنيه`) : null,
+            "",
+            carat("24") ? rtl(`🥇 عيار 24     <b>${fmt(carat("24"))}</b> جنيه`) : null,
+            "",
+            carat("21") ? rtl(`🥇 عيار 21     <b>${fmt(carat("21"))}</b> جنيه`) : null,
+            "",
+            carat("18") ? rtl(`🥇 عيار 18     <b>${fmt(carat("18"))}</b> جنيه`) : null,
+            "",
             "",
             (gold as any)?.pound?.sell
-              ? rtl(`💰 جنيه الذهب: ${fmt((gold as any).pound.sell)} جنيه`)
-              : null,
-            (gold as any)?.ounce_usd
-              ? rtl(`🌍 الأونصة العالمية: $${fmt((gold as any).ounce_usd, { maximumFractionDigits: 2 })}`)
+              ? rtl(`💎 جنيه الذهب     <b>${fmt((gold as any).pound.sell)}</b> جنيه`)
               : null,
             "",
-            carat21?.buy ? rtl(`⭐ سعر الشراء: ${fmt(carat21.buy)} جنيه`) : null,
-            carat21?.sell ? rtl(`⭐ سعر البيع: ${fmt(carat21.sell)} جنيه`) : null,
+            (gold as any)?.ounce_usd
+              ? rtl(`🌍 الأونصة بالدولار     <b>$${fmt((gold as any).ounce_usd, { maximumFractionDigits: 2 })}</b>`)
+              : null,
+            "",
+            "",
+            carat21?.buy ? rtl(`⭐ سعر الشراء     <b>${fmt(carat21.buy)}</b> جنيه`) : null,
+            "",
+            carat21?.sell ? rtl(`⭐ سعر البيع     <b>${fmt(carat21.sell)}</b> جنيه`) : null,
+            "",
             "",
             (currency as any)?.rates?.usd?.sell
-              ? rtl(`💵 سعر الدولار: ${fmt((currency as any).rates.usd.sell)} جنيه`)
-              : null,
-            (gold as any)?.implied_usd_rate
-              ? rtl(`💵 دولار الصاغة: ${fmt((gold as any).implied_usd_rate)} جنيه`)
+              ? rtl(`💵 سعر الدولار     <b>${fmt((currency as any).rates.usd.sell)}</b> جنيه`)
               : null,
             "",
+            (gold as any)?.implied_usd_rate
+              ? rtl(`💵 دولار الصاغة     <b>${fmt((gold as any).implied_usd_rate)}</b> جنيه`)
+              : null,
+            "",
+            "",
             rtl(`🕐 الساعة ${time}`),
+            "",
             rtl(`🔗 zahaby1.com`),
-          ].filter(Boolean);
+          ].filter((l) => l !== null);
 
           await sendTelegramMessage(lines.join("\n"));
 
