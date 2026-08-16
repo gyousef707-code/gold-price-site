@@ -41,43 +41,46 @@ export const Route = createFileRoute("/api/telegram/summary")({
           const fmt = (n: number, opts?: Intl.NumberFormatOptions) =>
             Number(n).toLocaleString("en-US", opts);
 
+          const DIVIDER = "➖➖➖➖➖➖➖➖➖➖";
+
           const lines = [
-            rtl(`✨ <b>ذهبي | أسعار الذهب الآن</b> ✨`),
+            rtl(`✨ <b>ذهبي | أسعار الذهب اليوم</b> ✨`),
+            rtl(DIVIDER),
             "",
+            rtl(`<b>🥇 أسعار الأعيرة</b>`),
             "",
-            carat("24") ? rtl(`🥇 عيار 24     <b>${fmt(carat("24"))}</b> جنيه`) : null,
+            carat("24") ? rtl(`عيار 24     <b>${fmt(carat("24"))}</b> جنيه`) : null,
+            carat("21") ? rtl(`عيار 21     <b>${fmt(carat("21"))}</b> جنيه`) : null,
+            carat("18") ? rtl(`عيار 18     <b>${fmt(carat("18"))}</b> جنيه`) : null,
             "",
-            carat("21") ? rtl(`🥇 عيار 21     <b>${fmt(carat("21"))}</b> جنيه`) : null,
-            "",
-            carat("18") ? rtl(`🥇 عيار 18     <b>${fmt(carat("18"))}</b> جنيه`) : null,
-            "",
+            rtl(`<b>📊 الأسواق العالمية</b>`),
             "",
             (gold as any)?.pound?.sell
               ? rtl(`💎 جنيه الذهب     <b>${fmt((gold as any).pound.sell)}</b> جنيه`)
               : null,
-            "",
             (gold as any)?.ounce_usd
-              ? rtl(`🌍 الأونصة بالدولار     <b>$${fmt((gold as any).ounce_usd, { maximumFractionDigits: 2 })}</b>`)
+              ? rtl(`🌍 الأونصة عالميًا     <b>$${fmt((gold as any).ounce_usd, { maximumFractionDigits: 2 })}</b>`)
               : null,
             "",
+            rtl(`<b>⭐ سعر التداول (عيار 21)</b>`),
             "",
-            carat21?.buy ? rtl(`⭐ سعر الشراء     <b>${fmt(carat21.buy)}</b> جنيه`) : null,
+            carat21?.buy ? rtl(`الشراء     <b>${fmt(carat21.buy)}</b> جنيه`) : null,
+            carat21?.sell ? rtl(`البيع     <b>${fmt(carat21.sell)}</b> جنيه`) : null,
             "",
-            carat21?.sell ? rtl(`⭐ سعر البيع     <b>${fmt(carat21.sell)}</b> جنيه`) : null,
-            "",
+            rtl(`<b>💵 الدولار</b>`),
             "",
             (currency as any)?.rates?.usd?.sell
-              ? rtl(`💵 سعر الدولار     <b>${fmt((currency as any).rates.usd.sell)}</b> جنيه`)
+              ? rtl(`دولار البنك     <b>${fmt((currency as any).rates.usd.sell)}</b> جنيه`)
               : null,
-            "",
             (gold as any)?.implied_usd_rate
-              ? rtl(`💵 دولار الصاغة     <b>${fmt((gold as any).implied_usd_rate)}</b> جنيه`)
+              ? rtl(`دولار الصاغة     <b>${fmt((gold as any).implied_usd_rate)}</b> جنيه`)
               : null,
             "",
+            rtl(DIVIDER),
+            rtl(`🕐 آخر تحديث: ${time}`),
             "",
-            rtl(`🕐 الساعة ${time}`),
-            "",
-            rtl(`🔗 zahaby1.com`),
+            rtl(`🌐 موقعنا: zahaby1.com`),
+            rtl(`📢 قناتنا: t.me/zahaby1`),
           ].filter((l) => l !== null);
 
           await sendTelegramMessage(lines.join("\n"));
