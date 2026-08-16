@@ -47,7 +47,7 @@ export const Route = createFileRoute("/api/telegram/summary")({
             rtl(`✨ <b>ذهبي | أسعار الذهب اليوم</b> ✨`),
             rtl(DIVIDER),
             "",
-            rtl(`<b>🥇 أسعار الأعيرة</b>`),
+            rtl(`<b>🥇 أسعار الذهب الان</b>`),
             "",
             carat("24") ? rtl(`عيار 24     <b>${fmt(carat("24"))}</b> جنيه`) : null,
             carat("21") ? rtl(`عيار 21     <b>${fmt(carat("21"))}</b> جنيه`) : null,
