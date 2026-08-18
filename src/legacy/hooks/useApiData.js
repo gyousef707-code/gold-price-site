@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 
 // بيجيب بيانات من أي endpoint داخلي زي /api/gold-price، وبيعمل تحديث دوري (polling)
-export default function useApiData(url, { intervalMs = 60000 } = {}) {
-  const [data, setData] = useState(null);
+// initialData: لو اتبعتت (من بيانات السيرفر وقت التحميل الأول)، بتُستخدم كقيمة
+// ابتدائية بدل ما نبدأ بـ null، عشان المحتوى يظهر فورًا من غير ما ننتظر أول طلب.
+export default function useApiData(url, { intervalMs = 60000, initialData = null } = {}) {
+  const [data, setData] = useState(initialData);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(initialData == null);
   const timerRef = useRef(null);
 
   useEffect(() => {

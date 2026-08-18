@@ -18,8 +18,11 @@ import { shareCard } from '../lib/shareCard.js';
 
 const KARAT_ORDER = ['24', '22', '21', '18', '14', '12'];
 
-export default function GoldPage() {
-  const { data, loading, error } = useApiData('/api/public/gold-price', { intervalMs: 45000 });
+export default function GoldPage({ initialGoldData = null } = {}) {
+  const { data, loading, error } = useApiData('/api/public/gold-price', {
+    intervalMs: 45000,
+    initialData: initialGoldData,
+  });
   const { t, lang } = useLang();
   const changePct = data?.ounce_change_percent != null ? Number(data.ounce_change_percent) : null;
 
