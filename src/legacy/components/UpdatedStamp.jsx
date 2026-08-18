@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import FaIcon from './FaIcon.jsx';
 
 const TZ = 'Africa/Cairo';
 
@@ -40,7 +41,7 @@ export default function UpdatedStamp({ lang = 'ar', label }) {
   return (
     <div className="updated-stamp">
       <span className="updated-stamp-label">
-        <i className="fa-regular fa-clock" /> {text}
+        <FaIcon icon="fa-regular fa-clock" /> {text}
       </span>
       <span className="updated-stamp-time">{time}</span>
       <span className="updated-stamp-sep">•</span>

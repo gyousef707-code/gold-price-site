@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import FaIcon from '../components/FaIcon.jsx';
 import { Link } from '@/lib/router-compat.jsx';
 import Seo from '../components/Seo.jsx';
 import CurrencyConverter from '../components/CurrencyConverter.jsx';
@@ -32,7 +33,7 @@ export default function CurrenciesPage() {
 
       <section ref={converterRef}>
         <div className="section-title-bar">
-          <h2><i className="fa-solid fa-right-left" /> {t('converter.title')}</h2>
+          <h2><FaIcon icon="fa-solid fa-right-left" /> {t('converter.title')}</h2>
         </div>
         <CurrencyConverter rates={data?.rates} selected={selected} />
         <UpdatedStamp lang={lang} />
@@ -40,7 +41,7 @@ export default function CurrenciesPage() {
 
       <section>
         <div className="section-title-bar">
-          <h2><i className="fa-solid fa-list" /> {t('currencies.list')}</h2>
+          <h2><FaIcon icon="fa-solid fa-list" /> {t('currencies.list')}</h2>
         </div>
         {loading && <p className="loading-text">{t('loading')}</p>}
         {error && !loading && <p className="error-text">{t('error')}</p>}
@@ -87,7 +88,7 @@ export default function CurrenciesPage() {
                     onClick={(e) => e.stopPropagation()}
                     aria-label={lang === 'en' ? 'Details' : 'التفاصيل'}
                   >
-                    <i className="fa-solid fa-chevron-left" />
+                    <FaIcon icon="fa-solid fa-chevron-left" />
                   </Link>
                 </div>
               </div>

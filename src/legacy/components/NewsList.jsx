@@ -1,4 +1,5 @@
 import useApiData from '../hooks/useApiData.js';
+import FaIcon from './FaIcon.jsx';
 import { useLang } from '../context/LangContext.jsx';
 
 export default function NewsList() {
@@ -8,7 +9,7 @@ export default function NewsList() {
   return (
     <section>
       <div className="section-title-bar">
-        <h2><i className="fa-regular fa-newspaper" /> {t('news.latest')}</h2>
+        <h2><FaIcon icon="fa-regular fa-newspaper" /> {t('news.latest')}</h2>
       </div>
       {loading && <p className="loading-text">{lang === 'en' ? 'Loading news...' : 'جارِ تحميل الأخبار...'}</p>}
       {error && !loading && <p className="error-text">{t('error')}</p>}

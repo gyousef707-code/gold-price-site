@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { CURRENCY_META, CURRENCY_ORDER } from '../data/currencies.js';
 import LivePrice from './LivePrice.jsx';
 import NumberInput from './NumberInput.jsx';
+import FaIcon from './FaIcon.jsx';
 
 export default function CurrencyConverter({ rates, selected }) {
   const [amount, setAmount] = useState(100);
@@ -48,7 +49,7 @@ export default function CurrencyConverter({ rates, selected }) {
         <div className="converter-select-wrapper">
           {flag(from)}
           <span className="converter-code">{from.toUpperCase()}</span>
-          <i className="fa-solid fa-chevron-down converter-select-arrow" />
+          <FaIcon icon="fa-solid fa-chevron-down" className="converter-select-arrow" />
           <select value={from} onChange={(e) => setFrom(e.target.value)} aria-label="من">
             {allCodes.map((c) => (
               <option key={c} value={c}>{CURRENCY_META[c].name}</option>
@@ -75,7 +76,7 @@ export default function CurrencyConverter({ rates, selected }) {
         <div className="converter-select-wrapper">
           {flag(to)}
           <span className="converter-code">{to.toUpperCase()}</span>
-          <i className="fa-solid fa-chevron-down converter-select-arrow" />
+          <FaIcon icon="fa-solid fa-chevron-down" className="converter-select-arrow" />
           <select value={to} onChange={(e) => setTo(e.target.value)} aria-label="إلى">
             {allCodes.map((c) => (
               <option key={c} value={c}>{CURRENCY_META[c].name}</option>

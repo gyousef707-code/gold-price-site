@@ -1,4 +1,5 @@
 import TradingViewChart from '../components/TradingViewChart.jsx';
+import FaIcon from '../components/FaIcon.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
 import NewsList from '../components/NewsList.jsx';
 import LivePrice from '../components/LivePrice.jsx';
@@ -71,9 +72,9 @@ export default function SilverPage() {
                   aria-label={t('share.price')}
                   onClick={(e) => shareSilver(e, c, p)}
                 >
-                  <i className="fa-solid fa-share-nodes" />
+                  <FaIcon icon="fa-solid fa-share-nodes" />
                 </button>
-                <div className="silver-card-icon-top"><i className="fa-solid fa-gem" /></div>
+                <div className="silver-card-icon-top"><FaIcon icon="fa-solid fa-gem" /></div>
                 <div className="silver-carat-wrap">
                   <span className="silver-carat-label">{t('karat')}</span>
                   <span className="silver-carat-num">{c}</span>
@@ -100,7 +101,7 @@ export default function SilverPage() {
 
       <section id="tool-silver-calc" className="page-tools">
         <div className="section-title-bar">
-          <h2><i className="fa-solid fa-calculator" /> {lang === 'en' ? 'Silver tools' : 'أدوات الفضة'}</h2>
+          <h2><FaIcon icon="fa-solid fa-calculator" /> {lang === 'en' ? 'Silver tools' : 'أدوات الفضة'}</h2>
         </div>
         <SilverCalculator />
         <div id="tool-silver-savings"><SavingsCalculator metal="silver" /></div>

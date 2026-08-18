@@ -31,6 +31,10 @@ import { Route as ApiPublicCurrencyPriceRouteImport } from './routes/api/public/
 import { Route as ApiPublicGoldPriceRouteImport } from './routes/api/public/gold-price'
 import { Route as ApiPublicNewsRouteImport } from './routes/api/public/news'
 import { Route as ApiPublicSilverPriceRouteImport } from './routes/api/public/silver-price'
+import { Route as ApiPushCheckRouteImport } from './routes/api/push/check'
+import { Route as ApiPushSubscribeRouteImport } from './routes/api/push/subscribe'
+import { Route as ApiPushUnsubscribeRouteImport } from './routes/api/push/unsubscribe'
+import { Route as ApiTelegramSummaryRouteImport } from './routes/api/telegram/summary'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -142,6 +146,26 @@ const ApiPublicSilverPriceRoute = ApiPublicSilverPriceRouteImport.update({
   path: '/api/public/silver-price',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPushCheckRoute = ApiPushCheckRouteImport.update({
+  id: '/api/push/check',
+  path: '/api/push/check',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPushSubscribeRoute = ApiPushSubscribeRouteImport.update({
+  id: '/api/push/subscribe',
+  path: '/api/push/subscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPushUnsubscribeRoute = ApiPushUnsubscribeRouteImport.update({
+  id: '/api/push/unsubscribe',
+  path: '/api/push/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTelegramSummaryRoute = ApiTelegramSummaryRouteImport.update({
+  id: '/api/telegram/summary',
+  path: '/api/telegram/summary',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -166,6 +190,10 @@ export interface FileRoutesByFullPath {
   '/api/public/gold-price': typeof ApiPublicGoldPriceRoute
   '/api/public/news': typeof ApiPublicNewsRoute
   '/api/public/silver-price': typeof ApiPublicSilverPriceRoute
+  '/api/push/check': typeof ApiPushCheckRoute
+  '/api/push/subscribe': typeof ApiPushSubscribeRoute
+  '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
+  '/api/telegram/summary': typeof ApiTelegramSummaryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -190,6 +218,10 @@ export interface FileRoutesByTo {
   '/api/public/gold-price': typeof ApiPublicGoldPriceRoute
   '/api/public/news': typeof ApiPublicNewsRoute
   '/api/public/silver-price': typeof ApiPublicSilverPriceRoute
+  '/api/push/check': typeof ApiPushCheckRoute
+  '/api/push/subscribe': typeof ApiPushSubscribeRoute
+  '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
+  '/api/telegram/summary': typeof ApiTelegramSummaryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -215,6 +247,10 @@ export interface FileRoutesById {
   '/api/public/gold-price': typeof ApiPublicGoldPriceRoute
   '/api/public/news': typeof ApiPublicNewsRoute
   '/api/public/silver-price': typeof ApiPublicSilverPriceRoute
+  '/api/push/check': typeof ApiPushCheckRoute
+  '/api/push/subscribe': typeof ApiPushSubscribeRoute
+  '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
+  '/api/telegram/summary': typeof ApiTelegramSummaryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -241,6 +277,10 @@ export interface FileRouteTypes {
     | '/api/public/gold-price'
     | '/api/public/news'
     | '/api/public/silver-price'
+    | '/api/push/check'
+    | '/api/push/subscribe'
+    | '/api/push/unsubscribe'
+    | '/api/telegram/summary'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -265,6 +305,10 @@ export interface FileRouteTypes {
     | '/api/public/gold-price'
     | '/api/public/news'
     | '/api/public/silver-price'
+    | '/api/push/check'
+    | '/api/push/subscribe'
+    | '/api/push/unsubscribe'
+    | '/api/telegram/summary'
   id:
     | '__root__'
     | '/'
@@ -289,6 +333,10 @@ export interface FileRouteTypes {
     | '/api/public/gold-price'
     | '/api/public/news'
     | '/api/public/silver-price'
+    | '/api/push/check'
+    | '/api/push/subscribe'
+    | '/api/push/unsubscribe'
+    | '/api/telegram/summary'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -314,6 +362,10 @@ export interface RootRouteChildren {
   ApiPublicGoldPriceRoute: typeof ApiPublicGoldPriceRoute
   ApiPublicNewsRoute: typeof ApiPublicNewsRoute
   ApiPublicSilverPriceRoute: typeof ApiPublicSilverPriceRoute
+  ApiPushCheckRoute: typeof ApiPushCheckRoute
+  ApiPushSubscribeRoute: typeof ApiPushSubscribeRoute
+  ApiPushUnsubscribeRoute: typeof ApiPushUnsubscribeRoute
+  ApiTelegramSummaryRoute: typeof ApiTelegramSummaryRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -472,6 +524,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicSilverPriceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/push/check': {
+      id: '/api/push/check'
+      path: '/api/push/check'
+      fullPath: '/api/push/check'
+      preLoaderRoute: typeof ApiPushCheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/push/subscribe': {
+      id: '/api/push/subscribe'
+      path: '/api/push/subscribe'
+      fullPath: '/api/push/subscribe'
+      preLoaderRoute: typeof ApiPushSubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/push/unsubscribe': {
+      id: '/api/push/unsubscribe'
+      path: '/api/push/unsubscribe'
+      fullPath: '/api/push/unsubscribe'
+      preLoaderRoute: typeof ApiPushUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/telegram/summary': {
+      id: '/api/telegram/summary'
+      path: '/api/telegram/summary'
+      fullPath: '/api/telegram/summary'
+      preLoaderRoute: typeof ApiTelegramSummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -498,7 +578,21 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicGoldPriceRoute: ApiPublicGoldPriceRoute,
   ApiPublicNewsRoute: ApiPublicNewsRoute,
   ApiPublicSilverPriceRoute: ApiPublicSilverPriceRoute,
+  ApiPushCheckRoute: ApiPushCheckRoute,
+  ApiPushSubscribeRoute: ApiPushSubscribeRoute,
+  ApiPushUnsubscribeRoute: ApiPushUnsubscribeRoute,
+  ApiTelegramSummaryRoute: ApiTelegramSummaryRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

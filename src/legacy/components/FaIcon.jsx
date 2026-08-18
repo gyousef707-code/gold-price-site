@@ -33,6 +33,7 @@ import {
   faMagnifyingGlass,
   faChartSimple,
   faSackDollar,
+  faClock as faClockSolid,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -90,6 +91,7 @@ const ICON_MAP = {
   'fa-solid fa-chart-simple': faChartSimple,
   'fa-regular fa-trash-can': faTrashCan,
   'fa-solid fa-sack-dollar': faSackDollar,
+  'fa-solid fa-clock': faClockSolid,
 };
 
 /**

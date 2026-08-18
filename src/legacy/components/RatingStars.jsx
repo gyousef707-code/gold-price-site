@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import FaIcon from './FaIcon.jsx';
 import { useLang } from '../context/LangContext.jsx';
 import { showToast } from '../lib/shareCard.js';
 
@@ -37,7 +38,7 @@ export default function RatingStars({ compact = false }) {
             onClick={() => pick(n)}
             aria-label={`${n} / 5`}
           >
-            <i className="fa-solid fa-star" />
+            <FaIcon icon="fa-solid fa-star" />
           </button>
         ))}
       </div>

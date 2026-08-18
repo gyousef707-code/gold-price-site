@@ -1,4 +1,5 @@
 import { Link } from '@/lib/router-compat.jsx';
+import FaIcon from './FaIcon.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
 import { useLang } from '../context/LangContext.jsx';
 import { SunIcon, MoonIcon, AutoIcon } from './icons.jsx';
@@ -25,7 +26,7 @@ export default function Header({ onMenuClick }) {
           <ModeIcon mode={mode} />
         </button>
         <button className="icon-btn" onClick={refresh} aria-label={t('header.refresh')}>
-          <i className="fa-solid fa-rotate" />
+          <FaIcon icon="fa-solid fa-rotate" />
         </button>
       </div>
       <div className="header-right">
@@ -35,7 +36,7 @@ export default function Header({ onMenuClick }) {
           </h1>
         </Link>
         <button className="icon-btn" onClick={onMenuClick} aria-label={t('header.menu')}>
-          <i className="fa-solid fa-bars" />
+          <FaIcon icon="fa-solid fa-bars" />
         </button>
       </div>
     </header>

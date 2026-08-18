@@ -1,5 +1,6 @@
 import { Link } from '@/lib/router-compat.jsx';
 import { useLang } from '../context/LangContext.jsx';
+import FaIcon from '../components/FaIcon.jsx';
 
 const SECTIONS = [
   {
@@ -57,10 +58,10 @@ export default function ToolsPage() {
           <div className="tools-grid">
             {section.cards.map((c) => (
               <Link key={c.to + c.ar} to={c.to} className={`tool-card-pro tone-${c.tone}`}>
-                <span className="t-icon"><i className={c.icon} /></span>
+                <span className="t-icon"><FaIcon icon={c.icon} /></span>
                 <h3>{en ? c.en : c.ar}</h3>
                 <p>{en ? c.enDesc : c.arDesc}</p>
-                <i className="fa-solid fa-chevron-left t-arrow" />
+                <FaIcon icon="fa-solid fa-chevron-left" className="t-arrow" />
               </Link>
             ))}
           </div>

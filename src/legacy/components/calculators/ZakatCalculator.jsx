@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import FaIcon from '../FaIcon.jsx';
 import useApiData from '../../hooks/useApiData.js';
 import NumberInput from '../NumberInput.jsx';
 import { useLang } from '../../context/LangContext.jsx';
@@ -20,7 +21,7 @@ export default function ZakatCalculator() {
   return (
     <div className="calc-card" id="tool-zakat-calc">
       <div className="section-title-bar" style={{ marginBottom: 12 }}>
-        <h2><i className="fa-solid fa-hand-holding-dollar" /> {t('calc.zakat.title')}</h2>
+        <h2><FaIcon icon="fa-solid fa-hand-holding-dollar" /> {t('calc.zakat.title')}</h2>
       </div>
       <div className="calc-row">
         <div className="calc-group">

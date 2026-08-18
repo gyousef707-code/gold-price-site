@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import FaIcon from './FaIcon.jsx';
 
 export default function TradingViewChart({ symbol, id }) {
   const containerRef = useRef(null);
@@ -52,7 +53,7 @@ export default function TradingViewChart({ symbol, id }) {
   return (
     <section className="tradingview-section">
       <div className="section-title-bar">
-        <h2><i className="fa-solid fa-chart-area" /> الرسم البياني (TradingView)</h2>
+        <h2><FaIcon icon="fa-solid fa-chart-area" /> الرسم البياني (TradingView)</h2>
       </div>
       <div className="tradingview-widget-container">
         <div className="tradingview-widget-container__widget" id={id} ref={containerRef} />

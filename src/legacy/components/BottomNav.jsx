@@ -1,5 +1,6 @@
 import { NavLink } from '@/lib/router-compat.jsx';
 import { useLang } from '../context/LangContext.jsx';
+import FaIcon from './FaIcon.jsx';
 
 const TABS = [
   { to: '/', icon: 'fa-solid fa-chart-line', key: 'nav.prices', end: true },
@@ -20,7 +21,7 @@ export default function BottomNav() {
           end={tab.end}
           className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
         >
-          <i className={tab.icon} />
+          <FaIcon icon={tab.icon} />
           <span>{t(tab.key)}</span>
         </NavLink>
       ))}

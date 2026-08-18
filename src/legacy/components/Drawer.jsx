@@ -1,4 +1,5 @@
 import { Link } from '@/lib/router-compat.jsx';
+import FaIcon from './FaIcon.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
 import { useLang } from '../context/LangContext.jsx';
 import { SunIcon, MoonIcon, AutoIcon } from './icons.jsx';
@@ -42,7 +43,7 @@ export default function Drawer({ open, onClose, panel, setPanel }) {
         <div className="drawer-header">
           <h2>{t('app.name')}</h2>
           <button className="drawer-close" onClick={onClose} aria-label="إغلاق">
-            <i className="fa-solid fa-xmark" />
+            <FaIcon icon="fa-solid fa-xmark" />
           </button>
         </div>
         <div className="drawer-body">
@@ -50,7 +51,7 @@ export default function Drawer({ open, onClose, panel, setPanel }) {
             className="drawer-item"
             onClick={() => setPanel(panel === 'notifications' ? null : 'notifications')}
           >
-            <i className="fa-regular fa-bell" /> {t('drawer.notifications')}
+            <FaIcon icon="fa-regular fa-bell" /> {t('drawer.notifications')}
             {items.length > 0 && <span className="drawer-badge">{items.length}</span>}
           </button>
           {panel === 'notifications' && (
@@ -68,13 +69,13 @@ export default function Drawer({ open, onClose, panel, setPanel }) {
                 </p>
               )}
               <Link to="/notifications" className="drawer-panel-link" onClick={onClose}>
-                {t('drawer.allNotifications')} <i className="fa-solid fa-chevron-left" />
+                {t('drawer.allNotifications')} <FaIcon icon="fa-solid fa-chevron-left" />
               </Link>
             </div>
           )}
 
           <button className="drawer-item" onClick={() => setPanel(panel === 'settings' ? null : 'settings')}>
-            <i className="fa-solid fa-gear" /> {t('drawer.settings')}
+            <FaIcon icon="fa-solid fa-gear" /> {t('drawer.settings')}
           </button>
           {panel === 'settings' && (
             <div className="drawer-panel">
@@ -107,7 +108,7 @@ export default function Drawer({ open, onClose, panel, setPanel }) {
           )}
 
           <button className="drawer-item" onClick={shareApp}>
-            <i className="fa-solid fa-share-nodes" /> {t('drawer.share')}
+            <FaIcon icon="fa-solid fa-share-nodes" /> {t('drawer.share')}
           </button>
 
           <div className="drawer-rating">
@@ -121,22 +122,22 @@ export default function Drawer({ open, onClose, panel, setPanel }) {
             className="drawer-item"
             onClick={onClose}
           >
-            <i className="fa-brands fa-telegram" /> {t('drawer.telegram')}
+            <FaIcon icon="fa-brands fa-telegram" /> {t('drawer.telegram')}
           </a>
           <Link to="/contact" className="drawer-item" onClick={onClose}>
-            <i className="fa-regular fa-envelope" /> {t('drawer.contact')}
+            <FaIcon icon="fa-regular fa-envelope" /> {t('drawer.contact')}
           </Link>
           <Link to="/about" className="drawer-item" onClick={onClose}>
-            <i className="fa-regular fa-circle-question" /> {t('drawer.about')}
+            <FaIcon icon="fa-regular fa-circle-question" /> {t('drawer.about')}
           </Link>
           <Link to="/privacy" className="drawer-item" onClick={onClose}>
-            <i className="fa-solid fa-shield-halved" /> {t('drawer.privacy')}
+            <FaIcon icon="fa-solid fa-shield-halved" /> {t('drawer.privacy')}
           </Link>
           <Link to="/terms" className="drawer-item" onClick={onClose}>
-            <i className="fa-solid fa-file-contract" /> {t('drawer.terms')}
+            <FaIcon icon="fa-solid fa-file-contract" /> {t('drawer.terms')}
           </Link>
           <Link to="/disclaimer" className="drawer-item" onClick={onClose}>
-            <i className="fa-solid fa-triangle-exclamation" /> {t('drawer.disclaimer')}
+            <FaIcon icon="fa-solid fa-triangle-exclamation" /> {t('drawer.disclaimer')}
           </Link>
         </div>
       </aside>

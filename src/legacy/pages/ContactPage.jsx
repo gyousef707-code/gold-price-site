@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from '@/lib/router-compat.jsx';
 import Seo from '../components/Seo.jsx';
 import RatingStars from '../components/RatingStars.jsx';
+import FaIcon from '../components/FaIcon.jsx';
 import { staticPages } from '../data/staticPages.js';
 import { useLang } from '../context/LangContext.jsx';
 
@@ -95,23 +96,23 @@ export default function ContactPage() {
             <textarea className="calc-input contact-textarea" rows={5} required value={form.message} onChange={set('message')} />
           </div>
           <button type="submit" className="btn contact-submit">
-            <i className="fa-solid fa-paper-plane" /> {en ? 'Send message' : 'إرسال الرسالة'}
+            <FaIcon icon="fa-solid fa-paper-plane" /> {en ? 'Send message' : 'إرسال الرسالة'}
           </button>
         </form>
 
         <aside className="contact-aside">
           <div className="contact-card center">
-            <i className="fa-solid fa-envelope-open-text" />
+            <FaIcon icon="fa-solid fa-envelope-open-text" />
             <h3>{en ? 'Email' : 'البريد الإلكتروني'}</h3>
             <p><a className="email-link" href={`mailto:${EMAIL}`}>{EMAIL}</a></p>
           </div>
           <div className="contact-card center">
-            <i className="fa-solid fa-clock" />
+            <FaIcon icon="fa-solid fa-clock" />
             <h3>{en ? 'Response time' : 'وقت الرد'}</h3>
             <p>{en ? 'Usually within 24 hours' : 'عادةً خلال 24 ساعة'}</p>
           </div>
           <div className="contact-card center">
-            <i className="fa-solid fa-bullhorn" />
+            <FaIcon icon="fa-solid fa-bullhorn" />
             <h3>{en ? 'Advertise with us' : 'أعلن معانا'}</h3>
             <p>{en ? 'Reach thousands of daily gold & currency watchers in Egypt.' : 'وصل لآلاف المتابعين اليومي لأسعار الذهب والعملات في مصر.'}</p>
           </div>
@@ -121,13 +122,13 @@ export default function ContactPage() {
 
       <section className="faq-section">
         <div className="section-title-bar">
-          <h2><i className="fa-regular fa-circle-question" /> {en ? 'Frequently asked questions' : 'أسئلة شائعة'}</h2>
+          <h2><FaIcon icon="fa-regular fa-circle-question" /> {en ? 'Frequently asked questions' : 'أسئلة شائعة'}</h2>
         </div>
         {FAQ.map((f, i) => (
           <div key={i} className={`faq-item ${open === i ? 'open' : ''}`}>
             <button type="button" className="faq-q" onClick={() => setOpen(open === i ? -1 : i)}>
               <span>{en ? f.q.en : f.q.ar}</span>
-              <i className={`fa-solid fa-chevron-${open === i ? 'up' : 'down'}`} />
+              <FaIcon icon={`fa-solid fa-chevron-${open === i ? 'up' : 'down'}`} />
             </button>
             {open === i && <div className="faq-a">{en ? f.a.en : f.a.ar}</div>}
           </div>

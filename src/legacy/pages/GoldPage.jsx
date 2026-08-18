@@ -1,4 +1,5 @@
 import { Link } from '@/lib/router-compat.jsx';
+import FaIcon from '../components/FaIcon.jsx';
 import TradingViewChart from '../components/TradingViewChart.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
 import NewsList from '../components/NewsList.jsx';
@@ -99,10 +100,10 @@ export default function GoldPage() {
                   aria-label={t('share.price')}
                   onClick={(e) => shareKarat(e, k, p)}
                 >
-                  <i className="fa-solid fa-share-nodes" />
+                  <FaIcon icon="fa-solid fa-share-nodes" />
                 </button>
                 <Link to={`/gold/${k}`} style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
-                  <div className="gold-card-icon-top"><i className="fa-solid fa-coins" /></div>
+                  <div className="gold-card-icon-top"><FaIcon icon="fa-solid fa-coins" /></div>
                   <div className="gold-carat-wrap">
                     <span className="gold-carat-label">{t('karat')}</span>
                     <span className="gold-carat-num">{k}</span>
@@ -132,9 +133,9 @@ export default function GoldPage() {
               aria-label={t('share.price')}
               onClick={sharePound}
             >
-              <i className="fa-solid fa-share-nodes" />
+              <FaIcon icon="fa-solid fa-share-nodes" />
             </button>
-            <div className="gold-card-icon-top"><i className="fa-solid fa-sack-dollar" /></div>
+            <div className="gold-card-icon-top"><FaIcon icon="fa-solid fa-sack-dollar" /></div>
             <div className="gold-carat-wrap pound-wrap">
               <span className="pound-title">{t('gold.pound')}</span>
             </div>
@@ -178,7 +179,7 @@ export default function GoldPage() {
 
       <section id="tool-gold-calc" className="page-tools">
         <div className="section-title-bar">
-          <h2><i className="fa-solid fa-calculator" /> {lang === 'en' ? 'Gold tools' : 'أدوات الذهب'}</h2>
+          <h2><FaIcon icon="fa-solid fa-calculator" /> {lang === 'en' ? 'Gold tools' : 'أدوات الذهب'}</h2>
         </div>
         <GoldCalculator />
         <div id="tool-zakat-calc"><ZakatCalculator /></div>
@@ -187,7 +188,7 @@ export default function GoldPage() {
 
       <section id="tool-gold-karats">
         <div className="section-title-bar">
-          <h2><i className="fa-solid fa-coins" /> {lang === 'en' ? 'Gold karats in detail' : 'عيارات الذهب بالتفصيل'}</h2>
+          <h2><FaIcon icon="fa-solid fa-coins" /> {lang === 'en' ? 'Gold karats in detail' : 'عيارات الذهب بالتفصيل'}</h2>
         </div>
         <div className="carat-grid">
           {goldKaratsDesc.map((g) => (

@@ -1,4 +1,5 @@
 import { Link, useParams } from '@/lib/router-compat.jsx';
+import FaIcon from '../components/FaIcon.jsx';
 import LivePrice from '../components/LivePrice.jsx';
 import UpdatedStamp from '../components/UpdatedStamp.jsx';
 import CurrencyConverter from '../components/CurrencyConverter.jsx';
@@ -48,7 +49,7 @@ export default function CurrencyPage() {
               {meta.name} — {code.toUpperCase()}/EGP
             </span>
             <button className="card-share-btn" onClick={share} aria-label={t('share.price')} title={t('share.price')}>
-              <i className="fa-solid fa-share-nodes" />
+              <FaIcon icon="fa-solid fa-share-nodes" />
             </button>
           </div>
           <div className="ounce-price">
@@ -64,14 +65,14 @@ export default function CurrencyPage() {
       <section>
         <div className="gold-cards-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
           <div className="gold-card">
-            <div className="gold-card-icon-top"><i className="fa-solid fa-arrow-down" /></div>
+            <div className="gold-card-icon-top"><FaIcon icon="fa-solid fa-arrow-down" /></div>
             <div className="gold-v-row">
               <span className="gold-v-label">{lang === 'en' ? 'Buy' : 'شراء'}</span>
               <span className="gold-v-value buy-price"><LivePrice value={r?.buy ?? null} decimals={2} /></span>
             </div>
           </div>
           <div className="gold-card">
-            <div className="gold-card-icon-top"><i className="fa-solid fa-arrow-up" /></div>
+            <div className="gold-card-icon-top"><FaIcon icon="fa-solid fa-arrow-up" /></div>
             <div className="gold-v-row">
               <span className="gold-v-label">{lang === 'en' ? 'Sell' : 'بيع'}</span>
               <span className="gold-v-value sell-price"><LivePrice value={r?.sell ?? null} decimals={2} /></span>
@@ -82,7 +83,7 @@ export default function CurrencyPage() {
 
       <section>
         <div className="section-title-bar">
-          <h2><i className="fa-solid fa-right-left" /> {t('converter.title')}</h2>
+          <h2><FaIcon icon="fa-solid fa-right-left" /> {t('converter.title')}</h2>
         </div>
         <CurrencyConverter rates={data?.rates} selected={code} />
       </section>

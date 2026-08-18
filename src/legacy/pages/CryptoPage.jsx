@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import FaIcon from '../components/FaIcon.jsx';
 import { Link } from '@/lib/router-compat.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
 import NewsList from '../components/NewsList.jsx';
@@ -56,7 +57,7 @@ export default function CryptoPage() {
       )}
 
       <div className="crypto-legal-note">
-        <i className="fa-solid fa-circle-info" />
+        <FaIcon icon="fa-solid fa-circle-info" />
         <span>
           {lang === 'en'
             ? 'Informational only. Displayed prices are indicative market data from public sources. Trading or promoting cryptocurrencies is not licensed by the Central Bank of Egypt — this page offers no buying, selling, brokerage, investment advice or referral links.'
@@ -67,12 +68,12 @@ export default function CryptoPage() {
 
       <section>
         <div className="section-title-bar">
-          <h2><i className="fa-brands fa-bitcoin" /> {t('crypto.top')}</h2>
+          <h2><FaIcon icon="fa-brands fa-bitcoin" /> {t('crypto.top')}</h2>
         </div>
 
         <div className="crypto-toolbar">
           <div className="crypto-search">
-            <i className="fa-solid fa-magnifying-glass" />
+            <FaIcon icon="fa-solid fa-magnifying-glass" />
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
@@ -140,14 +141,14 @@ export default function CryptoPage() {
 
       <section id="tool-crypto-calc" className="page-tools">
         <div className="section-title-bar">
-          <h2><i className="fa-solid fa-calculator" /> {lang === 'en' ? 'Crypto tools' : 'أدوات العملات الرقمية'}</h2>
+          <h2><FaIcon icon="fa-solid fa-calculator" /> {lang === 'en' ? 'Crypto tools' : 'أدوات العملات الرقمية'}</h2>
         </div>
         <CryptoCalculator />
       </section>
 
       <section id="tool-crypto-details">
         <div className="section-title-bar">
-          <h2><i className="fa-brands fa-bitcoin" /> {lang === 'en' ? 'Coins in detail' : 'العملات الرقمية بالتفصيل'}</h2>
+          <h2><FaIcon icon="fa-brands fa-bitcoin" /> {lang === 'en' ? 'Coins in detail' : 'العملات الرقمية بالتفصيل'}</h2>
         </div>
         <div className="crypto-grid">
           {cryptoDetails.map((c) => (

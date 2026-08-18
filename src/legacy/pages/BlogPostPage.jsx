@@ -1,4 +1,5 @@
 import { Link, useParams, Navigate } from '@/lib/router-compat.jsx';
+import FaIcon from '../components/FaIcon.jsx';
 import Seo from '../components/Seo.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
 import AdSlot from '../components/AdSlot.jsx';
@@ -40,7 +41,7 @@ export default function BlogPostPage() {
       <AdSlot id={`blog-${slug}-bottom`} />
 
       <button type="button" className="share-btn" onClick={share}>
-        <i className="fa-solid fa-share-nodes" /> شارك المقال
+        <FaIcon icon="fa-solid fa-share-nodes" /> شارك المقال
       </button>
 
       <RelatedArticles slugs={related} />

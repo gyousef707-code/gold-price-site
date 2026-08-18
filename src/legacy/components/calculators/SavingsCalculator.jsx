@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import useApiData from '../../hooks/useApiData.js';
 import NumberInput from '../NumberInput.jsx';
 import { useLang } from '../../context/LangContext.jsx';
+import FaIcon from '../FaIcon.jsx';
 
 const CONFIG = {
   gold: {
@@ -46,7 +47,7 @@ export default function SavingsCalculator({ metal }) {
   return (
     <div className="calc-card" id={cfg.id}>
       <div className="section-title-bar" style={{ marginBottom: 12 }}>
-        <h2><i className={cfg.icon} /> {t(cfg.titleKey)}</h2>
+        <h2><FaIcon icon={cfg.icon} /> {t(cfg.titleKey)}</h2>
       </div>
       <div className="calc-row">
         <div className="calc-group">
