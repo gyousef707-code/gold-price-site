@@ -1,20 +1,25 @@
+import { lazy, Suspense } from 'react';
 import { Link } from '@/lib/router-compat.jsx';
 import FaIcon from '../components/FaIcon.jsx';
 import TradingViewChart from '../components/TradingViewChart.jsx';
-import RelatedArticles from '../components/RelatedArticles.jsx';
-import NewsList from '../components/NewsList.jsx';
 import LivePrice from '../components/LivePrice.jsx';
 import UpdatedStamp from '../components/UpdatedStamp.jsx';
 import MarketStatus from '../components/MarketStatus.jsx';
 import GapGauge from '../components/GapGauge.jsx';
 
-import GoldCalculator from '../components/calculators/GoldCalculator.jsx';
-import ZakatCalculator from '../components/calculators/ZakatCalculator.jsx';
-import SavingsCalculator from '../components/calculators/SavingsCalculator.jsx';
 import useApiData from '../hooks/useApiData.js';
 import { useLang } from '../context/LangContext.jsx';
 import { goldKaratsDesc } from '../data/gold.js';
 import { shareCard } from '../lib/shareCard.js';
+
+// الأجزاء دي تحت الشاشة الأولى (تحت السكرول)، فبنأجل تحميل الكود بتاعها
+// لحد ما المستخدم يقرب منها فعلاً، بدل ما تتحمّل كلها من أول لحظة.
+// الشكل والمحتوى النهائي بيفضلوا زي ما هم بالظبط.
+const RelatedArticles = lazy(() => import('../components/RelatedArticles.jsx'));
+const NewsList = lazy(() => import('../components/NewsList.jsx'));
+const GoldCalculator = lazy(() => import('../components/calculators/GoldCalculator.jsx'));
+const ZakatCalculator = lazy(() => import('../components/calculators/ZakatCalculator.jsx'));
+const SavingsCalculator = lazy(() => import('../components/calculators/SavingsCalculator.jsx'));
 
 const KARAT_ORDER = ['24', '22', '21', '18', '14', '12'];
 
@@ -184,9 +189,11 @@ export default function GoldPage({ initialGoldData = null } = {}) {
         <div className="section-title-bar">
           <h2><FaIcon icon="fa-solid fa-calculator" /> {lang === 'en' ? 'Gold tools' : 'أدوات الذهب'}</h2>
         </div>
-        <GoldCalculator />
-        <div id="tool-zakat-calc"><ZakatCalculator /></div>
-        <div id="tool-gold-savings"><SavingsCalculator metal="gold" /></div>
+        <Suspense fallback={null}>
+          <GoldCalculator />
+          <div id="tool-zakat-calc"><ZakatCalculator /></div>
+          <div id="tool-gold-savings"><SavingsCalculator metal="gold" /></div>
+        </Suspense>
       </section>
 
       <section id="tool-gold-karats">
@@ -200,9 +207,13 @@ export default function GoldPage({ initialGoldData = null } = {}) {
         </div>
       </section>
 
-      <RelatedArticles slugs={['gold-price-today-egypt', 'difference-21-24-karat', 'gold-zakat-calculation']} />
+      <Suspense fallback={null}>
+        <RelatedArticles slugs={['gold-price-today-egypt', 'difference-21-24-karat', 'gold-zakat-calculation']} />
+      </Suspense>
 
-      <NewsList />
+      <Suspense fallback={null}>
+        <NewsList />
+      </Suspense>
     </div>
   );
 }
