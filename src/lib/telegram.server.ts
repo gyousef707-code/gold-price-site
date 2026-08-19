@@ -1,9 +1,9 @@
 // إرسال رسائل لقناة تيليجرام عن طريق Bot API — مجرد fetch عادي، بيشتغل على أي استضافة
 
-export async function sendTelegramMessage(text: string) {
+export async function sendTelegramMessage(text: string, chatId?: string) {
   const token = process.env['TELEGRAM_BOT_TOKEN'];
-  const chatId = process.env['TELEGRAM_CHANNEL_ID'];
-  if (!token || !chatId) {
+  const targetChatId = chatId || process.env['TELEGRAM_CHANNEL_ID'];
+  if (!token || !targetChatId) {
     throw new Error(
       "متغيرات تيليجرام غير مضبوطة (TELEGRAM_BOT_TOKEN / TELEGRAM_CHANNEL_ID)",
     );
@@ -13,7 +13,7 @@ export async function sendTelegramMessage(text: string) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      chat_id: chatId,
+      chat_id: targetChatId,
       text,
       parse_mode: "HTML",
       disable_web_page_preview: true,

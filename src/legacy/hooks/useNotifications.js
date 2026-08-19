@@ -164,7 +164,7 @@ export default function useNotifications() {
           );
         }
         if (prev.usd && now.usd && prev.usd !== now.usd) {
-          add('usd', 'تغيّر سعر الدولار', `${now.usd.toLocaleString('en-US')} ج.م للبيع`);
+          add('usd', 'تغيّر سعر الدولار', `${now.usd.toFixed(2)} ج.م للبيع`);
         }
         if (prev.btc && now.btc && Math.abs(pct(prev.btc, now.btc)) >= 0.3) {
           const p = pct(prev.btc, now.btc);

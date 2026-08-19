@@ -183,7 +183,7 @@ export function buildChangeMessage(prev: Snapshot, now: Snapshot, which: Rotatio
   const d = now.usd - prev.usd;
   return {
     title: "سعر الدولار",
-    body: `الدولار: ${prev.usd.toLocaleString("en-US")} ← ${now.usd.toLocaleString("en-US")} ج.م للبيع (${d > 0 ? "+" : ""}${d.toFixed(2)})`,
+    body: `الدولار: ${prev.usd.toFixed(2)} ← ${now.usd.toFixed(2)} ج.م للبيع (${d > 0 ? "+" : ""}${d.toFixed(2)})`,
   };
 }
 

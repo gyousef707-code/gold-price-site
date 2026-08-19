@@ -1,6 +1,8 @@
 // مصادر الأسعار اللحظية (ذهب / فضة / عملات / عملات رقمية / أخبار)
 // كلها مصادر مجانية بدون مفاتيح API
 
+import { reportSuccess, reportFailure } from "./alert.server";
+
 const UA = { "User-Agent": "Mozilla/5.0 (compatible; DahabySite/1.0)" };
 const GRAMS_PER_OUNCE = 31.1034768;
 const GOLD_PURITY: Record<number, number> = {
@@ -194,8 +196,11 @@ async function cached<T>(key: string, freshMs: number, fn: () => Promise<T>): Pr
   try {
     const data = await fn();
     memCache.set(key, { at: Date.now(), data });
+    void reportSuccess(key); // مش هننتظرها، مبتأثرش على سرعة الرد
     return data;
   } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    await reportFailure(key, !!hit, message); // بنستنى دي عشان التنبيه يتبعت فعلاً قبل ما نرجع الرد
     if (hit) return hit.data as T; // نرجّع آخر نسخة ناجحة بدل الخطأ
     throw e;
   }
