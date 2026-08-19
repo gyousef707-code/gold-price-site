@@ -51,7 +51,7 @@ export default function CryptoPage() {
             <div className="ounce-price">
               <LivePrice value={top.price_usd ?? null} prefix="$" decimals={2} live volatility={0.0002} tickMs={2200} />
             </div>
-            <UpdatedStamp lang={lang} />
+            <UpdatedStamp lang={lang} date={data?.updated_at} />
           </div>
         </section>
       )}

@@ -82,7 +82,7 @@ export default function GoldPage({ initialGoldData = null } = {}) {
           <div className="ounce-price">
             <LivePrice value={data?.ounce_usd != null ? Number(data.ounce_usd) : null} prefix="$" decimals={2} live volatility={0.00012} tickMs={2400} />
           </div>
-          <UpdatedStamp lang={lang} />
+          <UpdatedStamp lang={lang} date={data?.updated_at} />
           <div className="ounce-footer">
             <span className="live-pulse"><span className="update-dot" /> {t('live')}</span>
             <MarketStatus lang={lang} />

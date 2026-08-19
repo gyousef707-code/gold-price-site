@@ -55,7 +55,7 @@ export default function CurrencyPage() {
           <div className="ounce-price">
             <LivePrice value={r?.mid ?? null} decimals={2} suffix=" ج.م" live volatility={0.00015} tickMs={2200} />
           </div>
-          <UpdatedStamp lang={lang} />
+          <UpdatedStamp lang={lang} date={data?.updated_at} />
         </div>
       </section>
 

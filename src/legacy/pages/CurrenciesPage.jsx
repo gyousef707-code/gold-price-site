@@ -36,7 +36,7 @@ export default function CurrenciesPage() {
           <h2><FaIcon icon="fa-solid fa-right-left" /> {t('converter.title')}</h2>
         </div>
         <CurrencyConverter rates={data?.rates} selected={selected} />
-        <UpdatedStamp lang={lang} />
+        <UpdatedStamp lang={lang} date={data?.updated_at} />
       </section>
 
       <section>
