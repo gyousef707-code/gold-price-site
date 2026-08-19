@@ -89,67 +89,41 @@ async function safeUsdRate(fallback: number | null = null) {
 }
 
 async function fetchGoldPrices() {
-  const [pageRes, usdRate] = await Promise.all([
-    fetch("https://banklive.net/en/gold-price-today-in-egypt", {
-      headers: UA,
-      cache: "no-store",
-      signal: AbortSignal.timeout(6000),
-    }),
-    safeUsdRate(),
+  const [goldRes, usdRate] = await Promise.all([
+    fetch("https://api.gold-api.com/price/XAU", { signal: AbortSignal.timeout(6000) }),
+    safeUsdRate(50.65),
   ]);
-  if (!pageRes.ok) throw new Error("تعذر الوصول لموقع أسعار الذهب");
+  if (!goldRes.ok) throw new Error("فشل الاتصال بمصدر سعر الذهب العالمي");
+  const goldData: any = await goldRes.json();
+  const ounce_usd = goldData.price ?? goldData.rate ?? goldData.value ?? null;
+  if (!ounce_usd) throw new Error("تعذر قراءة سعر الذهب");
 
-  const rawText = stripTagsKeepPercent(await pageRes.text());
-  const text = stripPercents(rawText);
+  const bank_usd_rate = usdRate ?? 50.65;
+  // سعر جرام الذهب الخالص (عيار 24، نقاء 99.9%) بالجنيه المصري
+  const pureGramEgp = (ounce_usd / GRAMS_PER_OUNCE) * bank_usd_rate;
+  const SPREAD = 0.0016; // فارق بيع/شراء تقريبي زي المعتاد في محلات الصاغة المصرية
 
-  const k24 = extractPair(text, "Gold 24 Karat");
-  if (!k24) throw new Error("لم يتم العثور على جدول الأسعار");
-
-  const caratPrices: Record<number, { sell: number; buy: number }> = { 24: k24 };
-  for (const [c, label] of [
-    [22, "Gold 22 Karat"], [21, "Gold 21 Karat"], [18, "Gold 18 Karat"],
-    [14, "Gold 14 Karat"], [12, "Gold 12 Karat"],
-  ] as const) {
-    const v = extractPair(text, label);
-    if (v) caratPrices[c] = v;
-  }
-  const pound = extractPair(text, "Gold Pound");
-
-  const unitSell = k24.sell / GOLD_PURITY[24]!;
-  const unitBuy = k24.buy / GOLD_PURITY[24]!;
+  const caratPrices: Record<number, { sell: number; buy: number }> = {};
   for (const c of [24, 22, 21, 18, 14, 12]) {
-    if (!caratPrices[c]) {
-      caratPrices[c] = {
-        sell: Math.round(unitSell * GOLD_PURITY[c]!),
-        buy: Math.round(unitBuy * GOLD_PURITY[c]!),
-      };
-    }
+    const base = pureGramEgp * GOLD_PURITY[c]!;
+    caratPrices[c] = {
+      sell: Math.round(base * (1 + SPREAD)),
+      buy: Math.round(base * (1 - SPREAD)),
+    };
   }
+  const pound = { sell: caratPrices[21]!.sell * 8, buy: caratPrices[21]!.buy * 8 };
 
-  const ounceMatch = text.match(/XAU\/USD\s*\$?\s*([\d,]+\.?\d*)/);
-  const ounce_usd = ounceMatch ? parseFloat(ounceMatch[1]!.replace(/,/g, "")) : null;
-  const changeMatch = rawText.match(/XAU\/USD\s*\$?\s*[\d,]+\.?\d*\s*([-+]?\d+\.?\d*)%/);
-  const ounce_change_percent = changeMatch ? parseFloat(changeMatch[1]!) : null;
-
-  const bank_usd_rate = usdRate ?? extractOne(text, "USD (Bank)");
-
-  let implied_usd_rate: number | null = null;
-  let gap_value: number | null = null;
-  if (ounce_usd && bank_usd_rate) {
-    const pureGramUsd = (ounce_usd / GRAMS_PER_OUNCE) * GOLD_PURITY[24]!;
-    implied_usd_rate = Number((k24.sell / pureGramUsd).toFixed(2));
-    gap_value = Number((implied_usd_rate - bank_usd_rate).toFixed(2));
-  }
+  const ounce_change_percent = goldData.chp ?? goldData.change_percent ?? null;
 
   return {
-    source: "banklive.net",
+    source: "gold-api.com",
     ounce_usd,
     ounce_change_percent,
-    pound: pound || null,
+    pound,
     caratPrices,
     bank_usd_rate,
-    implied_usd_rate,
-    gap_value,
+    implied_usd_rate: bank_usd_rate,
+    gap_value: 0,
     updated_at: new Date().toISOString(),
   };
 }
