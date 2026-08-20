@@ -2,6 +2,7 @@
 // كلها مصادر مجانية بدون مفاتيح API
 
 import { reportSuccess, reportFailure } from "./alert.server";
+import { fetchEgyptGoldMarket } from "./egypt-gold.server";
 
 const UA = { "User-Agent": "Mozilla/5.0 (compatible; DahabySite/1.0)" };
 const GRAMS_PER_OUNCE = 31.1034768;
@@ -53,30 +54,70 @@ const CURRENCIES: Record<string, string> = {
 };
 
 async function fetchCurrencyRates() {
-  const res = await fetch("https://banklive.net/en/currencies", {
-    headers: UA,
-    cache: "no-store",
-    signal: AbortSignal.timeout(6000),
-  });
-  if (!res.ok) throw new Error("تعذر الوصول لصفحة أسعار العملات");
-  const text = stripTagsKeepPercent(await res.text());
-
   const SPREAD = 0.002;
   const rates: Record<string, { mid: number; buy: number; sell: number }> = {
     egp: { mid: 1, buy: 1, sell: 1 },
   };
-  for (const [code, label] of Object.entries(CURRENCIES)) {
-    const mid = extractOne(text, label);
-    if (mid) {
-      rates[code] = {
-        mid: Number(mid.toFixed(4)),
-        buy: Number((mid * (1 - SPREAD)).toFixed(4)),
-        sell: Number((mid * (1 + SPREAD)).toFixed(4)),
-      };
+  const put = (code: string, mid: number) => {
+    if (!mid || !isFinite(mid) || mid <= 0) return;
+    rates[code] = {
+      mid: Number(mid.toFixed(4)),
+      buy: Number((mid * (1 - SPREAD)).toFixed(4)),
+      sell: Number((mid * (1 + SPREAD)).toFixed(4)),
+    };
+  };
+
+  const sources: string[] = [];
+
+  // 1) أسعار البنوك المصرية (المصدر الأساسي)
+  try {
+    const res = await fetch("https://banklive.net/en/currencies", {
+      headers: UA,
+      cache: "no-store",
+      signal: AbortSignal.timeout(6000),
+    });
+    if (res.ok) {
+      const text = stripTagsKeepPercent(await res.text());
+      for (const [code, label] of Object.entries(CURRENCIES)) {
+        const mid = extractOne(text, label);
+        if (mid) put(code, mid);
+      }
+      if (Object.keys(rates).length > 1) sources.push("banklive.net");
+    }
+  } catch {
+    // نكمل على المصدر الاحتياطي
+  }
+
+  // 2) مصدر احتياطي مجاني لأي عملة ناقصة
+  if (Object.keys(rates).length < Object.keys(CURRENCIES).length + 1) {
+    try {
+      const res = await fetch("https://open.er-api.com/v6/latest/USD", {
+        signal: AbortSignal.timeout(6000),
+      });
+      if (res.ok) {
+        const data: any = await res.json();
+        const usdEgp = data?.rates?.EGP;
+        if (usdEgp) {
+          for (const code of Object.keys(CURRENCIES)) {
+            if (rates[code]) continue;
+            const perUsd = data.rates[code.toUpperCase()];
+            if (code === "usd") put("usd", usdEgp);
+            else if (perUsd) put(code, usdEgp / perUsd);
+          }
+          sources.push("exchangerate-api.com");
+        }
+      }
+    } catch {
+      // نتجاهل: لو فيه أسعار من المصدر الأول هترجع زي ما هي
     }
   }
+
   if (Object.keys(rates).length < 6) throw new Error("لم يتم العثور على أسعار كافية للعملات");
-  return { source: "banklive.net", rates, updated_at: new Date().toISOString() };
+  return {
+    source: sources.join(" + ") || "banklive.net",
+    rates,
+    updated_at: new Date().toISOString(),
+  };
 }
 
 async function safeUsdRate(fallback: number | null = null) {
@@ -89,6 +130,71 @@ async function safeUsdRate(fallback: number | null = null) {
 }
 
 async function fetchGoldPrices() {
+  // المصدر الأساسي: أسعار محلات الصاغة المصرية الفعلية (نفس أرقام التطبيقات المصرية)
+  try {
+    return await fetchLocalGoldPrices();
+  } catch {
+    return await fetchComputedGoldPrices();
+  }
+}
+
+async function fetchLocalGoldPrices() {
+  const [local, globalOunce] = await Promise.all([
+    fetchEgyptGoldMarket(),
+    fetchGlobalOunce("XAU").catch(() => null),
+  ]);
+
+  const k24 = local.karats[24]!;
+  const pureGramSell = k24.sell / GOLD_PURITY[24]!;
+  const pureGramBuy = k24.buy / GOLD_PURITY[24]!;
+
+  const caratPrices: Record<number, { sell: number; buy: number }> = {};
+  for (const c of [24, 22, 21, 18, 14, 12]) {
+    const scraped = local.karats[c];
+    caratPrices[c] = scraped ?? {
+      // العيارات غير المنشورة (22 و 12) بتتحسب من الذهب الخالص بنسبة النقاء
+      sell: Math.round(pureGramSell * GOLD_PURITY[c]!),
+      buy: Math.round(pureGramBuy * GOLD_PURITY[c]!),
+    };
+  }
+
+  const pound =
+    local.pound ?? { sell: caratPrices[21]!.sell * 8, buy: caratPrices[21]!.buy * 8 };
+
+  const ounce_usd = globalOunce?.price ?? local.ounce_usd;
+  const market_usd_rate = local.market_usd_rate ?? null;
+  const bank_usd_rate = local.bank_usd_rate ?? (await safeUsdRate(null));
+
+  return {
+    source: "gold-price-today.com (محلات الصاغة) + gold-api.com",
+    ounce_usd,
+    ounce_egp: local.ounce_egp,
+    ounce_change_percent: local.change_percent,
+    pound,
+    caratPrices,
+    bank_usd_rate,
+    implied_usd_rate: market_usd_rate ?? bank_usd_rate,
+    gap_value:
+      market_usd_rate && bank_usd_rate
+        ? Number((market_usd_rate - bank_usd_rate).toFixed(2))
+        : 0,
+    history: local.history,
+    updated_at: new Date().toISOString(),
+  };
+}
+
+async function fetchGlobalOunce(symbol: "XAU" | "XAG") {
+  const res = await fetch(`https://api.gold-api.com/price/${symbol}`, {
+    signal: AbortSignal.timeout(6000),
+  });
+  if (!res.ok) throw new Error("فشل الاتصال بمصدر السعر العالمي");
+  const data: any = await res.json();
+  const price = data.price ?? data.rate ?? data.value ?? null;
+  if (!price) throw new Error("تعذر قراءة السعر العالمي");
+  return { price: Number(price) as number, raw: data };
+}
+
+async function fetchComputedGoldPrices() {
   const [goldRes, usdRate] = await Promise.all([
     fetch("https://api.gold-api.com/price/XAU", { signal: AbortSignal.timeout(6000) }),
     safeUsdRate(50.65),
@@ -129,16 +235,16 @@ async function fetchGoldPrices() {
 }
 
 async function fetchSilverPrices() {
-  const [silverRes, usdRate] = await Promise.all([
-    fetch("https://api.gold-api.com/price/XAG", { signal: AbortSignal.timeout(6000) }),
-    safeUsdRate(51.4),
+  const [silver, local, usdRate] = await Promise.all([
+    fetchGlobalOunce("XAG"),
+    fetchEgyptGoldMarket().catch(() => null),
+    safeUsdRate(null),
   ]);
-  if (!silverRes.ok) throw new Error("فشل الاتصال بمصدر سعر الفضة العالمي");
-  const silverData: any = await silverRes.json();
-  const ounce_usd = silverData.price ?? silverData.rate ?? silverData.value ?? null;
-  if (!ounce_usd) throw new Error("تعذر قراءة سعر الفضة");
+  const ounce_usd = silver.price;
 
-  const bank_usd_rate = usdRate ?? 51.4;
+  // سعر دولار السوق (الصاغة) هو الأقرب لتسعير الفضة في محلات مصر
+  const bank_usd_rate =
+    local?.market_usd_rate ?? local?.bank_usd_rate ?? usdRate ?? 50.65;
   const gramEgp = (ounce_usd / GRAMS_PER_OUNCE) * bank_usd_rate;
   const SPREAD = 0.0035;
 
@@ -152,7 +258,9 @@ async function fetchSilverPrices() {
   }
 
   return {
-    source: "gold-api.com + banklive.net",
+    source: local?.market_usd_rate
+      ? "gold-api.com + gold-price-today.com"
+      : "gold-api.com + banklive.net",
     ounce_usd,
     bank_usd_rate,
     silverPrices,
