@@ -4,7 +4,6 @@ import { Link } from '@/lib/router-compat.jsx';
 import Seo from '../components/Seo.jsx';
 import CurrencyConverter from '../components/CurrencyConverter.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
-import NewsList from '../components/NewsList.jsx';
 import LivePrice from '../components/LivePrice.jsx';
 import UpdatedStamp from '../components/UpdatedStamp.jsx';
 import useApiData from '../hooks/useApiData.js';
@@ -99,7 +98,6 @@ export default function CurrenciesPage() {
 
       <RelatedArticles slugs={['gold-price-forecast-2026', 'why-gold-price-differs-shops', 'gold-price-today-egypt']} />
 
-      <NewsList />
     </div>
   );
 }

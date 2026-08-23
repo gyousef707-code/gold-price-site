@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import FaIcon from '../components/FaIcon.jsx';
 import { Link } from '@/lib/router-compat.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
-import NewsList from '../components/NewsList.jsx';
 import LivePrice from '../components/LivePrice.jsx';
 import UpdatedStamp from '../components/UpdatedStamp.jsx';
 import CryptoCalculator from '../components/calculators/CryptoCalculator.jsx';
@@ -159,7 +158,6 @@ export default function CryptoPage() {
 
       <RelatedArticles slugs={['gold-vs-silver-investment', 'gold-price-forecast-2026', 'beginners-guide-gold-investment']} />
 
-      <NewsList />
     </div>
   );
 }

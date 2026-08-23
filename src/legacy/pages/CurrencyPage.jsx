@@ -3,7 +3,6 @@ import FaIcon from '../components/FaIcon.jsx';
 import LivePrice from '../components/LivePrice.jsx';
 import UpdatedStamp from '../components/UpdatedStamp.jsx';
 import CurrencyConverter from '../components/CurrencyConverter.jsx';
-import NewsList from '../components/NewsList.jsx';
 import useApiData from '../hooks/useApiData.js';
 import { useLang } from '../context/LangContext.jsx';
 import { CURRENCY_META } from '../data/currencies.js';
@@ -88,7 +87,6 @@ export default function CurrencyPage() {
         <CurrencyConverter rates={data?.rates} selected={code} />
       </section>
 
-      <NewsList />
     </div>
   );
 }

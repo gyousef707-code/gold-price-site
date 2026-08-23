@@ -2272,3 +2272,63 @@ input.calc-input[inputmode='decimal'] {
     .gold-carats-section .gap-card .gap-card-container { flex: 1; }
 }
 
+
+
+/* ===== حاسبة زكاة الذهب (شكل جديد) ===== */
+.zakat-hint {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0 0 10px;
+}
+.zakat-karat-cards {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.zakat-karat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 2px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color, rgba(255,255,255,0.12));
+  background: var(--card-bg-2, rgba(255,255,255,0.03));
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+.zakat-karat-card:hover { border-color: var(--gold-primary); }
+.zakat-karat-card .zk-label { font-size: 0.62rem; opacity: 0.85; }
+.zakat-karat-card .zk-num { font-size: 1rem; font-weight: 800; }
+.zakat-karat-card.active {
+  border-color: var(--gold-primary);
+  color: var(--gold-primary);
+  background: rgba(212, 175, 55, 0.12);
+  box-shadow: 0 0 0 1px var(--gold-primary) inset;
+}
+.zakat-summary {
+  margin: 12px 0;
+  border: 1px solid var(--border-color, rgba(255,255,255,0.1));
+  border-radius: 12px;
+  overflow: hidden;
+}
+.zakat-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 12px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.zakat-summary-row + .zakat-summary-row { border-top: 1px solid var(--border-color, rgba(255,255,255,0.08)); }
+.zakat-summary-row strong { color: var(--text-primary, #e6edf3); font-weight: 700; }
+.zakat-summary-row strong.zk-good { color: #3fb950; }
+.zakat-summary-row strong.zk-bad { color: #f85149; }
+@media (max-width: 380px) {
+  .zakat-karat-cards { grid-template-columns: repeat(3, 1fr); }
+}

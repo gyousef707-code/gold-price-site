@@ -1,4 +1,9 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { config } from '@fortawesome/fontawesome-svg-core';
+
+// تنسيقات Font Awesome بقت متحمّلة مع ملف الستايل الأساسي (src/styles/fontawesome.css)
+// عشان الأيقونات متظهرش بحجم عملاق لحظة أول تحميل/تحديث للصفحة قبل تشغيل الجافاسكريبت.
+config.autoAddCss = false;
 
 import {
   faChevronLeft,

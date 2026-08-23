@@ -1,7 +1,6 @@
 import TradingViewChart from '../components/TradingViewChart.jsx';
 import FaIcon from '../components/FaIcon.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
-import NewsList from '../components/NewsList.jsx';
 import LivePrice from '../components/LivePrice.jsx';
 import UpdatedStamp from '../components/UpdatedStamp.jsx';
 import MarketStatus from '../components/MarketStatus.jsx';
@@ -109,7 +108,6 @@ export default function SilverPage() {
 
       <RelatedArticles slugs={['gold-vs-silver-investment', 'gold-price-today-egypt', 'best-time-to-buy-gold']} />
 
-      <NewsList />
     </div>
   );
 }

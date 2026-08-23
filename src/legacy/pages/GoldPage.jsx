@@ -16,7 +16,6 @@ import { shareCard } from '../lib/shareCard.js';
 // لحد ما المستخدم يقرب منها فعلاً، بدل ما تتحمّل كلها من أول لحظة.
 // الشكل والمحتوى النهائي بيفضلوا زي ما هم بالظبط.
 const RelatedArticles = lazy(() => import('../components/RelatedArticles.jsx'));
-const NewsList = lazy(() => import('../components/NewsList.jsx'));
 const GoldCalculator = lazy(() => import('../components/calculators/GoldCalculator.jsx'));
 const ZakatCalculator = lazy(() => import('../components/calculators/ZakatCalculator.jsx'));
 const SavingsCalculator = lazy(() => import('../components/calculators/SavingsCalculator.jsx'));
@@ -209,10 +208,6 @@ export default function GoldPage({ initialGoldData = null } = {}) {
 
       <Suspense fallback={null}>
         <RelatedArticles slugs={['gold-price-today-egypt', 'difference-21-24-karat', 'gold-zakat-calculation']} />
-      </Suspense>
-
-      <Suspense fallback={null}>
-        <NewsList />
       </Suspense>
     </div>
   );
