@@ -293,37 +293,42 @@ export async function getCryptoPrices() {
 }
 
 async function fetchCryptoPrices() {
+  // ملاحظة: CoinGecko بيرفض (403) طلبات جايه من Cloudflare Workers، فبنستخدم
+  // CoinPaprika بدالها — مجاني وبدون مفتاح API وشغال كويس مع Cloudflare.
   const [marketsRes, usdRate] = await Promise.all([
-    fetch(
-      "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=20&page=1&sparkline=false&price_change_percentage=24h",
-      { signal: AbortSignal.timeout(8000) },
-    ),
+    fetch("https://api.coinpaprika.com/v1/tickers", {
+      headers: UA,
+      signal: AbortSignal.timeout(8000),
+    }),
     safeUsdRate(51.4),
   ]);
   if (!marketsRes.ok) throw new Error("تعذر الوصول لمصدر أسعار العملات الرقمية");
-  const markets: any = await marketsRes.json();
-  if (!Array.isArray(markets) || markets.length === 0) {
+  const all: any = await marketsRes.json();
+  if (!Array.isArray(all) || all.length === 0) {
     throw new Error("لم يتم العثور على بيانات عملات رقمية");
   }
+  const markets = all
+    .filter((c: any) => c.rank && c.rank <= 20)
+    .sort((a: any, b: any) => a.rank - b.rank);
   const bank_usd_rate = usdRate ?? 51.4;
 
-  const coins = markets.map((c: any) => ({
-    id: c.id,
-    symbol: (c.symbol || "").toUpperCase(),
-    name: c.name,
-    image: c.image || null,
-    price_usd: c.current_price,
-    price_egp:
-      typeof c.current_price === "number"
-        ? Number((c.current_price * bank_usd_rate).toFixed(4))
-        : null,
-    change_24h:
-      typeof c.price_change_percentage_24h === "number"
-        ? Number(c.price_change_percentage_24h.toFixed(2))
-        : null,
-  }));
+  const coins = markets.map((c: any) => {
+    const price = c.quotes?.USD?.price ?? null;
+    const change = c.quotes?.USD?.percent_change_24h ?? null;
+    return {
+      id: c.id,
+      symbol: (c.symbol || "").toUpperCase(),
+      name: c.name,
+      image: null,
+      price_usd: price,
+      price_egp:
+        typeof price === "number" ? Number((price * bank_usd_rate).toFixed(4)) : null,
+      change_24h:
+        typeof change === "number" ? Number(change.toFixed(2)) : null,
+    };
+  });
 
-  return { source: "coingecko.com", bank_usd_rate, coins, updated_at: new Date().toISOString() };
+  return { source: "coinpaprika.com", bank_usd_rate, coins, updated_at: new Date().toISOString() };
 }
 
 function escapeRegex(str: string) {
