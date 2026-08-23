@@ -302,7 +302,12 @@ async function fetchCryptoPrices() {
     }),
     safeUsdRate(51.4),
   ]);
-  if (!marketsRes.ok) throw new Error("تعذر الوصول لمصدر أسعار العملات الرقمية");
+  if (!marketsRes.ok) {
+    const bodyText = await marketsRes.text().catch(() => "");
+    throw new Error(
+      `تعذر الوصول لمصدر أسعار العملات الرقمية (status ${marketsRes.status}) ${bodyText.slice(0, 150)}`,
+    );
+  }
   const all: any = await marketsRes.json();
   if (!Array.isArray(all) || all.length === 0) {
     throw new Error("لم يتم العثور على بيانات عملات رقمية");
