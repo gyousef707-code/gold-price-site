@@ -4,7 +4,7 @@ import TradingViewChart from '../components/TradingViewChart.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
 import useApiData from '../hooks/useApiData.js';
 import { cryptoDetails } from '../data/crypto.js';
-import { CRYPTO_TV_SYMBOL } from '../data/cryptoSymbols.js';
+import { CRYPTO_TV_SYMBOL, SYMBOL_TO_ID } from '../data/cryptoSymbols.js';
 
 export default function CryptoCoinPage() {
   const { coin } = useParams();
@@ -13,7 +13,7 @@ export default function CryptoCoinPage() {
 
   if (!info) return <Navigate to="/crypto" replace />;
 
-  const liveCoin = data?.coins?.find((c) => c.id === coin);
+  const liveCoin = data?.coins?.find((c) => SYMBOL_TO_ID[c.symbol] === coin);
   const otherCoins = cryptoDetails.filter((c) => c.id !== coin).slice(0, 5);
 
   return (
