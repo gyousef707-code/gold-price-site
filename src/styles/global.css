@@ -1985,6 +1985,8 @@ body.light-mode .gap-gauge-track { stroke: rgba(0,0,0,0.08); }
     transition: all 0.22s ease;
 }
 .crypto-row:hover { border-color: var(--border-gold); box-shadow: 0 4px 14px rgba(227,179,65,0.08); }
+.crypto-row-nolink { cursor: default; }
+.crypto-row-nolink:hover { border-color: inherit; box-shadow: none; }
 .crypto-row-info { display: flex; flex-direction: column; min-width: 0; }
 .crypto-row-name { font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .crypto-row-symbol { font-size: 11px; color: var(--text-muted); font-weight: 600; }
