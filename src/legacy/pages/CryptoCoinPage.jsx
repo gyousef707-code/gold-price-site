@@ -6,6 +6,8 @@ import useApiData from '../hooks/useApiData.js';
 import { cryptoDetails } from '../data/crypto.js';
 import { CRYPTO_TV_SYMBOL, SYMBOL_TO_ID } from '../data/cryptoSymbols.js';
 
+const FALLBACK_ICON = (id) => `https://assets.coincap.io/assets/icons/${id}@2x.png`;
+
 export default function CryptoCoinPage() {
   const { coin } = useParams();
   const info = cryptoDetails.find((c) => c.id === coin);
@@ -14,6 +16,7 @@ export default function CryptoCoinPage() {
   if (!info) return <Navigate to="/crypto" replace />;
 
   const liveCoin = data?.coins?.find((c) => SYMBOL_TO_ID[c.symbol] === coin);
+  const symbol = liveCoin?.symbol || info.specRows.find(([label]) => label === 'الرمز')?.[1] || '';
   const otherCoins = cryptoDetails.filter((c) => c.id !== coin).slice(0, 5);
 
   return (
@@ -27,10 +30,18 @@ export default function CryptoCoinPage() {
       <h1>{info.h1}</h1>
 
       <div className="crypto-detail-header">
-        {liveCoin?.image && <img className="crypto-detail-icon" src={liveCoin.image} alt={liveCoin.symbol} />}
+        <img
+          className="crypto-detail-icon"
+          src={liveCoin?.image || FALLBACK_ICON(symbol.toLowerCase())}
+          alt={symbol}
+          width="48"
+          height="48"
+          loading="lazy"
+          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+        />
         <div className="crypto-detail-info">
           <h2>{liveCoin?.name || info.h1.split('(')[0]}</h2>
-          <span className="crypto-detail-symbol-badge">{liveCoin?.symbol}</span>
+          <span className="crypto-detail-symbol-badge">{symbol}</span>
         </div>
       </div>
 
