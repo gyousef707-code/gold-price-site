@@ -70,10 +70,10 @@ export const Route = createFileRoute("/api/telegram/summary")({
             rtl(`<b>💵 الدولار</b>`),
             "",
             (currency as any)?.rates?.usd?.sell
-              ? rtl(`دولار البنك     <b>${fmt((currency as any).rates.usd.sell)}</b> جنيه`)
+              ? rtl(`دولار البنك     <b>${fmt((currency as any).rates.usd.sell, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b> جنيه`)
               : null,
             (gold as any)?.implied_usd_rate
-              ? rtl(`دولار الصاغة     <b>${fmt((gold as any).implied_usd_rate)}</b> جنيه`)
+              ? rtl(`دولار الصاغة     <b>${fmt((gold as any).implied_usd_rate, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b> جنيه`)
               : null,
             "",
             rtl(DIVIDER),
