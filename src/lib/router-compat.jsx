@@ -11,8 +11,16 @@ import { useEffect } from 'react';
 
 function parseTo(to) {
   const raw = String(to || '/');
-  const [path, hash] = raw.split('#');
-  return hash ? { to: path || '/', hash } : { to: path || '/' };
+  const [pathAndQuery, hash] = raw.split('#');
+  const [path, query] = pathAndQuery.split('?');
+  const result = { to: path || '/' };
+  if (hash) result.hash = hash;
+  if (query) {
+    const search = {};
+    for (const [k, v] of new URLSearchParams(query)) search[k] = v;
+    result.search = search;
+  }
+  return result;
 }
 
 export function Link({ to, children, ...rest }) {
