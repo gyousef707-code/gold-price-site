@@ -82,7 +82,7 @@ export default function CryptoCoinPage() {
 
       <div className="live-cta">
         <p>احسب قيمة أي كمية من {name} بسهولة</p>
-        <Link to="/crypto#tool-crypto-calc" className="btn">احسب القيمة</Link>
+        <Link to={`/crypto?coin=${symbol}#tool-crypto-calc`} className="btn">احسب القيمة</Link>
       </div>
 
       {info ? (
