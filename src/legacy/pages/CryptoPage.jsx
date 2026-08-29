@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import FaIcon from '../components/FaIcon.jsx';
-import { Link } from '@/lib/router-compat.jsx';
+import { Link, useLocation } from '@/lib/router-compat.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
 import LivePrice from '../components/LivePrice.jsx';
 import UpdatedStamp from '../components/UpdatedStamp.jsx';
@@ -15,6 +15,7 @@ const FALLBACK_ICON = (id) => `https://assets.coincap.io/assets/icons/${id}@2x.p
 export default function CryptoPage() {
   const { data, loading, error } = useApiData('/api/public/crypto-price', { intervalMs: 60000 });
   const { t, lang } = useLang();
+  const location = useLocation();
   const [q, setQ] = useState('');
   const [sort, setSort] = useState('rank');
 
@@ -144,7 +145,7 @@ export default function CryptoPage() {
         <div className="section-title-bar">
           <h2><FaIcon icon="fa-solid fa-calculator" /> {lang === 'en' ? 'Crypto tools' : 'أدوات العملات الرقمية'}</h2>
         </div>
-        <CryptoCalculator />
+        <CryptoCalculator initialSymbol={location.search?.coin} />
       </section>
 
       <section id="tool-crypto-details">
