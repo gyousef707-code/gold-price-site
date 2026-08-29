@@ -1,9 +1,11 @@
 import { Link, useParams, Navigate } from '@/lib/router-compat.jsx';
 import FaIcon from '../components/FaIcon.jsx';
 import Seo from '../components/Seo.jsx';
+import JsonLd from '../components/JsonLd.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
 import AdSlot from '../components/AdSlot.jsx';
 import { blogPosts } from '../data/blog.js';
+import { breadcrumbJsonLd, articleJsonLd } from '@/lib/jsonld.js';
 
 export default function BlogPostPage() {
   const { slug } = useParams();
@@ -26,6 +28,21 @@ export default function BlogPostPage() {
   return (
     <div className="page-wrap">
       <Seo title={post.title} description={post.description} path={`/blog/${slug}`} type="article" />
+      <JsonLd
+        data={[
+          breadcrumbJsonLd([
+            { name: 'الرئيسية', path: '/' },
+            { name: 'المدونة', path: '/blog' },
+            { name: post.title, path: `/blog/${slug}` },
+          ]),
+          articleJsonLd({
+            title: post.title,
+            description: post.description,
+            path: `/blog/${slug}`,
+            datePublished: post.date,
+          }),
+        ]}
+      />
 
       <div className="breadcrumb">
         <Link to="/">الرئيسية</Link> / <Link to="/blog">المدونة</Link>

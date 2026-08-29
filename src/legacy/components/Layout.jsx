@@ -5,7 +5,9 @@ import Drawer from './Drawer.jsx';
 import BottomNav from './BottomNav.jsx';
 import Footer from './Footer.jsx';
 import ScrollToTop from './ScrollToTop.jsx';
+import JsonLd from './JsonLd.jsx';
 import useBackClose from '../hooks/useBackClose.js';
+import { organizationJsonLd, websiteJsonLd } from '@/lib/jsonld.js';
 
 export default function Layout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -27,6 +29,8 @@ export default function Layout() {
 
   return (
     <>
+      {/* بيانات المنظمة والموقع — مرة واحدة بس، بتظهر في كل الصفحات */}
+      <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
       <ScrollToTop />
       <Header onMenuClick={() => setDrawerOpen(true)} />
       <Drawer open={drawerOpen} onClose={closeDrawer} panel={panel} setPanel={setPanel} />

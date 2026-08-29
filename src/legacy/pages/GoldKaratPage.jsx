@@ -1,8 +1,10 @@
 import { Link, useParams, Navigate } from '@/lib/router-compat.jsx';
 import Seo from '../components/Seo.jsx';
+import JsonLd from '../components/JsonLd.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
 import useApiData from '../hooks/useApiData.js';
 import { goldKarats, goldKaratsDesc } from '../data/gold.js';
+import { breadcrumbJsonLd } from '@/lib/jsonld.js';
 
 const RELATED_BY_KARAT = {
   '24': ['gold-karat-types-explained', 'difference-21-24-karat'],
@@ -26,6 +28,13 @@ export default function GoldKaratPage() {
   return (
     <div className="page-wrap">
       <Seo title={info.title} description={info.description} path={`/gold/${karat}`} type="article" />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: 'الرئيسية', path: '/' },
+          { name: 'الأدوات', path: '/tools' },
+          { name: `عيار ${karat}`, path: `/gold/${karat}` },
+        ])}
+      />
 
       <div className="breadcrumb">
         <Link to="/">الرئيسية</Link> / <Link to="/tools">الأدوات</Link> / عيار {karat}

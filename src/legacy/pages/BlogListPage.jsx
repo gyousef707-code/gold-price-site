@@ -1,6 +1,8 @@
 import { Link } from '@/lib/router-compat.jsx';
 import Seo from '../components/Seo.jsx';
+import JsonLd from '../components/JsonLd.jsx';
 import { blogPosts } from '../data/blog.js';
+import { breadcrumbJsonLd } from '@/lib/jsonld.js';
 
 export default function BlogListPage() {
   return (
@@ -10,6 +12,12 @@ export default function BlogListPage() {
         description="مقالات ذهبي: كل ما تحتاج معرفته عن اسعار الذهب، الفضة، الزكاة، والاستثمار في مصر."
         keywords="مقالات عن الذهب, مدونة ذهبي"
         path="/blog"
+      />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: 'الرئيسية', path: '/' },
+          { name: 'المدونة', path: '/blog' },
+        ])}
       />
 
       <h1>المدونة والمقالات</h1>

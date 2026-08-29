@@ -3,10 +3,12 @@ import FaIcon from '../components/FaIcon.jsx';
 import LivePrice from '../components/LivePrice.jsx';
 import UpdatedStamp from '../components/UpdatedStamp.jsx';
 import CurrencyConverter from '../components/CurrencyConverter.jsx';
+import JsonLd from '../components/JsonLd.jsx';
 import useApiData from '../hooks/useApiData.js';
 import { useLang } from '../context/LangContext.jsx';
 import { CURRENCY_META } from '../data/currencies.js';
 import { shareCard } from '../lib/shareCard.js';
+import { breadcrumbJsonLd } from '@/lib/jsonld.js';
 
 export default function CurrencyPage() {
   const params = useParams();
@@ -40,6 +42,18 @@ export default function CurrencyPage() {
 
   return (
     <div className="page-wrap">
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: 'الرئيسية', path: '/' },
+          { name: 'العملات', path: '/currencies' },
+          { name: meta.name, path: `/currency/${code}` },
+        ])}
+      />
+      <div className="breadcrumb">
+        <Link to="/">{lang === 'en' ? 'Home' : 'الرئيسية'}</Link> /{' '}
+        <Link to="/currencies">{lang === 'en' ? 'Currencies' : 'العملات'}</Link> / {meta.name}
+      </div>
+
       <section className="global-ounce-section">
         <div className="ounce-card">
           <div className="ounce-header">

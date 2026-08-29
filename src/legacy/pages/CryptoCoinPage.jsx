@@ -1,10 +1,12 @@
 import { Link, useParams, Navigate } from '@/lib/router-compat.jsx';
 import Seo from '../components/Seo.jsx';
+import JsonLd from '../components/JsonLd.jsx';
 import TradingViewChart from '../components/TradingViewChart.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
 import useApiData from '../hooks/useApiData.js';
 import { cryptoDetails } from '../data/crypto.js';
 import { CRYPTO_TV_SYMBOL, SYMBOL_TO_ID } from '../data/cryptoSymbols.js';
+import { breadcrumbJsonLd } from '@/lib/jsonld.js';
 
 const FALLBACK_ICON = (id) => `https://assets.coincap.io/assets/icons/${id}@2x.png`;
 
@@ -45,6 +47,13 @@ export default function CryptoCoinPage() {
         description={info?.description || `تابع سعر عملة ${name} (${symbol}) الرقمية لحظة بلحظة بالجنيه المصري والدولار.`}
         path={`/crypto/${coin}`}
         type="article"
+      />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: 'الرئيسية', path: '/' },
+          { name: 'العملات الرقمية', path: '/crypto' },
+          { name, path: `/crypto/${coin}` },
+        ])}
       />
 
       <div className="breadcrumb">
