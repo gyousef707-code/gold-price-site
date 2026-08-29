@@ -102,13 +102,9 @@ export default function CryptoPage() {
           {coins.map((c) => {
             const changeKnown = typeof c.change_24h === 'number';
             const isNeg = changeKnown && c.change_24h < 0;
-            const slug = SYMBOL_TO_ID[c.symbol];
-            const Wrapper = slug ? Link : 'div';
-            const wrapperProps = slug
-              ? { to: `/crypto/${slug}`, className: 'crypto-row' }
-              : { className: 'crypto-row crypto-row-nolink' };
+            const slug = SYMBOL_TO_ID[c.symbol] || (c.symbol || '').toLowerCase();
             return (
-              <Wrapper key={c.id} {...wrapperProps}>
+              <Link key={c.id} to={`/crypto/${slug}`} className="crypto-row">
                 <span className="crypto-card-rank">{c.rank}</span>
                 <img
                   className="crypto-card-icon"
@@ -138,7 +134,7 @@ export default function CryptoPage() {
                     {isNeg ? '▼' : '▲'} {Math.abs(c.change_24h).toFixed(2)}%
                   </span>
                 )}
-              </Wrapper>
+              </Link>
             );
           })}
         </div>
