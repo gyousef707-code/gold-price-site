@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -14,6 +15,26 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ThemeProvider } from "@/legacy/context/ThemeContext.jsx";
 import { LangProvider } from "@/legacy/context/LangContext.jsx";
 import Layout from "@/legacy/components/Layout.jsx";
+
+// لينكات زي /crypto#tool-crypto-calc أو /#tool-zakat-calc المفروض توديك
+// لقسم معيّن جوه الصفحة. الراوتر مبيعملش scroll تلقائي للعنصر ده لوحده،
+// فالكومبوننت ده بيراقب الـ hash وكل ما يتغيّر بيلف للعنصر اللي بنفس الـ id.
+function HashScroll() {
+  const hash = useRouterState({ select: (s) => s.location.hash });
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  useEffect(() => {
+    if (!hash) return;
+    // بنستنى شوية عشان محتوى الصفحة الجديدة يخلص يترندر الأول (خصوصًا
+    // لو جايين من صفحة تانية) قبل ما نحسب مكان العنصر ونلف له
+    const timer = setTimeout(() => {
+      document.getElementById(hash)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
+    return () => clearTimeout(timer);
+  }, [hash, pathname]);
+
+  return null;
+}
 
 function NotFoundComponent() {
   return (
@@ -127,6 +148,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <LangProvider>
+          <HashScroll />
           {/* Layout بيحتوي الهيدر والقائمة والفوتر وبيرندر <Outlet /> جواه */}
           <Layout />
         </LangProvider>
