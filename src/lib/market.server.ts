@@ -3,6 +3,8 @@
 
 import { reportSuccess, reportFailure } from "./alert.server";
 import { fetchEgyptGoldMarket } from "./egypt-gold.server";
+import { recordDailySnapshotIfMissing } from "./gold-history.server";
+import { recordSilverSnapshotIfMissing } from "./silver-history.server";
 
 const UA = { "User-Agent": "Mozilla/5.0 (compatible; DahabySite/1.0)" };
 const GRAMS_PER_OUNCE = 31.1034768;
@@ -165,6 +167,10 @@ async function fetchLocalGoldPrices() {
   const market_usd_rate = local.market_usd_rate ?? null;
   const bank_usd_rate = local.bank_usd_rate ?? (await safeUsdRate(null));
 
+  // تسجيل لقطة أرشيفية لسعر النهاردة — بدون await عشان متأخرش استجابة السعر
+  // اللحظي؛ لو فشلت أو Upstash مش مضبوط، بتتجاهل نفسها بهدوء (شوف الملف نفسه).
+  void recordDailySnapshotIfMissing({ caratPrices, ounce_egp: local.ounce_egp, pound });
+
   return {
     source: "gold-price-today.com (محلات الصاغة) + gold-api.com",
     ounce_usd,
@@ -256,6 +262,8 @@ async function fetchSilverPrices() {
       buy: Number((base * (1 - SPREAD)).toFixed(2)),
     };
   }
+
+  void recordSilverSnapshotIfMissing(silverPrices);
 
   return {
     source: local?.market_usd_rate
