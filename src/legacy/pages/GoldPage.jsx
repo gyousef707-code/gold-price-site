@@ -6,6 +6,7 @@ import LivePrice from '../components/LivePrice.jsx';
 import UpdatedStamp from '../components/UpdatedStamp.jsx';
 import MarketStatus from '../components/MarketStatus.jsx';
 import GapGauge from '../components/GapGauge.jsx';
+import HistoryTable from '../components/HistoryTable.jsx';
 
 import useApiData from '../hooks/useApiData.js';
 import { useLang } from '../context/LangContext.jsx';
@@ -181,6 +182,18 @@ export default function GoldPage({ initialGoldData = null } = {}) {
         )}
 
       </section>
+
+      <HistoryTable
+        endpoint="/api/public/gold-history"
+        titleAr="تطور سعر الذهب خلال آخر 30 يوم"
+        titleEn="Gold price history (last 30 days)"
+        columns={[
+          { key: 'karat24_sell', labelAr: 'عيار 24', labelEn: 'Karat 24' },
+          { key: 'karat21_sell', labelAr: 'عيار 21', labelEn: 'Karat 21' },
+          { key: 'ounce_egp_sell', labelAr: 'الأونصة (ج.م)', labelEn: 'Ounce (EGP)' },
+          { key: 'pound_sell', labelAr: 'جنيه الذهب', labelEn: 'Gold pound' },
+        ]}
+      />
 
       <TradingViewChart symbol="OANDA:XAUUSD" id="tradingview-gold" />
 
