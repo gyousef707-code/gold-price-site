@@ -1,4 +1,5 @@
 import TradingViewChart from '../components/TradingViewChart.jsx';
+import HistoryTable from '../components/HistoryTable.jsx';
 import FaIcon from '../components/FaIcon.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
 import LivePrice from '../components/LivePrice.jsx';
@@ -95,6 +96,16 @@ export default function SilverPage() {
           })}
         </div>
       </section>
+
+      <HistoryTable
+        endpoint="/api/public/silver-history"
+        titleAr="تطور سعر الفضة خلال آخر 30 يوم"
+        titleEn="Silver price history (last 30 days)"
+        columns={[
+          { key: 'silver999_sell', labelAr: 'عيار 999', labelEn: 'Purity 999' },
+          { key: 'silver925_sell', labelAr: 'عيار 925', labelEn: 'Purity 925' },
+        ]}
+      />
 
       <TradingViewChart symbol="OANDA:XAGUSD" id="tradingview-silver" />
 
