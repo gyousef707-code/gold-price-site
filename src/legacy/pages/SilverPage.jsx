@@ -17,6 +17,7 @@ const CARAT_ORDER = ['999', '925', '900', '800', '720', '500'];
 export default function SilverPage() {
   const { data, loading, error } = useApiData('/api/public/silver-price', { intervalMs: 5 * 60000 });
   const { t, lang } = useLang();
+  const changePct = data?.ounce_change_percent != null ? Number(data.ounce_change_percent) : null;
 
   const shareSilver = (e, carat, p) => {
     e.preventDefault();
@@ -44,6 +45,11 @@ export default function SilverPage() {
         <div className="ounce-card">
           <div className="ounce-header">
             <span>{t('silver.ounce')}</span>
+            {changePct != null && (
+              <span className={`badge-change ${changePct >= 0 ? 'positive' : 'negative'}`}>
+                {changePct >= 0 ? '▲' : '▼'} {Math.abs(changePct).toFixed(2)}%
+              </span>
+            )}
           </div>
           <div className="ounce-price">
             <LivePrice value={data?.ounce_usd != null ? Number(data.ounce_usd) : null} prefix="$" decimals={2} live volatility={0.00015} tickMs={2400} />
@@ -66,6 +72,11 @@ export default function SilverPage() {
             const p = data?.silverPrices?.[c];
             return (
               <div key={c} className="silver-card clickable-card">
+                {changePct != null && (
+                  <span className={`card-change-badge ${changePct >= 0 ? 'positive' : 'negative'}`}>
+                    {changePct >= 0 ? '▲' : '▼'} {Math.abs(changePct).toFixed(2)}%
+                  </span>
+                )}
                 <button
                   className="card-share-btn"
                   title={t('share.price')}
