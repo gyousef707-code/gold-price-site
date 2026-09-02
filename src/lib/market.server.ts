@@ -226,11 +226,21 @@ async function fetchComputedGoldPrices() {
   const pound = { sell: caratPrices[21]!.sell * 8, buy: caratPrices[21]!.buy * 8 };
 
   const ounce_change_percent = goldData.chp ?? goldData.change_percent ?? null;
+  const ounce_egp = {
+    sell: Math.round(pureGramEgp * GRAMS_PER_OUNCE * (1 + SPREAD)),
+    buy: Math.round(pureGramEgp * GRAMS_PER_OUNCE * (1 - SPREAD)),
+  };
+
+  // نفس تسجيل الأرشيف اللي في fetchLocalGoldPrices — المسار ده بيتفعّل بس لو
+  // مصدر الصاغة المحلي فشل، فمن غير السطر ده كان يوم زي ده هيفضل من غير أي
+  // لقطة في الأرشيف اليومي (نفس المشكلة اللي كانت في مسار الفضة).
+  void recordDailySnapshotIfMissing({ caratPrices, ounce_egp, pound });
 
   return {
     source: "gold-api.com",
     ounce_usd,
     ounce_change_percent,
+    ounce_egp,
     pound,
     caratPrices,
     bank_usd_rate,
@@ -240,13 +250,27 @@ async function fetchComputedGoldPrices() {
   };
 }
 
+// آخر سعر فضة عالمي (XAG) نجحنا نجيبه — بيستخدم كخط دفاع تاني لو مصدر السعر
+// العالمي فشل في طلب معين (تايم أوت / رجّع خطأ)، عشان صفحة الفضة والأرشيف
+// اليومي بتاعها ميقفوش تمامًا لمجرد تعثر مؤقت في مصدر خارجي واحد. نفس الفكرة
+// اللي بيستخدمها مسار الذهب أصلاً (fetchGlobalOunce("XAU").catch(() => null)).
+let lastKnownXagUsd: number | null = null;
+
 async function fetchSilverPrices() {
-  const [silver, local, usdRate] = await Promise.all([
-    fetchGlobalOunce("XAG"),
+  const [silverRes, local, usdRate] = await Promise.all([
+    fetchGlobalOunce("XAG").catch(() => null),
     fetchEgyptGoldMarket().catch(() => null),
     safeUsdRate(null),
   ]);
-  const ounce_usd = silver.price;
+
+  if (silverRes?.price) lastKnownXagUsd = silverRes.price;
+  const ounce_usd = silverRes?.price ?? lastKnownXagUsd;
+  if (!ounce_usd) {
+    // فشل المصدر اللحظي ومفيش سعر سابق محفوظ من نفس تشغيلة السيرفر (مثلاً أول
+    // طلب بعد إعادة تشغيل) — هنا فعلاً مفيش سعر نقدر نعتمد عليه، فبنرفع خطأ
+    // عادي وبيتكفل بيه الكاش (cached()) برجوع آخر نسخة ناجحة لو موجودة.
+    throw new Error("تعذر الحصول على سعر الفضة العالمي ولا يوجد سعر سابق محفوظ");
+  }
 
   // سعر دولار السوق (الصاغة) هو الأقرب لتسعير الفضة في محلات مصر
   const bank_usd_rate =
