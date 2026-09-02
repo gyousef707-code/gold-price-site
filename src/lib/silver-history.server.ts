@@ -54,3 +54,18 @@ export async function getRecentSilverHistory(days = 30): Promise<SilverDailySnap
     return [];
   }
 }
+
+// لقطة الأمس بالظبط — بتُستخدم لحساب نسبة تغيّر سعر الفضة اليومي (زي اللي بيظهر
+// جنب سعر الأونصة). لو مش موجودة (مثلاً أول يوم تفعيل الأرشيف)، بترجع null
+// وبيتجاهل حساب النسبة بهدوء في مكان الاستدعاء.
+export async function getYesterdaySilverSnapshot(): Promise<SilverDailySnapshot | null> {
+  try {
+    const yesterday = new Date(Date.now() + 2 * 60 * 60 * 1000 - 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 10);
+    const raw = await upstash("GET", `silver:history:${yesterday}`);
+    return raw ? (JSON.parse(raw) as SilverDailySnapshot) : null;
+  } catch {
+    return null;
+  }
+}
