@@ -39,6 +39,9 @@ import {
   faChartSimple,
   faSackDollar,
   faClock as faClockSolid,
+  faClockRotateLeft,
+  faCaretUp,
+  faCaretDown,
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -97,6 +100,9 @@ const ICON_MAP = {
   'fa-regular fa-trash-can': faTrashCan,
   'fa-solid fa-sack-dollar': faSackDollar,
   'fa-solid fa-clock': faClockSolid,
+  'fa-solid fa-clock-rotate-left': faClockRotateLeft,
+  'fa-solid fa-caret-up': faCaretUp,
+  'fa-solid fa-caret-down': faCaretDown,
 };
 
 /**
