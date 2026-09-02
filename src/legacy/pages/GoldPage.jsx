@@ -101,11 +101,6 @@ export default function GoldPage({ initialGoldData = null } = {}) {
             return (
               <div key={k} className={`gold-card clickable-card${k === '21' ? ' featured hero-karat' : ''}`}>
                 {k === '21' && <span className="gold-card-badge">{lang === 'en' ? 'MOST TRADED' : 'الأكثر تداولًا'}</span>}
-                {changePct != null && (
-                  <span className={`card-change-badge ${changePct >= 0 ? 'positive' : 'negative'}`}>
-                    {changePct >= 0 ? '▲' : '▼'} {Math.abs(changePct).toFixed(2)}%
-                  </span>
-                )}
 
                 <button
                   className="card-share-btn"
@@ -127,6 +122,11 @@ export default function GoldPage({ initialGoldData = null } = {}) {
                       <LivePrice value={p?.sell ?? null} decimals={0} />
                     </span>
                   </div>
+                  {changePct != null && (
+                    <span className={`card-change-badge ${changePct >= 0 ? 'positive' : 'negative'}`}>
+                      {changePct >= 0 ? '▲' : '▼'} {Math.abs(changePct).toFixed(2)}%
+                    </span>
+                  )}
                   <div className="gold-v-row">
                     <span className="gold-v-label">{t('price.buy')}</span>
                     <span className="gold-v-value buy-price">
@@ -140,11 +140,6 @@ export default function GoldPage({ initialGoldData = null } = {}) {
 
           {/* كارت الجنيه الذهب جنب عيار 12 و14 */}
           <div className="gold-card pound-card">
-            {changePct != null && (
-              <span className={`card-change-badge ${changePct >= 0 ? 'positive' : 'negative'}`}>
-                {changePct >= 0 ? '▲' : '▼'} {Math.abs(changePct).toFixed(2)}%
-              </span>
-            )}
             <button
               className="card-share-btn"
               title={t('share.price')}
@@ -163,6 +158,11 @@ export default function GoldPage({ initialGoldData = null } = {}) {
                 <LivePrice value={data?.pound?.sell ?? null} decimals={0} />
               </span>
             </div>
+            {changePct != null && (
+              <span className={`card-change-badge ${changePct >= 0 ? 'positive' : 'negative'}`}>
+                {changePct >= 0 ? '▲' : '▼'} {Math.abs(changePct).toFixed(2)}%
+              </span>
+            )}
             <div className="gold-v-row">
               <span className="gold-v-label">{t('price.buy')}</span>
               <span className="gold-v-value buy-price">
