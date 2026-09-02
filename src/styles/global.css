@@ -532,6 +532,24 @@ body.light-mode .swap-btn { background: #f3f4f6; }
 }
 body.light-mode .card-share-btn { background: rgba(0,0,0,0.04); }
 
+/* ====== شارة نسبة التغيّر اليومي (موجودة على كل كارت عيار ذهب/فضة) ====== */
+.card-change-badge {
+    position: absolute;
+    top: 8px;
+    inset-inline-start: 8px;
+    padding: 2px 7px;
+    border-radius: 8px;
+    font-size: 9.5px;
+    font-weight: 800;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    line-height: 1.4;
+}
+.card-change-badge.positive { color: var(--success); background: rgba(63,185,80,0.14); }
+.card-change-badge.negative { color: var(--danger); background: rgba(248,81,73,0.14); }
+
 /* ====== توست بسيط لتأكيد نجاح المشاركة/النسخ ====== */
 .app-toast {
     position: fixed;
