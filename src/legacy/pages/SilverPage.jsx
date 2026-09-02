@@ -101,6 +101,7 @@ export default function SilverPage() {
         endpoint="/api/public/silver-history"
         titleAr="تطور سعر الفضة خلال آخر 30 يوم"
         titleEn="Silver price history (last 30 days)"
+        primaryKey="silver999_sell"
         columns={[
           { key: 'silver999_sell', labelAr: 'عيار 999', labelEn: 'Purity 999' },
           { key: 'silver925_sell', labelAr: 'عيار 925', labelEn: 'Purity 925' },
