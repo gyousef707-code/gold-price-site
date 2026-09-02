@@ -51,7 +51,7 @@ export default function GoldKaratPage() {
             الشراء: {price ? price.buy.toLocaleString('en-US') : '—'} ج.م
           </p>
         </div>
-        <Link to="/tools#tool-gold-calc" className="btn">احسب قيمة ذهبك</Link>
+        <Link to="/#tool-gold-calc" className="btn">احسب قيمة ذهبك</Link>
       </div>
 
       <p>{info.intro}</p>
