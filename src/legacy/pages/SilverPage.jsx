@@ -72,11 +72,6 @@ export default function SilverPage() {
             const p = data?.silverPrices?.[c];
             return (
               <div key={c} className="silver-card clickable-card">
-                {changePct != null && (
-                  <span className={`card-change-badge ${changePct >= 0 ? 'positive' : 'negative'}`}>
-                    {changePct >= 0 ? '▲' : '▼'} {Math.abs(changePct).toFixed(2)}%
-                  </span>
-                )}
                 <button
                   className="card-share-btn"
                   title={t('share.price')}
@@ -96,6 +91,11 @@ export default function SilverPage() {
                     <LivePrice value={p?.sell ?? null} decimals={0} />
                   </span>
                 </div>
+                {changePct != null && (
+                  <span className={`card-change-badge ${changePct >= 0 ? 'positive' : 'negative'}`}>
+                    {changePct >= 0 ? '▲' : '▼'} {Math.abs(changePct).toFixed(2)}%
+                  </span>
+                )}
                 <div className="silver-v-row">
                   <span className="silver-v-label">{t('price.buy')}</span>
                   <span className="silver-v-value buy-price">
