@@ -5,7 +5,12 @@ import NumberInput from '../NumberInput.jsx';
 import { useLang } from '../../context/LangContext.jsx';
 
 const KARATS = ['24', '22', '21', '18', '14', '12'];
-const NISAB_GRAMS = 85;
+// نصاب زكاة الذهب: 85 جرام ذهب خالص (عيار 24). لو الذهب عيار أقل، لازم وزن
+// أكبر عشان يوصل لنفس كمية الذهب الخالص، فبنحسب النصاب بنفس نسبة النقاء
+// (نفس الأرقام المستخدمة في باقي الموقع لتحويل العيارات).
+const GOLD_PURITY = { 24: 0.999, 22: 0.916, 21: 0.875, 18: 0.75, 14: 0.583, 12: 0.5 };
+const PURE_NISAB_GRAMS = 85;
+const nisabForKarat = (k) => PURE_NISAB_GRAMS * (GOLD_PURITY[24] / GOLD_PURITY[k]);
 
 export default function ZakatCalculator() {
   const { t, lang } = useLang();
@@ -19,7 +24,8 @@ export default function ZakatCalculator() {
 
   const gramPrice = data?.caratPrices?.[karat]?.[priceType] ?? null;
   const w = Number(weight) || 0;
-  const belowNisab = w > 0 && w < NISAB_GRAMS;
+  const nisabGrams = useMemo(() => nisabForKarat(karat), [karat]);
+  const belowNisab = w > 0 && w < nisabGrams;
 
   const totalValue = useMemo(() => (gramPrice ? gramPrice * w : null), [gramPrice, w]);
   const zakat = belowNisab || totalValue == null ? null : totalValue * 0.025;
@@ -77,12 +83,12 @@ export default function ZakatCalculator() {
           <strong>{fmt(totalValue)} {en ? 'EGP' : 'ج.م'}</strong>
         </div>
         <div className="zakat-summary-row">
-          <span>{en ? 'Nisab (85 g)' : 'النصاب (85 جرام)'}</span>
+          <span>{en ? `Nisab (${fmt(nisabGrams)} g)` : `النصاب (${fmt(nisabGrams)} جرام)`}</span>
           <strong className={belowNisab ? 'zk-bad' : 'zk-good'}>
             {w <= 0
               ? '—'
               : belowNisab
-                ? (en ? `Below by ${fmt(NISAB_GRAMS - w)} g` : `ناقص ${fmt(NISAB_GRAMS - w)} جرام`)
+                ? (en ? `Below by ${fmt(nisabGrams - w)} g` : `ناقص ${fmt(nisabGrams - w)} جرام`)
                 : (en ? 'Reached' : 'مكتمل')}
           </strong>
         </div>
@@ -92,7 +98,7 @@ export default function ZakatCalculator() {
         <div className="calc-result-box zakat-result-no">
           <div className="calc-result-label">{t('calc.zakatResult')}</div>
           <div className="calc-result-value" style={{ fontSize: '1.02rem', lineHeight: 1.6 }}>
-            {t('calc.zakatNoNisab')}
+            {t('calc.zakatNoNisab')} ({en ? `${fmt(nisabGrams)} g` : `${fmt(nisabGrams)} جرام`})
           </div>
           <div className="calc-result-unit">{t('calc.zakatNisabHint')}</div>
         </div>
