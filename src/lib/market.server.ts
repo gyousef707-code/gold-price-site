@@ -4,7 +4,7 @@
 import { reportSuccess, reportFailure } from "./alert.server";
 import { fetchEgyptGoldMarket } from "./egypt-gold.server";
 import { recordDailySnapshotIfMissing } from "./gold-history.server";
-import { recordSilverSnapshotIfMissing } from "./silver-history.server";
+import { recordSilverSnapshotIfMissing, getYesterdaySilverSnapshot } from "./silver-history.server";
 
 const UA = { "User-Agent": "Mozilla/5.0 (compatible; DahabySite/1.0)" };
 const GRAMS_PER_OUNCE = 31.1034768;
@@ -289,11 +289,23 @@ async function fetchSilverPrices() {
 
   void recordSilverSnapshotIfMissing(silverPrices);
 
+  // نسبة التغيّر اليومي لسعر الفضة (زي اللي بيظهر جنب سعر أونصة الذهب) —
+  // بتتحسب من مقارنة سعر عيار 999 النهاردة بلقطة الأمس المحفوظة في الأرشيف.
+  // مفيش مصدر خارجي بيدّينا نسبة تغيّر جاهزة للفضة زي اللي عند الذهب، فبنعتمد
+  // على أرشيفنا احنا بدل ما نسيب الكارت من غير أي مؤشر.
+  const yesterday = await getYesterdaySilverSnapshot().catch(() => null);
+  const todayRef = silverPrices["999"]?.sell ?? null;
+  const ounce_change_percent =
+    yesterday?.silver999_sell && todayRef
+      ? Number((((todayRef - yesterday.silver999_sell) / yesterday.silver999_sell) * 100).toFixed(2))
+      : null;
+
   return {
     source: local?.market_usd_rate
       ? "gold-api.com + gold-price-today.com"
       : "gold-api.com + banklive.net",
     ounce_usd,
+    ounce_change_percent,
     bank_usd_rate,
     silverPrices,
     updated_at: new Date().toISOString(),
