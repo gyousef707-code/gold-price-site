@@ -187,6 +187,7 @@ export default function GoldPage({ initialGoldData = null } = {}) {
         endpoint="/api/public/gold-history"
         titleAr="تطور سعر الذهب خلال آخر 30 يوم"
         titleEn="Gold price history (last 30 days)"
+        primaryKey="karat24_sell"
         columns={[
           { key: 'karat24_sell', labelAr: 'عيار 24', labelEn: 'Karat 24' },
           { key: 'karat21_sell', labelAr: 'عيار 21', labelEn: 'Karat 21' },
