@@ -2126,7 +2126,7 @@ body.light-mode .crypto-search input, body.light-mode .crypto-chip { background:
 .contact-submit {
     width: 100%; margin-top: 6px; padding: 12px; border-radius: 12px; border: 0;
     font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 800; cursor: pointer;
-    color: #000; background: linear-gradient(135deg, var(--gold-light), var(--gold-primary));
+    color: #000; background: linear-gradient(135deg, var(--gold-bright), var(--gold-primary));
 }
 .contact-submit:hover { filter: brightness(1.06); }
 .contact-aside { display: flex; flex-direction: column; gap: 12px; }
