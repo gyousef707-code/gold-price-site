@@ -10,3 +10,4 @@ binding = "ASSETS"
 [vars]
 WHATSAPP_API_URL = "https://gate.whapi.cloud"
 WHATSAPP_CHANNEL_ID = "120363412213041156@newsletter"
+VAPID_SUBJECT = "mailto:gyousef707@gmail.com"
