@@ -17,17 +17,22 @@ async function sha256Hex(input: string) {
 }
 
 // -------- تخزين الاشتراكات --------
+//
+// كل الاشتراكات متخزنة في Hash واحد بس ("push:subs:hash") بدل ما كل اشتراك
+// يكون له مفتاح منفصل. الفايدة: جلب كل الاشتراكات بيبقى طلب HTTP واحد بس
+// (HGETALL) بدل ما نعمل SMEMBERS ثم طلب GET منفصل لكل مشترك — وده كان
+// السبب الرئيسي في تخطي حد "Too many subrequests" بتاع Cloudflare مع زيادة
+// عدد المشتركين، لأن كل مشترك كان بيكلفنا طلب HTTP إضافي بس عشان نجيب بياناته.
+const SUBS_HASH_KEY = "push:subs:hash";
 
 export async function saveSubscription(sub: StoredSubscription) {
   const id = await sha256Hex(sub.endpoint);
-  await upstash("SET", `push:sub:${id}`, JSON.stringify(sub));
-  await upstash("SADD", "push:subs", id);
+  await upstash("HSET", SUBS_HASH_KEY, id, JSON.stringify(sub));
   return id;
 }
 
 async function removeSubscriptionById(id: string) {
-  await upstash("DEL", `push:sub:${id}`);
-  await upstash("SREM", "push:subs", id);
+  await upstash("HDEL", SUBS_HASH_KEY, id);
 }
 
 export async function removeSubscriptionByEndpoint(endpoint: string) {
@@ -36,19 +41,18 @@ export async function removeSubscriptionByEndpoint(endpoint: string) {
 }
 
 export async function getAllSubscriptions(): Promise<Array<{ id: string; sub: StoredSubscription }>> {
-  const ids: string[] = (await upstash("SMEMBERS", "push:subs")) || [];
+  // Upstash REST بيرجع نتيجة HGETALL كمصفوفة مسطّحة: [field1, value1, field2, value2, ...]
+  const flat: string[] = (await upstash("HGETALL", SUBS_HASH_KEY)) || [];
   const out: Array<{ id: string; sub: StoredSubscription }> = [];
 
-  for (const id of ids) {
-    const raw = await upstash("GET", `push:sub:${id}`);
-    if (!raw) {
-      await removeSubscriptionById(id);
-      continue;
-    }
+  for (let i = 0; i < flat.length; i += 2) {
+    const id = flat[i]!;
+    const raw = flat[i + 1];
+    if (!raw) continue;
     try {
       out.push({ id, sub: JSON.parse(raw) });
     } catch {
-      await removeSubscriptionById(id);
+      // تجاهل أي قيمة تالفة بهدوء، بدون طلب شبكة إضافي للحذف الفوري
     }
   }
   return out;
