@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { jsonOk, jsonErr } from "@/lib/api-response";
 import { getGoldPrices, getCurrencyRates } from "@/lib/market.server";
 import { sendTelegramMessage } from "@/lib/telegram.server";
+import { sendWhatsAppMessage } from "@/lib/whatsapp.server";
 
 // ده الـ endpoint اللي بينده عليه cron خارجي كل ساعة، وبيبعت ملخص أسعار كامل
 // لقناة تيليجرام (كل الأعيرة + الجنيه الذهب + الأونصة + الدولار)
@@ -83,9 +84,27 @@ export const Route = createFileRoute("/api/telegram/summary")({
             rtl(`📢 قناتنا: t.me/zahaby1`),
           ].filter((l) => l !== null);
 
-          await sendTelegramMessage(lines.join("\n"));
+          const message = lines.join("\n");
 
-          return jsonOk({ ok: true });
+          await sendTelegramMessage(message);
+
+          // فور نجاح الإرسال لتليجرام، ابعت نفس الرسالة لقناة الواتساب
+          // بنعمل try/catch منفصلة عشان لو واتساب فشل، ميضيعش نجاح تيليجرام
+          // اللي حصل فعلاً، وبس نرجّع تفاصيل الخطأ في الرد
+          let whatsapp: { ok: boolean; error?: string } = { ok: true };
+          try {
+            await sendWhatsAppMessage(message);
+          } catch (whatsappError) {
+            whatsapp = {
+              ok: false,
+              error:
+                whatsappError instanceof Error
+                  ? whatsappError.message
+                  : "فشل إرسال رسالة الواتساب",
+            };
+          }
+
+          return jsonOk({ ok: true, telegram: { ok: true }, whatsapp });
         } catch (e) {
           return jsonErr(e);
         }
