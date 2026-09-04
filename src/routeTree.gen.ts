@@ -28,8 +28,10 @@ import { Route as CurrencyCodeRouteImport } from './routes/currency.$code'
 import { Route as GoldKaratRouteImport } from './routes/gold.$karat'
 import { Route as ApiPublicCryptoPriceRouteImport } from './routes/api/public/crypto-price'
 import { Route as ApiPublicCurrencyPriceRouteImport } from './routes/api/public/currency-price'
+import { Route as ApiPublicGoldHistoryRouteImport } from './routes/api/public/gold-history'
 import { Route as ApiPublicGoldPriceRouteImport } from './routes/api/public/gold-price'
 import { Route as ApiPublicNewsRouteImport } from './routes/api/public/news'
+import { Route as ApiPublicSilverHistoryRouteImport } from './routes/api/public/silver-history'
 import { Route as ApiPublicSilverPriceRouteImport } from './routes/api/public/silver-price'
 import { Route as ApiPushCheckRouteImport } from './routes/api/push/check'
 import { Route as ApiPushSubscribeRouteImport } from './routes/api/push/subscribe'
@@ -131,6 +133,11 @@ const ApiPublicCurrencyPriceRoute = ApiPublicCurrencyPriceRouteImport.update({
   path: '/api/public/currency-price',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicGoldHistoryRoute = ApiPublicGoldHistoryRouteImport.update({
+  id: '/api/public/gold-history',
+  path: '/api/public/gold-history',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicGoldPriceRoute = ApiPublicGoldPriceRouteImport.update({
   id: '/api/public/gold-price',
   path: '/api/public/gold-price',
@@ -139,6 +146,11 @@ const ApiPublicGoldPriceRoute = ApiPublicGoldPriceRouteImport.update({
 const ApiPublicNewsRoute = ApiPublicNewsRouteImport.update({
   id: '/api/public/news',
   path: '/api/public/news',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicSilverHistoryRoute = ApiPublicSilverHistoryRouteImport.update({
+  id: '/api/public/silver-history',
+  path: '/api/public/silver-history',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicSilverPriceRoute = ApiPublicSilverPriceRouteImport.update({
@@ -187,8 +199,10 @@ export interface FileRoutesByFullPath {
   '/crypto/': typeof CryptoIndexRoute
   '/api/public/crypto-price': typeof ApiPublicCryptoPriceRoute
   '/api/public/currency-price': typeof ApiPublicCurrencyPriceRoute
+  '/api/public/gold-history': typeof ApiPublicGoldHistoryRoute
   '/api/public/gold-price': typeof ApiPublicGoldPriceRoute
   '/api/public/news': typeof ApiPublicNewsRoute
+  '/api/public/silver-history': typeof ApiPublicSilverHistoryRoute
   '/api/public/silver-price': typeof ApiPublicSilverPriceRoute
   '/api/push/check': typeof ApiPushCheckRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
@@ -215,8 +229,10 @@ export interface FileRoutesByTo {
   '/crypto': typeof CryptoIndexRoute
   '/api/public/crypto-price': typeof ApiPublicCryptoPriceRoute
   '/api/public/currency-price': typeof ApiPublicCurrencyPriceRoute
+  '/api/public/gold-history': typeof ApiPublicGoldHistoryRoute
   '/api/public/gold-price': typeof ApiPublicGoldPriceRoute
   '/api/public/news': typeof ApiPublicNewsRoute
+  '/api/public/silver-history': typeof ApiPublicSilverHistoryRoute
   '/api/public/silver-price': typeof ApiPublicSilverPriceRoute
   '/api/push/check': typeof ApiPushCheckRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
@@ -244,8 +260,10 @@ export interface FileRoutesById {
   '/crypto/': typeof CryptoIndexRoute
   '/api/public/crypto-price': typeof ApiPublicCryptoPriceRoute
   '/api/public/currency-price': typeof ApiPublicCurrencyPriceRoute
+  '/api/public/gold-history': typeof ApiPublicGoldHistoryRoute
   '/api/public/gold-price': typeof ApiPublicGoldPriceRoute
   '/api/public/news': typeof ApiPublicNewsRoute
+  '/api/public/silver-history': typeof ApiPublicSilverHistoryRoute
   '/api/public/silver-price': typeof ApiPublicSilverPriceRoute
   '/api/push/check': typeof ApiPushCheckRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
@@ -274,8 +292,10 @@ export interface FileRouteTypes {
     | '/crypto/'
     | '/api/public/crypto-price'
     | '/api/public/currency-price'
+    | '/api/public/gold-history'
     | '/api/public/gold-price'
     | '/api/public/news'
+    | '/api/public/silver-history'
     | '/api/public/silver-price'
     | '/api/push/check'
     | '/api/push/subscribe'
@@ -302,8 +322,10 @@ export interface FileRouteTypes {
     | '/crypto'
     | '/api/public/crypto-price'
     | '/api/public/currency-price'
+    | '/api/public/gold-history'
     | '/api/public/gold-price'
     | '/api/public/news'
+    | '/api/public/silver-history'
     | '/api/public/silver-price'
     | '/api/push/check'
     | '/api/push/subscribe'
@@ -330,8 +352,10 @@ export interface FileRouteTypes {
     | '/crypto/'
     | '/api/public/crypto-price'
     | '/api/public/currency-price'
+    | '/api/public/gold-history'
     | '/api/public/gold-price'
     | '/api/public/news'
+    | '/api/public/silver-history'
     | '/api/public/silver-price'
     | '/api/push/check'
     | '/api/push/subscribe'
@@ -359,8 +383,10 @@ export interface RootRouteChildren {
   CryptoIndexRoute: typeof CryptoIndexRoute
   ApiPublicCryptoPriceRoute: typeof ApiPublicCryptoPriceRoute
   ApiPublicCurrencyPriceRoute: typeof ApiPublicCurrencyPriceRoute
+  ApiPublicGoldHistoryRoute: typeof ApiPublicGoldHistoryRoute
   ApiPublicGoldPriceRoute: typeof ApiPublicGoldPriceRoute
   ApiPublicNewsRoute: typeof ApiPublicNewsRoute
+  ApiPublicSilverHistoryRoute: typeof ApiPublicSilverHistoryRoute
   ApiPublicSilverPriceRoute: typeof ApiPublicSilverPriceRoute
   ApiPushCheckRoute: typeof ApiPushCheckRoute
   ApiPushSubscribeRoute: typeof ApiPushSubscribeRoute
@@ -503,6 +529,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicCurrencyPriceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/gold-history': {
+      id: '/api/public/gold-history'
+      path: '/api/public/gold-history'
+      fullPath: '/api/public/gold-history'
+      preLoaderRoute: typeof ApiPublicGoldHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/gold-price': {
       id: '/api/public/gold-price'
       path: '/api/public/gold-price'
@@ -515,6 +548,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/news'
       fullPath: '/api/public/news'
       preLoaderRoute: typeof ApiPublicNewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/silver-history': {
+      id: '/api/public/silver-history'
+      path: '/api/public/silver-history'
+      fullPath: '/api/public/silver-history'
+      preLoaderRoute: typeof ApiPublicSilverHistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/silver-price': {
@@ -575,8 +615,10 @@ const rootRouteChildren: RootRouteChildren = {
   CryptoIndexRoute: CryptoIndexRoute,
   ApiPublicCryptoPriceRoute: ApiPublicCryptoPriceRoute,
   ApiPublicCurrencyPriceRoute: ApiPublicCurrencyPriceRoute,
+  ApiPublicGoldHistoryRoute: ApiPublicGoldHistoryRoute,
   ApiPublicGoldPriceRoute: ApiPublicGoldPriceRoute,
   ApiPublicNewsRoute: ApiPublicNewsRoute,
+  ApiPublicSilverHistoryRoute: ApiPublicSilverHistoryRoute,
   ApiPublicSilverPriceRoute: ApiPublicSilverPriceRoute,
   ApiPushCheckRoute: ApiPushCheckRoute,
   ApiPushSubscribeRoute: ApiPushSubscribeRoute,
