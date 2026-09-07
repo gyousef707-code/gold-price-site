@@ -36,6 +36,18 @@ function HashScroll() {
   return null;
 }
 
+// بيسجّل الـ Service Worker تلقائيًا لكل زائر بمجرد فتح الموقع، بغض النظر
+// عن تفعيل الإشعارات من عدمه — عشان صفحة الأوفلاين المخصصة (public/offline.html)
+// تشتغل لأي حد حتى لو مفعلش الإشعارات أبدًا.
+function SwRegister() {
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    }
+  }, []);
+  return null;
+}
+
 function NotFoundComponent() {
   return (
     <div className="page-wrap" style={{ textAlign: "center", padding: "60px 20px" }}>
@@ -229,6 +241,7 @@ function RootComponent() {
       <ThemeProvider>
         <LangProvider>
           <HashScroll />
+          <SwRegister />
           {/* Layout بيحتوي الهيدر والقائمة والفوتر وبيرندر <Outlet /> جواه */}
           <Layout />
         </LangProvider>
