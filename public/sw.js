@@ -1,12 +1,28 @@
 // Service Worker حقيقي — بيستقبل إشعارات Push من السيرفر حتى لو التطبيق مقفول تمامًا
 // (المتصفح/نظام التشغيل هو اللي بيشغّله وقت وصول push event، مش الـ tab)
 
-self.addEventListener("install", () => {
+const OFFLINE_CACHE = "offline-v1";
+const OFFLINE_URL = "/offline.html";
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(OFFLINE_CACHE).then((cache) => cache.addAll([OFFLINE_URL, "/icons/icon-192.png"])),
+  );
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(self.clients.claim());
+});
+
+// أي محاولة فتح صفحة (تنقل بين التابات أو أول فتح للتطبيق) لو فشلت لعدم وجود
+// نت، بنرجّع صفحة الأوفلاين المخصصة بدل ما المتصفح يعرض شاشته الافتراضية.
+self.addEventListener("fetch", (event) => {
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(OFFLINE_URL)),
+    );
+  }
 });
 
 self.addEventListener("push", (event) => {
