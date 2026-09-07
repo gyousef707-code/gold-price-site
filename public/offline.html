@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>ذهبي - لا يوجد اتصال</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #0d1117;
+    color: #f0f6fc;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, Arial, sans-serif;
+  }
+  .wrap {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+  }
+  .logo {
+    width: 108px;
+    height: 108px;
+    border-radius: 28px;
+    margin-bottom: 26px;
+    box-shadow: 0 6px 24px rgba(227, 179, 65, 0.25);
+  }
+  .cloud {
+    font-size: 34px;
+    margin-bottom: 14px;
+    color: #8b949e;
+  }
+  h1 {
+    font-size: 19px;
+    font-weight: 800;
+    margin: 0 0 8px;
+    color: #f0f6fc;
+  }
+  p {
+    font-size: 13.5px;
+    color: #8b949e;
+    margin: 0 0 26px;
+    line-height: 1.7;
+    max-width: 280px;
+  }
+  button {
+    background: linear-gradient(145deg, #e3b341, #c99a2e);
+    color: #0d1117;
+    border: none;
+    border-radius: 999px;
+    padding: 13px 34px;
+    font-size: 14.5px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  button:active { opacity: 0.85; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <img class="logo" src="/icons/icon-192.png" alt="ذهبي" />
+    <div class="cloud">☁︎</div>
+    <h1>لا يوجد اتصال بالإنترنت</h1>
+    <p>تأكد من اتصالك بالإنترنت وحاول مرة أخرى لمتابعة أسعار الذهب والفضة والعملات لحظة بلحظة.</p>
+    <button onclick="location.reload()">حاول مرة أخرى</button>
+  </div>
+</body>
+</html>
