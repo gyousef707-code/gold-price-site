@@ -83,12 +83,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "theme-color", content: "#0d1117" },
     ],
     links: [
-      { rel: "stylesheet", href: appCss },
+      { rel: "stylesheet", href: appCss, media: "print", onload: "this.media='all'" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap",
+        media: "print",
+        onload: "this.media='all'",
       },
       { rel: "manifest", href: "/manifest.json" },
       { rel: "apple-touch-icon", href: "/icons/icon-180.png" },
@@ -107,6 +109,29 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="ar" dir="rtl">
       <head>
         <HeadContent />
+        {/* CSS شاشة الفتح مكتوب هنا مباشرة (inline) عشان يظهر فورًا من غير
+            ما يستنى تحميل ملف الـ CSS الرئيسي أو خطوط جوجل — ده اللي بيقصّر
+            المدة اللي فيها شاشة أندرويد/كروم الافتراضية (الأيقونة لوحدها)
+            بتفضل ظاهرة قبل ما شاشتنا تبان */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+              #splash-screen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d1117 0%,#161b22 50%,#0d1117 100%);transition:opacity .6s ease,visibility .6s ease}
+              #splash-screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
+              .splash-bg{position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 50% 50%,rgba(227,179,65,0.08) 0%,transparent 50%);animation:splashPulse 3s ease-in-out infinite}
+              @keyframes splashPulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.1);opacity:1}}
+              .splash-content{position:relative;z-index:1;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
+              .splash-icon{animation:splashIconIn .8s cubic-bezier(.34,1.56,.64,1) forwards;opacity:0;transform:scale(.5)}
+              @keyframes splashIconIn{to{opacity:1;transform:scale(1)}}
+              .splash-title{font-size:36px;font-weight:800;color:#e3b341;margin:0;letter-spacing:2px;animation:splashFadeUp .6s .3s ease forwards;opacity:0;transform:translateY(20px)}
+              .splash-subtitle{font-size:13px;color:#8b949e;margin:0;animation:splashFadeUp .6s .5s ease forwards;opacity:0;transform:translateY(20px)}
+              @keyframes splashFadeUp{to{opacity:1;transform:translateY(0)}}
+              .splash-loader{width:120px;height:3px;background:rgba(240,246,252,.1);border-radius:3px;overflow:hidden;margin-top:16px;animation:splashFadeUp .6s .7s ease forwards;opacity:0}
+              .splash-loader-bar{width:0%;height:100%;background:linear-gradient(90deg,#e3b341,#f0c040);border-radius:3px;animation:splashLoad 2s .8s ease-in-out forwards}
+              @keyframes splashLoad{0%{width:0%}60%{width:70%}100%{width:100%}}
+            `,
+          }}
+        />
         {/* Google Tag Manager */}
         <script
           async
