@@ -134,6 +134,63 @@ function RootShell({ children }: { children: ReactNode }) {
           ></iframe>
         </noscript>
         {/* End Google Tag Manager (noscript) */}
+
+        {/* SPLASH SCREEN — نفس شاشة الفتح القديمة (أيقونة + خط تحميل) */}
+        <div id="splash-screen">
+          <div className="splash-bg"></div>
+          <div className="splash-content">
+            <div className="splash-icon">
+              <svg viewBox="0 0 100 100" width="80" height="80">
+                <defs>
+                  <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#e3b341" />
+                    <stop offset="50%" stopColor="#f0c040" />
+                    <stop offset="100%" stopColor="#b8860b" />
+                  </linearGradient>
+                  <filter id="sglow">
+                    <feGaussianBlur stdDeviation="2" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+                <circle cx="50" cy="50" r="46" fill="url(#sg)" filter="url(#sglow)" />
+                <circle cx="50" cy="50" r="42" fill="none" stroke="#0d1117" strokeWidth="2" />
+                <text
+                  x="50"
+                  y="60"
+                  fontSize="26"
+                  textAnchor="middle"
+                  fill="#0d1117"
+                  fontFamily="Cairo, serif"
+                  fontWeight="800"
+                >
+                  ذهبي
+                </text>
+              </svg>
+            </div>
+            <h1 className="splash-title">ذهبي</h1>
+            <p className="splash-subtitle">أسعار الذهب والفضة والعملات</p>
+            <div className="splash-loader">
+              <div className="splash-loader-bar"></div>
+            </div>
+          </div>
+        </div>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.addEventListener('load', function () {
+                setTimeout(function () {
+                  var splash = document.getElementById('splash-screen');
+                  if (splash) splash.classList.add('hidden');
+                }, 2500);
+              });
+            `,
+          }}
+        />
+        {/* END SPLASH SCREEN */}
+
         {children}
         <Scripts />
       </body>
