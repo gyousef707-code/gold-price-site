@@ -1954,7 +1954,17 @@ footer.site-footer .foot-links a:hover { color: var(--gold-primary); }
     padding: 4px;
     overflow: hidden;
 }
-.history-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.history-table-wrap {
+    overflow-x: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    max-height: 234px; /* يظهر هيدر الجدول + 5 أيام فقط، والباقي يظهر بالسكرول */
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-gold) transparent;
+}
+.history-table-wrap::-webkit-scrollbar { width: 6px; }
+.history-table-wrap::-webkit-scrollbar-track { background: transparent; }
+.history-table-wrap::-webkit-scrollbar-thumb { background: var(--border-gold); border-radius: 999px; }
 .history-table {
     width: 100%;
     border-collapse: collapse;
