@@ -132,7 +132,7 @@ function RootShell({ children }: { children: ReactNode }) {
               .splash-subtitle{font-size:13px;color:#8b949e;margin:0;animation:splashFadeUp .6s .5s ease forwards;opacity:0;transform:translateY(20px)}
               @keyframes splashFadeUp{to{opacity:1;transform:translateY(0)}}
               .splash-loader{width:120px;height:3px;background:rgba(240,246,252,.1);border-radius:3px;overflow:hidden;margin-top:16px;animation:splashFadeUp .6s .7s ease forwards;opacity:0}
-              .splash-loader-bar{width:0%;height:100%;background:linear-gradient(90deg,#e3b341,#f0c040);border-radius:3px;animation:splashLoad 2s .8s ease-in-out forwards}
+              .splash-loader-bar{width:0%;height:100%;background:linear-gradient(90deg,#e3b341,#f0c040);border-radius:3px;animation:splashLoad 1s .3s ease-in-out forwards}
               @keyframes splashLoad{0%{width:0%}60%{width:70%}100%{width:100%}}
             `,
           }}
@@ -231,12 +231,27 @@ function RootShell({ children }: { children: ReactNode }) {
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              window.addEventListener('load', function () {
-                setTimeout(function () {
+              (function () {
+                function hideSplash() {
                   var splash = document.getElementById('splash-screen');
                   if (splash) splash.classList.add('hidden');
-                }, 2500);
-              });
+                }
+                // بنستنى إن الصفحة تخلص تحميل (مش كل الصور/الخطوط، بس
+                // المحتوى نفسه) زائد وقت بسيط يخلي أنيميشن الفتح تتشاف
+                // كاملة، بدل ما نستنى وقت ثابت طويل زي الأول أيًا كان
+                // سرعة النت.
+                function scheduleHide() {
+                  setTimeout(hideSplash, 1300);
+                }
+                if (document.readyState === 'loading') {
+                  document.addEventListener('DOMContentLoaded', scheduleHide);
+                } else {
+                  scheduleHide();
+                }
+                // خط أمان: لو لأي سبب المحتوى اتأخر جدًا، الشاشة تختفي
+                // على أقصى تقدير بعد 4 ثواني عشان محدش يفضل شايفها معلّقة.
+                setTimeout(hideSplash, 4000);
+              })();
             `,
           }}
         />
