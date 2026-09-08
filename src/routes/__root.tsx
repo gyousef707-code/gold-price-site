@@ -95,13 +95,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "theme-color", content: "#0d1117" },
     ],
     links: [
-      { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap",
-      },
       { rel: "manifest", href: "/manifest.json" },
       { rel: "apple-touch-icon", href: "/icons/icon-180.png" },
       { rel: "icon", type: "image/png", sizes: "32x32", href: "/icons/icon-32.png" },
@@ -139,6 +134,27 @@ function RootShell({ children }: { children: ReactNode }) {
               .splash-loader{width:120px;height:3px;background:rgba(240,246,252,.1);border-radius:3px;overflow:hidden;margin-top:16px;animation:splashFadeUp .6s .7s ease forwards;opacity:0}
               .splash-loader-bar{width:0%;height:100%;background:linear-gradient(90deg,#e3b341,#f0c040);border-radius:3px;animation:splashLoad 2s .8s ease-in-out forwards}
               @keyframes splashLoad{0%{width:0%}60%{width:70%}100%{width:100%}}
+            `,
+          }}
+        />
+        {/* بنحمّل ملف الـ CSS الرئيسي وخط Cairo عن طريق كود JS عادي (مش
+            onload attribute اللي اتلخبط بسبب إعدادات الأمان/الكاش عند
+            الاستضافة) — إنشاء <link> بالجافاسكريبت وإضافته للصفحة بالطريقة
+            دي معروف إنه مبيوقفش عرض الصفحة زي ما بيحصل مع <link> عادي
+            موجود في الـ HTML من الأول */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function () {
+                var l1 = document.createElement('link');
+                l1.rel = 'stylesheet';
+                l1.href = ${JSON.stringify(appCss)};
+                document.head.appendChild(l1);
+                var l2 = document.createElement('link');
+                l2.rel = 'stylesheet';
+                l2.href = 'https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap';
+                document.head.appendChild(l2);
+              })();
             `,
           }}
         />
