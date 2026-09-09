@@ -28,7 +28,7 @@ const SECTIONS = [
     cards: [
       { to: '/#tool-gold-karats', icon: 'fa-solid fa-coins', ar: 'عيارات الذهب بالتفصيل', en: 'Gold karats', arDesc: 'كل العيارات', enDesc: 'Every karat', tone: 'gold' },
       { to: '/crypto#tool-crypto-details', icon: 'fa-solid fa-chart-simple', ar: 'العملات الرقمية بالتفصيل', en: 'Coins in detail', arDesc: 'كل العملات', enDesc: 'Every coin', tone: 'crypto' },
-      { to: '/notifications', icon: 'fa-regular fa-bell', ar: 'تنبيهات الأسعار', en: 'Price alerts', arDesc: 'كل تحركات السوق بوقتها', enDesc: 'Every move, timestamped', tone: 'blue' },
+      { to: '/alerts', icon: 'fa-regular fa-bell', ar: 'تنبيهات الأسعار', en: 'Price alerts', arDesc: 'اضبط تنبيهاتك الخاصة', enDesc: 'Set up your alerts', tone: 'blue' },
     ],
   },
   {
