@@ -1,19 +1,20 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@/lib/router-compat.jsx";
 import { useLang } from "../context/LangContext.jsx";
 import FaIcon from "../components/FaIcon.jsx";
+import useApiData from "../hooks/useApiData.js";
 import useAlertPreferences, { type AlertKey } from "../hooks/useAlertPreferences";
 
-// صف واحد: تسمية العيار + حقل السعر المستهدف + زرار التفعيل/الإلغاء.
-// بيحتفظ بقيمة الحقل محليًا وهو بيتكتب (draft)، ومبيحفظش في localStorage
-// إلا لما المستخدم يبعد عن الحقل (blur) أو يدوس على زرار التفعيل، عشان
-// منكتبش على القرص مع كل حرف يتكتب.
+// صف واحد: تسمية العيار + حقل السعر المستهدف (متعبّى بالسعر الحي أول
+// مرة) + زرار زيادة/نقصان + زرار التفعيل/الإلغاء.
 function AlertTargetRow({
   akey,
   label,
   sublabel,
   target,
   enabled,
+  livePrice,
+  step,
   onCommitTarget,
   onToggleEnabled,
   en,
@@ -24,18 +25,41 @@ function AlertTargetRow({
   sublabel?: string;
   target: number | null;
   enabled: boolean;
+  livePrice: number | null;
+  step: number;
   onCommitTarget: (key: AlertKey, value: number | null) => void;
   onToggleEnabled: (key: AlertKey, enabled: boolean) => void;
   en: boolean;
   unit?: string;
 }) {
   const [draft, setDraft] = useState(target != null ? String(target) : "");
+  // بنسجّل هل المستخدم اتفاعل مع الحقل بنفسه (كتب أو دوس +/-) عشان بعد
+  // كده نوقف تحديث الحقل تلقائيًا بالسعر الحي، ونسيب اختياره هو زي ما هو.
+  const touchedRef = useRef(target != null);
+
+  // أول ما السعر الحي يوصل (أو يتغيّر)، لو المستخدم لسه محددش سعر خاص بيه
+  // بنفسه، بنعرض السعر الحالي كقيمة مبدئية جاهزة يقدر يعدّلها أو يقبلها.
+  useEffect(() => {
+    if (!touchedRef.current && livePrice != null) {
+      setDraft(String(livePrice));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [livePrice]);
 
   const hasValidTarget = draft.trim() !== "" && !Number.isNaN(Number(draft));
 
-  const commit = () => {
-    const num = draft.trim() === "" ? null : Number(draft);
+  const commit = (nextDraft = draft) => {
+    const num = nextDraft.trim() === "" ? null : Number(nextDraft);
     onCommitTarget(akey, Number.isNaN(num as number) ? null : num);
+  };
+
+  const bump = (delta: number) => {
+    touchedRef.current = true;
+    const base = draft.trim() === "" ? (livePrice ?? 0) : Number(draft);
+    const next = Math.round((base + delta) * 100) / 100;
+    const nextStr = String(next);
+    setDraft(nextStr);
+    commit(nextStr);
   };
 
   return (
@@ -45,16 +69,35 @@ function AlertTargetRow({
         {sublabel && <div className="alert-row-sub">{sublabel}</div>}
       </div>
       <div className="alert-target-controls">
-        <div className="alert-target-input-wrap">
+        <div className="alert-target-stepper">
+          <button
+            type="button"
+            className="alert-step-btn"
+            aria-label={en ? "Decrease" : "تقليل"}
+            onClick={() => bump(-step)}
+          >
+            −
+          </button>
           <input
             type="number"
             inputMode="decimal"
             className="alert-target-input"
             placeholder={unit ?? (en ? "Target price" : "السعر المستهدف")}
             value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onBlur={commit}
+            onChange={(e) => {
+              touchedRef.current = true;
+              setDraft(e.target.value);
+            }}
+            onBlur={() => commit()}
           />
+          <button
+            type="button"
+            className="alert-step-btn"
+            aria-label={en ? "Increase" : "زيادة"}
+            onClick={() => bump(step)}
+          >
+            +
+          </button>
         </div>
         <button
           type="button"
@@ -77,13 +120,33 @@ export default function AlertSettingsPage() {
   const en = lang === "en";
   const { prefs, setTarget, setEnabled } = useAlertPreferences();
 
+  // نفس الـ endpoints المستخدمة في صفحتي الذهب والفضة، عشان الحقول تتعبّى
+  // بالسعر اللحظي الحقيقي نفسه من غير أي مصدر تاني أو تكرار منطق.
+  const { data: goldData } = useApiData("/api/public/gold-price", { intervalMs: 45000 });
+  const { data: silverData } = useApiData("/api/public/silver-price", { intervalMs: 5 * 60000 });
+
+  const livePrices: Partial<Record<AlertKey, number>> = {
+    gold24: goldData?.caratPrices?.["24"]?.sell,
+    gold21: goldData?.caratPrices?.["21"]?.sell,
+    gold18: goldData?.caratPrices?.["18"]?.sell,
+    goldPound: goldData?.pound?.sell,
+    silver999: silverData?.silverPrices?.["999"]?.sell,
+    silver925: silverData?.silverPrices?.["925"]?.sell,
+    silver900: silverData?.silverPrices?.["900"]?.sell,
+    silver800: silverData?.silverPrices?.["800"]?.sell,
+    silver720: silverData?.silverPrices?.["720"]?.sell,
+    silver500: silverData?.silverPrices?.["500"]?.sell,
+    usdSaygha: goldData?.implied_usd_rate,
+    marketGap: goldData?.gap_value,
+  };
+
   const row = (
     key: AlertKey,
     label: string,
     labelEn: string,
     sublabel?: string,
     sublabelEn?: string,
-    unit?: string,
+    opts?: { unit?: string; step?: number },
   ) => (
     <AlertTargetRow
       key={key}
@@ -92,10 +155,12 @@ export default function AlertSettingsPage() {
       sublabel={sublabel ? (en ? sublabelEn : sublabel) : undefined}
       target={prefs[key].target}
       enabled={prefs[key].enabled}
+      livePrice={livePrices[key] ?? null}
+      step={opts?.step ?? 5}
       onCommitTarget={setTarget}
       onToggleEnabled={setEnabled}
       en={en}
-      unit={unit}
+      unit={opts?.unit}
     />
   );
 
@@ -111,8 +176,8 @@ export default function AlertSettingsPage() {
       </div>
       <p className="alert-settings-intro">
         {en
-          ? "Set a target price for any item and turn on its alert — we'll notify you once the live price reaches it. Everything is saved on this device only."
-          : "اكتب السعر المستهدف لأي عنصر وفعّل تنبيهه — هنبلغك أول ما السعر اللحظي يوصله. كل حاجة بتتحفظ على الجهاز ده بس."}
+          ? "Each field starts at today's live price — adjust it with + / − or type your own target, then activate the alert. Everything is saved on this device only."
+          : "كل حقل بيبدأ بالسعر الحي لحظة بلحظة — عدّله بزرار +/- أو اكتب سعرك المستهدف بنفسك، وبعدين فعّل التنبيه. كل حاجة بتتحفظ على الجهاز ده بس."}
       </p>
 
       {/* تنبيهات الذهب */}
@@ -170,7 +235,7 @@ export default function AlertSettingsPage() {
           "Market gap",
           "تنبيه لما نسبة الفجوة (%) توصل للهدف",
           "Alert when the gap (%) reaches target",
-          en ? "Target %" : "النسبة %",
+          { unit: en ? "Target %" : "النسبة %", step: 0.1 },
         )}
       </div>
 
