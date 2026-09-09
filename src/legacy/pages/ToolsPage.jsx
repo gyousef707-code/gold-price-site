@@ -12,6 +12,7 @@ const SECTIONS = [
       { to: '/crypto#tool-crypto-calc', icon: 'fa-brands fa-bitcoin', ar: 'حاسبة العملات الرقمية', en: 'Crypto calculator', arDesc: 'قيمة أي عملة رقمية', enDesc: 'Any coin value', tone: 'crypto' },
       { to: '/currencies', icon: 'fa-solid fa-right-left', ar: 'محول العملات', en: 'Currency converter', arDesc: 'التحويل بين العملات', enDesc: 'Convert any currency', tone: 'blue' },
       { to: '/#tool-zakat-calc', icon: 'fa-solid fa-hand-holding-dollar', ar: 'حاسبة زكاة الذهب', en: 'Gold zakat', arDesc: 'زكاة الذهب 2.5%', enDesc: '2.5% zakat', tone: 'gold' },
+      { to: '/alerts', icon: 'fa-regular fa-bell', ar: 'تنبيهات الأسعار', en: 'Price alerts', arDesc: 'اضبط تنبيهاتك الخاصة', enDesc: 'Set up your alerts', tone: 'blue' },
     ],
   },
   {
@@ -28,7 +29,6 @@ const SECTIONS = [
     cards: [
       { to: '/#tool-gold-karats', icon: 'fa-solid fa-coins', ar: 'عيارات الذهب بالتفصيل', en: 'Gold karats', arDesc: 'كل العيارات', enDesc: 'Every karat', tone: 'gold' },
       { to: '/crypto#tool-crypto-details', icon: 'fa-solid fa-chart-simple', ar: 'العملات الرقمية بالتفصيل', en: 'Coins in detail', arDesc: 'كل العملات', enDesc: 'Every coin', tone: 'crypto' },
-      { to: '/alerts', icon: 'fa-regular fa-bell', ar: 'تنبيهات الأسعار', en: 'Price alerts', arDesc: 'اضبط تنبيهاتك الخاصة', enDesc: 'Set up your alerts', tone: 'blue' },
     ],
   },
   {
