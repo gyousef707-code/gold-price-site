@@ -1903,6 +1903,29 @@ footer.site-footer .foot-links a:hover { color: var(--gold-primary); }
 .notification-body p { font-size: 12.5px; color: var(--text-muted); margin: 0 0 5px; }
 .notification-time { font-size: 11.5px; color: var(--gold-primary); }
 
+/* إعدادات تنبيهات الأسعار */
+.alert-settings-intro { color: var(--text-muted); font-size: 13px; margin: 0 0 20px; line-height: 1.7; }
+.alert-section { background: var(--card-bg); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 16px 18px; margin-bottom: 14px; }
+.alert-section-head { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.alert-section-head i { font-size: 16px; color: var(--gold-primary); width: 22px; text-align: center; }
+.alert-section-head h2 { font-size: 15px; font-weight: 800; margin: 0; }
+.alert-section-sub { font-size: 12px; color: var(--text-muted); margin: 2px 0 12px 32px; }
+.alert-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-top: 1px solid var(--border-subtle); }
+.alert-row:first-of-type { border-top: none; padding-top: 4px; }
+.alert-row-label { font-size: 13.5px; color: var(--text-color); font-weight: 600; }
+.alert-row-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+
+.alert-switch { position: relative; width: 44px; height: 26px; flex-shrink: 0; }
+.alert-switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 1; }
+.alert-switch-track { position: absolute; inset: 0; background: var(--card-bg-elevated); border: 1px solid var(--border-subtle); border-radius: 999px; transition: background .2s ease, border-color .2s ease; }
+.alert-switch-thumb { position: absolute; top: 2px; inset-inline-start: 2px; width: 20px; height: 20px; border-radius: 50%; background: var(--text-muted); transition: inset-inline-start .2s ease, background .2s ease; }
+.alert-switch input:checked ~ .alert-switch-track { background: rgba(227,179,65,0.18); border-color: var(--border-gold); }
+.alert-switch input:checked ~ .alert-switch-thumb { inset-inline-start: 20px; background: var(--gold-primary); }
+
+.alert-settings-footer { display: flex; justify-content: center; margin-top: 18px; }
+.alert-history-link { font-size: 12.5px; color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+.alert-history-link:hover { color: var(--gold-primary); }
+
 /* الدرج: لوحات + تقييم */
 .drawer-panel { padding: 4px 14px 14px; }
 .drawer-panel-title { font-size: 12.5px; color: var(--text-muted); margin-bottom: 8px; }
