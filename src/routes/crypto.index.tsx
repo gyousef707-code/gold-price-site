@@ -11,5 +11,24 @@ export const Route = createFileRoute("/crypto/")({
       keywords: "اسعار العملات الرقمية, سعر بيتكوين اليوم, سعر إيثيريوم",
       path: "/crypto",
     }),
-  component: CryptoPage,
+  component: RouteComponent,
 });
+
+function RouteComponent() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            name: "اسعار العملات الرقمية اليوم",
+            dateModified: new Date().toISOString(),
+          }),
+        }}
+      />
+      <CryptoPage />
+    </>
+  );
+}
