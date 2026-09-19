@@ -35,3 +35,21 @@ export function seoMeta({
     links: [{ rel: "canonical", href: url }],
   };
 }
+
+// بيرجع كود JSON-LD (Schema.org) بيقول لجوجل صراحة إمتى آخر مرة الصفحة
+// دي اتحدثت فيها البيانات، عشان يظهر "قبل كذا دقيقة" في نتيجة البحث
+// (Freshness signal) زي المواقع المنافسة بالظبط.
+export function freshnessSchema(updatedAt: string) {
+  return {
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          dateModified: updatedAt,
+        }),
+      },
+    ],
+  };
+}
