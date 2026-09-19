@@ -11,5 +11,24 @@ export const Route = createFileRoute("/currencies")({
       keywords: "اسعار العملات, سعر الدولار اليوم, سعر اليورو",
       path: "/currencies",
     }),
-  component: CurrenciesPage,
+  component: RouteComponent,
 });
+
+function RouteComponent() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            name: "اسعار العملات اليوم في مصر",
+            dateModified: new Date().toISOString(),
+          }),
+        }}
+      />
+      <CurrenciesPage />
+    </>
+  );
+}
