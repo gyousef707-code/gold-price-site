@@ -11,5 +11,24 @@ export const Route = createFileRoute("/silver")({
       keywords: "سعر الفضة اليوم, اسعار الفضة في مصر",
       path: "/silver",
     }),
-  component: SilverPage,
+  component: RouteComponent,
 });
+
+function RouteComponent() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            name: "سعر الفضة اليوم في مصر",
+            dateModified: new Date().toISOString(),
+          }),
+        }}
+      />
+      <SilverPage />
+    </>
+  );
+}
