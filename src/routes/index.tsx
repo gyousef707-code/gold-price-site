@@ -41,5 +41,20 @@ export const Route = createFileRoute("/")({
 
 function RouteComponent() {
   const { initialGoldData } = Route.useLoaderData();
-  return <GoldPage initialGoldData={initialGoldData} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            name: "سعر الذهب اليوم في مصر",
+            dateModified: initialGoldData?.updated_at ?? new Date().toISOString(),
+          }),
+        }}
+      />
+      <GoldPage initialGoldData={initialGoldData} />
+    </>
+  );
 }
