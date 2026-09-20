@@ -137,26 +137,18 @@ function RootShell({ children }: { children: ReactNode }) {
             `,
           }}
         />
-        {/* بنحمّل ملف الـ CSS الرئيسي وخط Cairo عن طريق كود JS عادي (مش
-            onload attribute اللي اتلخبط بسبب إعدادات الأمان/الكاش عند
-            الاستضافة) — إنشاء <link> بالجافاسكريبت وإضافته للصفحة بالطريقة
-            دي معروف إنه مبيوقفش عرض الصفحة زي ما بيحصل مع <link> عادي
-            موجود في الـ HTML من الأول */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function () {
-                var l1 = document.createElement('link');
-                l1.rel = 'stylesheet';
-                l1.href = ${JSON.stringify(appCss)};
-                document.head.appendChild(l1);
-                var l2 = document.createElement('link');
-                l2.rel = 'stylesheet';
-                l2.href = 'https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap';
-                document.head.appendChild(l2);
-              })();
-            `,
-          }}
+        {/* ملف الـ CSS الرئيسي وخط Cairo بيتحمّلوا هنا بطريقة عادية (link
+            تاجات عادية جوه head) بدل ما كانوا بيتحمّلوا بكود JS بعد أول رسم
+            للصفحة. الطريقة القديمة كانت بتخلي الصفحة تتعرض من غير أي تنسيق
+            خالص لجزء من الثانية، وبعدين كل التنسيق (بما فيه المساحات
+            المحجوزة زي ارتفاع كارت التراديج فيو) يتطبق فجأة مرة واحدة —
+            وده اللي كان بيسبب قفزة كبيرة في شكل الصفحة (CLS) وقت التحميل.
+            تحميلهم بالطريقة العادية دي بيضمن إن التنسيق يكون جاهز من أول
+            لحظة رسم، فمفيش قفزة تحصل. */}
+        <link rel="stylesheet" href={appCss} />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"
         />
         {/* Google Tag Manager */}
         <script
