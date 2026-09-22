@@ -312,28 +312,85 @@ async function fetchSilverPrices() {
   };
 }
 
-// كاش فى الذاكرة: بيخلى الاستجابة أسرع وبيقدّم آخر بيانات ناجحة لو المصدر رفض الطلب
+// كاش على مستوى الطبقتين:
+// 1) كاش فى الذاكرة (memCache) — سريع جدًا، بس خاص بكل نسخة Worker لوحدها
+//    (Cloudflare بيشغّل عشرات النسخ حول العالم، كل واحدة ذاكرتها منفصلة).
+// 2) كاش فى Cloudflare KV (PRICE_CACHE) — مشترك بين كل النسخ حول العالم،
+//    عشان مصدر السعر (زي CoinPaprika) ميتضربش بطلبات كتير في نفس الوقت
+//    من أماكن مختلفة ويوقفنا بسبب حد الطلبات (زي ما حصل مع الكريبتو).
+// بنجرب الذاكرة الأول (الأسرع)، وبعدين الـ KV المشترك، وبعدين المصدر
+// نفسه لو الاتنين مفيهomش حاجة حديثة كفاية.
 type CacheEntry = { at: number; data: any };
 const memCache = new Map<string, CacheEntry>();
+
+async function getPriceCacheKv(): Promise<any | null> {
+  try {
+    // بنستورد cloudflare:workers جوه الفانكشن نفسها (مش فوق فى الملف) عشان
+    // الكود يفضل شغال عادي فى بيئة التطوير المحلي (بن/فايت) اللي معندهاش
+    // الموديول ده أصلاً — لو فشل الاستيراد، بنكمل من غير KV عادي.
+    const { env } = await import("cloudflare:workers");
+    return (env as any)?.PRICE_CACHE ?? null;
+  } catch {
+    return null;
+  }
+}
 
 async function cached<T>(key: string, freshMs: number, fn: () => Promise<T>): Promise<T> {
   const hit = memCache.get(key);
   if (hit && Date.now() - hit.at < freshMs) return hit.data as T;
+
+  const kv = await getPriceCacheKv();
+  const kvKey = `price:${key}`;
+
+  // مفيش حاجة حديثة فى الذاكرة المحلية؟ نشوف لو نسخة تانية من الـ Worker
+  // (فى مكان تاني فى العالم) أصلاً جابت سعر حديث وخزّنته فى الـ KV المشترك.
+  if (kv) {
+    try {
+      const raw: string | null = await kv.get(kvKey);
+      if (raw) {
+        const parsed = JSON.parse(raw) as CacheEntry;
+        memCache.set(key, parsed); // نسخّنها محلي كمان عشان السرعة فى المرات الجاية
+        if (Date.now() - parsed.at < freshMs) return parsed.data as T;
+      }
+    } catch {
+      // مشكلة فى قراءة الـ KV (مثلاً مش متظبط لسه) مبتوقفش الموقع، بنكمل عادي
+    }
+  }
+
   try {
     const data = await fn();
-    memCache.set(key, { at: Date.now(), data });
+    const entry: CacheEntry = { at: Date.now(), data };
+    memCache.set(key, entry);
+    if (kv) {
+      // بنخزّنها فى الـ KV المشترك (تنتهي صلاحيتها تلقائيًا بعد 10 دقايق)
+      // من غير ما ننتظر الكتابة تخلص عشان متبطّئش الرد للزائر.
+      void kv.put(kvKey, JSON.stringify(entry), { expirationTtl: 600 }).catch(() => {});
+    }
     void reportSuccess(key); // مش هننتظرها، مبتأثرش على سرعة الرد
     return data;
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     await reportFailure(key, !!hit, message); // بنستنى دي عشان التنبيه يتبعت فعلاً قبل ما نرجع الرد
-    if (hit) return hit.data as T; // نرجّع آخر نسخة ناجحة بدل الخطأ
+    if (hit) return hit.data as T; // نرجّع آخر نسخة ناجحة من الذاكرة المحلية بدل الخطأ
+    // آخر محاولة قبل ما نرمي الخطأ: لو فيه نسخة قديمة فى الـ KV المشترك
+    // (حتى لو مش حديثة كفاية)، أحسن نعرضها للزائر من رسالة خطأ فاضية.
+    if (kv) {
+      try {
+        const raw: string | null = await kv.get(kvKey);
+        if (raw) return (JSON.parse(raw) as CacheEntry).data as T;
+      } catch {
+        // ولا هنا لقينا حاجة، هنرمي الخطأ الأصلي تحت
+      }
+    }
     throw e;
   }
 }
 
 export async function getCryptoPrices() {
-  return cached("crypto", 45_000, fetchCryptoPrices);
+  // زودنا مدة الصلاحية لدقيقتين (كانت 45 ثانية) عشان نقلل عدد الطلبات
+  // الفعلية لمصدر الكريبتو (حده 60 طلب/ساعة بس)، والكاش المشترك فوق هيقلل
+  // العدد أكتر لأنه بيمنع كل نسخ Cloudflare تطلب لوحدها فى نفس الوقت.
+  return cached("crypto", 120_000, fetchCryptoPrices);
 }
 
 async function fetchCryptoPrices() {
