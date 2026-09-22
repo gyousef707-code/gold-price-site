@@ -11,3 +11,7 @@ binding = "ASSETS"
 WHATSAPP_API_URL = "https://gate.whapi.cloud"
 WHATSAPP_CHANNEL_ID = "120363412213041156@newsletter"
 VAPID_SUBJECT = "mailto:gyousef707@gmail.com"
+
+[[kv_namespaces]]
+binding = "PRICE_CACHE"
+id = "caab58e559724f0eab423ed70ac577fa"
