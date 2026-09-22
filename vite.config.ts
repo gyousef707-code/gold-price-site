@@ -12,4 +12,17 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // موديول "cloudflare:workers" (اللي بنستخدمه في market.server.ts عشان نوصل
+  // لتخزين KV المشترك بين نسخ Cloudflare) موديول خاص بيبقى متاح بس وقت
+  // التشغيل الفعلي على Cloudflare، مش ملف حقيقي موجود في المشروع. من غير
+  // السطر ده، أداة البناء (Vite/Rolldown) بتحاول تدوّر عليه كملف عادي
+  // وتفشل البناء بالكامل. الإعداد ده بيقولها "سيبيه زي ما هو من غير ما
+  // تفحصه، هيتحل لوحده وقت التشغيل الحقيقي بس".
+  vite: {
+    build: {
+      rollupOptions: {
+        external: ["cloudflare:workers"],
+      },
+    },
+  },
 });
