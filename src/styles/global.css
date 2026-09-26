@@ -35,56 +35,64 @@ main {
     }
 }
 body.light-mode {
-    --bg-color: #f6f8fa;
+    --bg-color: #f4f6f8;
     --card-bg: #ffffff;
-    --card-bg-elevated: #f3f4f6;
-    --text-color: #1f2328;
-    --text-muted: #656d76;
-    --border-gold: rgba(184, 134, 11, 0.2);
-    --border-subtle: rgba(0,0,0,0.06);
+    --card-bg-elevated: #f8f9fa;
+    --text-color: #18202a;
+    --text-muted: #596575;
+    --gold-primary: #b78112;
+    --gold-bright: #c89522;
+    --gold-dark: #8d640c;
+    --border-gold: rgba(183, 129, 18, 0.28);
+    --border-subtle: rgba(24, 32, 42, 0.09);
+    --success: #168342;
+    --danger: #c9342f;
+    --warning: #a96f08;
+    --info: #2769a8;
 }
-body.light-mode .p-value.buy-v, body.light-mode .buy-v { color: #333; }
-body.light-mode .p-label { color: #656d76; }
-body.light-mode .carat-title-top { color: #656d76; }
-body.light-mode .sub-card-title { color: #656d76; }
-body.light-mode .sub-card-unit { color: #8c959f; }
-body.light-mode .md-title { color: #656d76; }
-body.light-mode .gap-label-top { color: #656d76; }
-body.light-mode .ounce-header { color: #656d76; }
-body.light-mode .ounce-footer { color: #8c959f; }
-body.light-mode .news-item h3 { color: #1f2328; }
-body.light-mode .news-source { color: #656d76; }
-body.light-mode .nav-item { color: #656d76; }
-body.light-mode .carat-col { border-left-color: rgba(0,0,0,0.06); }
-body.light-mode .mini-dollar-box { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.06); }
-body.light-mode .news-item { border-color: rgba(0,0,0,0.06); }
-body.light-mode .gap-circle-inner { background: #f6f8fa; }
-body.light-mode .carats-box-main { background: linear-gradient(145deg, #ffffff 0%, #f3f4f6 100%); }
-body.light-mode .ounce-card { background: linear-gradient(145deg, #ffffff 0%, #f3f4f6 100%); }
-body.light-mode .icon-btn { background: #eaeef2; }
+body.light-mode .p-value.buy-v, body.light-mode .buy-v { color: #202934; }
+body.light-mode .p-label { color: var(--text-muted); }
+body.light-mode .carat-title-top { color: var(--text-muted); }
+body.light-mode .sub-card-title { color: var(--text-muted); }
+body.light-mode .sub-card-unit { color: #6e7987; }
+body.light-mode .md-title { color: var(--text-muted); }
+body.light-mode .gap-label-top { color: var(--text-muted); }
+body.light-mode .ounce-header { color: var(--text-muted); }
+body.light-mode .ounce-footer { color: #6e7987; }
+body.light-mode .news-item h3 { color: var(--text-color); }
+body.light-mode .news-source { color: var(--text-muted); }
+body.light-mode .nav-item { color: var(--text-muted); }
+body.light-mode .carat-col { border-left-color: var(--border-subtle); }
+body.light-mode .mini-dollar-box { background: #f8f9fa; border-color: var(--border-subtle); }
+body.light-mode .news-item { border-color: var(--border-subtle); }
+body.light-mode .gap-circle-inner { background: var(--bg-color); }
+body.light-mode .carats-box-main { background: linear-gradient(145deg, #ffffff 0%, #f7f8f9 100%); }
+body.light-mode .ounce-card { background: linear-gradient(145deg, #ffffff 0%, #f7f8f9 100%); }
+body.light-mode .icon-btn { background: #edf0f3; }
 body.light-mode .drawer { background: #ffffff; }
-body.light-mode .drawer-item { color: #1f2328; }
-body.light-mode .drawer-item:hover { background: #f3f4f6; }
-body.light-mode .calc-input { background: #ffffff; border-color: #d0d7de; color: #1f2328; }
-body.light-mode .calc-result-box { background: #f6f8fa; }
-body.light-mode .notification-item { background: #ffffff; border-color: rgba(0,0,0,0.06); }
-body.light-mode .currency-row { background: #ffffff; border-color: rgba(0,0,0,0.06); }
-body.light-mode .currency-row:hover { background: #f3f4f6; }
-body.light-mode .period-btn { color: #656d76; }
-body.light-mode .period-btn.active { color: var(--gold-primary); background: rgba(227,179,65,0.1); }
-body.light-mode .bottom-nav { background: linear-gradient(180deg, rgba(246,248,250,0.95) 0%, #ffffff 100%); }
-body.light-mode .gold-card { background: linear-gradient(145deg, #ffffff 0%, #f3f4f6 100%); }
-body.light-mode .tool-card { background: linear-gradient(145deg, #ffffff 0%, #f3f4f6 100%); }
-body.light-mode .tool-card h3 { color: #1f2328; }
-body.light-mode .tool-card p { color: #656d76; }
-body.light-mode .silver-card { background: linear-gradient(145deg, #ffffff 0%, #f3f4f6 100%); }
-body.light-mode .currency-card-new { background: #ffffff; border-color: rgba(0,0,0,0.08); }
+body.light-mode .drawer-item { color: var(--text-color); }
+body.light-mode .drawer-item:hover { background: #f4f0e7; }
+body.light-mode .calc-input { background: #ffffff; border-color: #cfd5dc; color: var(--text-color); }
+body.light-mode .calc-result-box { background: #f7f8f9; }
+body.light-mode .notification-item { background: #ffffff; border-color: var(--border-subtle); }
+body.light-mode .currency-row { background: #ffffff; border-color: var(--border-subtle); }
+body.light-mode .currency-row:hover { background: #f8f5ee; }
+body.light-mode .period-btn { color: var(--text-muted); }
+body.light-mode .period-btn.active { color: var(--gold-dark); background: rgba(183,129,18,0.11); }
+body.light-mode .bottom-nav { background: linear-gradient(180deg, rgba(244,246,248,0.96) 0%, #ffffff 100%); }
+body.light-mode .app-header { background: linear-gradient(180deg, #ffffff 0%, rgba(244,246,248,0.96) 100%); border-bottom-color: var(--border-gold); }
+body.light-mode .gold-card { background: linear-gradient(145deg, #ffffff 0%, #f7f8f9 100%); }
+body.light-mode .tool-card { background: linear-gradient(145deg, #ffffff 0%, #f7f8f9 100%); }
+body.light-mode .tool-card h3 { color: var(--text-color); }
+body.light-mode .tool-card p { color: var(--text-muted); }
+body.light-mode .silver-card { background: linear-gradient(145deg, #ffffff 0%, #f7f8f9 100%); }
+body.light-mode .currency-card-new { background: #ffffff; border-color: var(--border-subtle); }
 body.light-mode .currency-card-new:hover { border-color: var(--border-gold); }
-body.light-mode .currency-card-flag { background: #f3f4f6; border-color: rgba(0,0,0,0.08); }
+body.light-mode .currency-card-flag { background: #f1f3f5; border-color: var(--border-subtle); }
 body.light-mode .converter-box { background: #ffffff; }
-body.light-mode .converter-row { background: #f6f8fa; border-color: rgba(0,0,0,0.08); }
-body.light-mode .converter-input { color: #1f2328; }
-body.light-mode .swap-btn { background: #f3f4f6; }
+body.light-mode .converter-row { background: #f7f8f9; border-color: var(--border-subtle); }
+body.light-mode .converter-input { color: var(--text-color); }
+body.light-mode .swap-btn { background: #eef1f4; }
 
 /* SPLASH SCREEN */
 #splash-screen {
@@ -307,7 +315,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
     margin-right: auto;
     background: var(--danger);
     color: #fff;
-    font-size: 10px;
+    font-size: 11px;
     padding: 2px 7px;
     border-radius: 10px;
     font-weight: 700;
@@ -412,7 +420,7 @@ body.light-mode .swap-btn { background: #f3f4f6; }
 }
 .carat-change-badge {
     display: inline-block;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     padding: 1px 6px;
     border-radius: 8px;
@@ -603,7 +611,7 @@ body.light-mode .card-share-btn { background: rgba(0,0,0,0.04); }
     left: 6px;
     background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
     color: #000;
-    font-size: 7px;
+    font-size: 11px;
     font-weight: 800;
     padding: 3px 8px;
     border-radius: 10px;
@@ -678,7 +686,7 @@ body.light-mode .card-share-btn { background: rgba(0,0,0,0.04); }
     box-shadow: 0 4px 14px rgba(227,179,65,0.1);
 }
 .sub-card-title {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--text-muted);
     display: block;
     margin-bottom: 2px;
@@ -690,7 +698,7 @@ body.light-mode .card-share-btn { background: rgba(0,0,0,0.04); }
     display: block;
 }
 .sub-card-unit {
-    font-size: 9px;
+    font-size: 11px;
     color: var(--text-muted);
 }
 
@@ -735,7 +743,7 @@ body.light-mode .card-share-btn { background: rgba(0,0,0,0.04); }
     padding: 10px 14px;
 }
 .md-title {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--text-muted);
     display: block;
     margin-bottom: 2px;
@@ -764,9 +772,9 @@ body.light-mode .card-share-btn { background: rgba(0,0,0,0.04); }
     justify-content: center;
     text-align: center;
 }
-.gap-label-top { font-size: 10px; color: var(--text-muted); }
+.gap-label-top { font-size: 11px; color: var(--text-muted); }
 .gap-number { font-size: 19px; font-weight: 800; color: var(--text-color); }
-.gap-unit { font-size: 10px; color: var(--danger); font-weight: 700; }
+.gap-unit { font-size: 11px; color: var(--danger); font-weight: 700; }
 
 /* TradingView */
 .tradingview-widget-container {
@@ -944,7 +952,7 @@ body.light-mode .card-share-btn { background: rgba(0,0,0,0.04); }
     white-space: nowrap;
 }
 .converter-select-arrow {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--text-muted);
     flex-shrink: 0;
 }
@@ -1084,7 +1092,7 @@ body.light-mode .card-share-btn { background: rgba(0,0,0,0.04); }
     min-width: 42px;
 }
 .currency-card-price-label {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--text-muted);
     margin-bottom: 1px;
     font-weight: 500;
@@ -1347,32 +1355,32 @@ body.light-mode .card-share-btn { background: rgba(0,0,0,0.04); }
 .notification-content { flex: 1; }
 .notification-title { font-size: 14px; font-weight: 700; color: var(--text-color); margin-bottom: 2px; }
 .notification-desc { font-size: 12px; color: var(--text-muted); }
-.notification-time { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+.notification-time { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
 
 /* NEWS */
 .news-item {
     background: var(--card-bg);
     border: 1px solid var(--border-subtle);
-    border-radius: 14px;
-    padding: 14px;
-    margin-bottom: 8px;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 6px;
     transition: 0.3s;
 }
 .news-item:hover { border-color: var(--border-gold); }
 a.news-item { display: block; text-decoration: none; cursor: pointer; }
 .news-time {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--gold-primary);
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
     font-weight: 600;
 }
 .news-item h3 {
-    font-size: 14px;
-    margin: 0 0 6px 0;
+    font-size: 13.5px;
+    margin: 0 0 4px 0;
     color: var(--text-color);
     font-weight: 600;
-    line-height: 1.5;
+    line-height: 1.45;
 }
 .news-source {
     font-size: 11px;
@@ -1519,7 +1527,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
     .gold-carat-label { font-size: 11px; }
     .gold-v-value { font-size: 18px; }
     .gold-v-label { font-size: 11px; }
-    .gold-card-label { font-size: 10px; }
+    .gold-card-label { font-size: 11px; }
     .silver-cards-grid { gap: 8px; }
     .silver-card { padding: 8px 4px; border-radius: 12px; }
     .silver-carat-num { font-size: 24px; }
@@ -1613,7 +1621,7 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
     --info: #58a6ff;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: auto; }
 body {
     background-color: var(--bg-color);
     color: var(--text-color);
@@ -2130,7 +2138,7 @@ footer.site-footer .foot-links a:hover { color: var(--gold-primary); }
     inset-inline-end: auto;
     transform: translateX(-50%);
     white-space: nowrap;
-    font-size: 9px;
+    font-size: 11px;
     line-height: 1;
     padding: 5px 12px;
     border-radius: 999px;
@@ -2158,8 +2166,8 @@ body.light-mode .gap-gauge-track { stroke: rgba(0,0,0,0.08); }
 .gap-gauge-value { font-size: 22px; font-weight: 800; line-height: 1; }
 .gap-gauge-value.up { color: var(--gold-primary); }
 .gap-gauge-value.down { color: var(--danger); }
-.gap-gauge-unit { font-size: 10px; color: var(--text-muted); }
-.gap-gauge-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.gap-gauge-unit { font-size: 11px; color: var(--text-muted); }
+.gap-gauge-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 .mini-dollar-box .md-value { font-size: 17px; font-weight: 800; color: var(--text-color); }
 
 /* العملات: الكارت المختار + سهم التفاصيل */
@@ -2335,7 +2343,7 @@ body.light-mode .faq-item { background: #fff; }
     margin: 0 auto;
     background: linear-gradient(135deg, var(--gold-bright), var(--gold-dark));
     color: #1a1205;
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 900;
     line-height: 1;
     padding: 5px 10px;
@@ -2346,7 +2354,7 @@ body.light-mode .faq-item { background: #fff; }
     z-index: 4;
 }
 @media (min-width: 900px) {
-    .gold-card .gold-card-badge { font-size: 10px; padding: 5px 12px; }
+    .gold-card .gold-card-badge { font-size: 11px; padding: 5px 12px; }
 }
 
 /* --- كارت الفجوة السعرية: الدولار جنب الدايرة دايمًا --- */
@@ -2547,4 +2555,412 @@ input.calc-input[inputmode='decimal'] {
 .zakat-summary-row strong.zk-bad { color: #f85149; }
 @media (max-width: 380px) {
   .zakat-karat-cards { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ==========================================================================
+   COMPACT LAYOUT PASS (v2) — تصغير الكروت + حجز مساحة ضد قفز التصميم (CLS)
+   ========================================================================== */
+
+/* --- كروت الذهب والفضة: بادينج وخطوط أصغر عشان 4 كروت تبان فوق --- */
+.gold-cards-grid,
+.silver-cards-grid { gap: 8px !important; margin-bottom: 8px; }
+.gold-card,
+.silver-card { padding: 10px 6px !important; border-radius: 14px; }
+.gold-card.hero-karat { padding-top: 14px !important; }
+.gold-carat-num, .silver-carat-num { font-size: 22px !important; }
+.gold-carat-label, .silver-carat-label { font-size: 11px !important; }
+.gold-carat-wrap, .silver-carat-wrap { margin-bottom: 6px !important; }
+.gold-v-row, .silver-v-row { padding: 3px 0 !important; }
+.gold-v-label, .silver-v-label { font-size: 11px !important; margin-bottom: 1px !important; }
+.gold-v-value, .silver-v-value { font-size: 16px !important; }
+.gold-card-icon-top, .silver-card-icon-top { font-size: 13px !important; margin-bottom: 2px !important; }
+.gold-card.pound-card .pound-title { font-size: 13px !important; }
+
+@media (max-width: 400px) {
+  .gold-cards-grid, .silver-cards-grid { gap: 6px !important; }
+  .gold-card, .silver-card { padding: 8px 4px !important; }
+  .gold-carat-num, .silver-carat-num { font-size: 20px !important; }
+  .gold-v-value, .silver-v-value { font-size: 15px !important; }
+}
+@media (min-width: 900px) {
+  .gold-card, .silver-card { padding: 12px 8px !important; }
+  .gold-cards-grid, .silver-cards-grid { gap: 10px !important; }
+}
+
+/* --- حجز مساحة ثابتة للشبكات عشان الصفحة متنطش وقت تحميل الأسعار --- */
+.gold-cards-grid { min-height: 260px; }
+.silver-cards-grid { min-height: 250px; }
+.ounce-card { min-height: 150px; }
+.gap-card { min-height: 210px; }
+.crypto-list { min-height: 520px; }
+.currency-list-new { min-height: 480px; }
+.converter-box { min-height: 230px; }
+.live-price { display: inline-block; min-width: 2ch; }
+
+/* --- هياكل تحميل (Skeleton) --- */
+@keyframes skShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.sk {
+  display: block;
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(255,255,255,.05) 25%, rgba(255,255,255,.12) 37%, rgba(255,255,255,.05) 63%);
+  background-size: 200% 100%;
+  animation: skShimmer 1.2s ease-in-out infinite;
+}
+body.light-mode .sk { background: linear-gradient(90deg, rgba(0,0,0,.05) 25%, rgba(0,0,0,.1) 37%, rgba(0,0,0,.05) 63%); background-size: 200% 100%; }
+.sk-line { height: 12px; margin: 6px auto; width: 70%; }
+.sk-line.lg { height: 22px; width: 80%; }
+.sk-line.sm { height: 9px; width: 45%; }
+.sk-row { height: 56px; border-radius: 12px; margin-bottom: 6px; }
+
+/* --- محوّل العملات: ارتفاع أقل بكتير --- */
+.converter-box { padding: 12px !important; margin-bottom: 12px !important; }
+.converter-label { font-size: 11px !important; margin-bottom: 4px !important; }
+.converter-row { padding: 6px 10px !important; min-height: 42px !important; border-radius: 12px !important; }
+.converter-input { font-size: 16px !important; }
+.converter-code { font-size: 13px !important; }
+.converter-flag-img { width: 24px; height: 18px; border-radius: 3px; }
+.converter-select-wrapper { gap: 5px !important; padding-left: 6px !important; margin-left: 8px !important; }
+.converter-divider { height: 24px !important; }
+.converter-divider .swap-btn { width: 30px; height: 30px; }
+.converter-note { font-size: 11px !important; margin-top: 6px !important; }
+
+/* --- صفوف العملات الرقمية: أكبر عدد عملات فوق الشاشة --- */
+.crypto-list { gap: 5px !important; }
+.crypto-row { padding: 7px 10px !important; gap: 8px !important; border-radius: 10px !important; }
+.crypto-row-name { font-size: 13px !important; }
+.crypto-row-symbol { font-size: 11px !important; }
+.crypto-card-price-usd { font-size: 13px !important; }
+.crypto-card-price-egp { font-size: 11px !important; }
+.crypto-row .badge-change { font-size: 11px !important; padding: 2px 6px !important; }
+.crypto-card-icon { width: 26px !important; height: 26px !important; }
+.crypto-row { grid-template-columns: 18px 26px 1fr auto auto !important; }
+
+/* --- الرسم البياني للأسعار (30 يوم) --- */
+.price-chart-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 10px 6px 6px;
+  min-height: 250px;
+}
+.price-chart-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; padding: 2px 8px 8px; flex-direction: row-reverse;
+}
+.price-chart-last { font-size: 16px; font-weight: 800; color: var(--gold-primary); }
+.price-chart-card.silver .price-chart-last { color: #c9d1d9; }
+.price-chart-change { font-size: 11px; font-weight: 700; }
+.price-chart-change.up { color: var(--success); }
+.price-chart-change.down { color: var(--danger); }
+.price-chart-meta { font-size: 11px; color: var(--text-muted); }
+.price-chart-tip {
+  background: var(--card-bg-elevated);
+  border: 1px solid var(--border-gold);
+  border-radius: 10px; padding: 6px 10px; font-size: 12px; direction: rtl;
+}
+.price-chart-tip b { color: var(--gold-primary); }
+
+/* --- صفحة الأدوات: قائمة رأسية بستايل فيسبوك --- */
+.tools-list { display: flex; flex-direction: column; width: 100%; max-width: 42rem; margin-inline: auto; }
+.tools-list-row {
+  display: flex; flex-direction: row; align-items: center; justify-content: space-between;
+  gap: 12px; width: 100%; padding: 14px 4px; background: transparent; border: 0;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-color) !important; text-decoration: none !important;
+  font-family: 'Cairo', sans-serif; cursor: pointer; text-align: right;
+}
+.tools-list-row:last-child { border-bottom: 0; }
+.tools-list-main { display: flex; flex-direction: row; align-items: center; gap: 12px; min-width: 0; }
+.tools-list-icon {
+  width: 36px; height: 36px; flex-shrink: 0; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 15px;
+  background: rgba(227,179,65,.12); color: var(--gold-primary);
+}
+.tools-list-row.tone-silver .tools-list-icon { background: rgba(174,183,193,.14); color: #aeb7c1; }
+.tools-list-row.tone-crypto .tools-list-icon { background: rgba(247,147,26,.14); color: #f7931a; }
+.tools-list-row.tone-blue .tools-list-icon { background: rgba(88,166,255,.12); color: #58a6ff; }
+.tools-list-text { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; text-align: right; }
+.tools-list-title { font-size: 14px; font-weight: 700; }
+.tools-list-desc { font-size: 11.5px; color: var(--text-muted); }
+.tools-list-arrow { font-size: 12px; color: var(--text-muted); flex-shrink: 0; transition: transform .25s ease; }
+.tools-list-row[aria-expanded='true'] .tools-list-arrow { transform: rotate(-90deg); }
+.tools-sub { overflow: hidden; max-height: 0; transition: max-height .32s ease; }
+.tools-sub.open { max-height: 520px; }
+.tools-sub .tools-list-row { padding-right: 22px; }
+.tools-sub .tools-list-icon { width: 30px; height: 30px; font-size: 13px; }
+.tools-section-title { margin: 18px 0 2px; }
+
+/* صف العملة الرقمية: الشارة جنب السعر مش في سطر جديد — عشان يظهر أكبر عدد عملات */
+@media (max-width: 560px) {
+  .crypto-row { grid-template-columns: 16px 24px 1fr auto auto !important; padding: 6px 9px !important; }
+  .crypto-row .badge-change { grid-column: auto !important; justify-self: end !important; align-self: center !important; }
+  .crypto-row-prices { align-items: flex-end; }
+}
+
+/* ========================================================================
+   DENSITY PASS — نفس التصميم بمساحات رأسية أقل لعرض محتوى أكثر من أول شاشة
+   ======================================================================== */
+@media (max-width: 680px) {
+  main.page-wrap { padding: 10px 12px 48px; }
+
+  /* بطاقة السعر الرئيسية */
+  .global-ounce-section { margin-bottom: 7px; }
+  .ounce-card:not(.gap-card) { min-height: 0; padding: 11px 14px; border-radius: 15px; }
+  .ounce-card:not(.gap-card) .ounce-price { margin: 3px 0; }
+  .ounce-card:not(.gap-card) .updated-stamp { margin: 4px 0 2px; }
+  .ounce-card:not(.gap-card) .ounce-footer { margin-top: 4px; }
+
+  /* كروت الذهب والفضة: إزالة الارتفاع المحجوز الزائد مع بقاء الشبكة ثابتة */
+  .gold-cards-grid,
+  .silver-cards-grid { gap: 5px !important; margin-bottom: 6px; min-height: 0; }
+  .gold-card,
+  .silver-card { padding: 5px 3px !important; border-radius: 11px; }
+  .gold-card.hero-karat { padding-top: 9px !important; }
+  .gold-card-icon-top,
+  .silver-card-icon-top { font-size: 11px !important; margin-bottom: 0 !important; }
+  .gold-carat-wrap,
+  .silver-carat-wrap { gap: 2px; margin-bottom: 3px !important; }
+  .gold-carat-num,
+  .silver-carat-num { font-size: 18px !important; }
+  .gold-carat-label,
+  .silver-carat-label { font-size: 11px !important; }
+  .gold-v-row,
+  .silver-v-row { padding: 2px 0 !important; }
+  .gold-v-label,
+  .silver-v-label { font-size: 9.5px !important; line-height: 1.25; margin-bottom: 0 !important; }
+  .gold-v-value,
+  .silver-v-value { font-size: 14px !important; line-height: 1.3; }
+  .card-change-badge { margin: 2px auto 1px; padding: 1px 5px; font-size: 11px; }
+  .card-share-btn { top: 5px; left: 5px; width: 21px; height: 21px; font-size: 11px; }
+  .gold-card-badge { top: -7px; padding: 2px 6px; font-size: 11px; }
+  .pound-wrap { min-height: 20px; }
+  .gold-card.pound-card .pound-title { font-size: 11px !important; }
+
+  /* الحاسبات: نفس الحقول والنتائج لكن دون مساحات كبيرة */
+  .page-tools { margin-top: 4px; }
+  .section-title-bar { margin-bottom: 6px !important; }
+  .section-title-bar h2 { font-size: 13px; gap: 6px; }
+  .calc-card { padding: 10px; margin-bottom: 8px; border-radius: 13px; }
+  .calc-row { gap: 7px; margin-bottom: 7px; }
+  .calc-group label { font-size: 10.5px; margin-bottom: 3px; }
+  .calc-input { min-height: 38px; padding: 7px 10px; border-radius: 9px; font-size: 13px; }
+  .calc-select { background-position: left 8px center; padding-left: 11px; }
+  .calc-result-box { padding: 8px 10px; border-radius: 10px; margin-top: 2px; }
+  .calc-result-label { font-size: 10.5px; margin-bottom: 1px; }
+  .calc-result-value { font-size: 20px; line-height: 1.25; }
+  .calc-result-unit { font-size: 11px; margin-top: 0; }
+  .zakat-hint { font-size: 11px; line-height: 1.5; margin-bottom: 6px; }
+  .zakat-karat-cards { gap: 4px; margin-bottom: 7px; }
+  .zakat-karat-card { gap: 0; padding: 4px 2px; border-radius: 8px; }
+  .zakat-karat-card .zk-label { font-size: 11px; }
+  .zakat-karat-card .zk-num { font-size: 13px; }
+  .zakat-summary { margin: 7px 0; border-radius: 9px; }
+  .zakat-summary-row { padding: 6px 8px; font-size: 11px; }
+
+  /* صفحة الأدوات: تقليل الفراغات فقط مع الحفاظ على RTL الحالي */
+  .tools-hero { margin-bottom: 5px; }
+  .tools-hero h1 { font-size: 19px; line-height: 1.35; margin-bottom: 1px; }
+  .tools-hero p { font-size: 11px; line-height: 1.45; margin-bottom: 0; }
+  .tools-section-title { margin: 8px 0 0; font-size: 13px !important; line-height: 1.4; }
+  .tools-list-row { gap: 8px; padding: 7px 3px; min-height: 47px; }
+  .tools-list-main { gap: 8px; }
+  .tools-list-icon { width: 29px; height: 29px; font-size: 12px; }
+  .tools-list-title { font-size: 12.5px; line-height: 1.35; }
+  .tools-list-desc { font-size: 11px; line-height: 1.35; }
+  .tools-list-arrow { font-size: 11px; }
+  .tools-sub .tools-list-row { padding-right: 14px; }
+  .tools-sub .tools-list-icon { width: 26px; height: 26px; font-size: 11px; }
+
+  /* بقية القوائم والكروت المتكررة */
+  .converter-box { min-height: 0; padding: 9px !important; margin-bottom: 8px !important; }
+  .converter-row { min-height: 38px !important; padding: 4px 8px !important; }
+  .crypto-list { min-height: 0; gap: 4px !important; }
+  .crypto-row { padding-block: 5px !important; border-radius: 8px !important; }
+}
+
+/* ========================================================================
+   DENSITY PASS 2 — ضغط إضافي خفيف يشمل باقي الصفحات
+   ======================================================================== */
+@media (max-width: 680px) {
+  /* فجوة الدولار والرسوم البيانية */
+  .dollar-side-boxes { gap: 5px !important; margin-bottom: 7px !important; }
+  .ounce-card.gap-card { padding: 9px 11px !important; border-radius: 12px !important; }
+  .price-chart-card { padding: 7px 4px 4px !important; min-height: 210px !important; border-radius: 13px !important; }
+  .price-chart-head { padding: 0 6px 5px !important; }
+  .tradingview-section { margin-top: 8px !important; }
+
+  /* صفحة العملات */
+  .currency-card, .currencies-grid > * { border-radius: 11px !important; }
+  .currencies-grid { gap: 5px !important; }
+  .converter-note { margin-top: 4px !important; }
+
+  /* صفحة الكريبتو */
+  .crypto-row { padding-block: 4px !important; }
+  .crypto-row-name { font-size: 12.5px !important; }
+  .crypto-card-price-usd { font-size: 12.5px !important; }
+
+  /* المقالات والمدونة والصفحات النصية */
+  .page-wrap h1 { margin-bottom: 6px !important; line-height: 1.35; }
+  .page-wrap h2 { margin: 12px 0 5px !important; }
+  .page-wrap p { margin-bottom: 7px !important; line-height: 1.7; }
+  .blog-card, .article-card, .related-articles .related-item { padding: 8px 10px !important; border-radius: 11px !important; margin-bottom: 6px !important; }
+  .related-articles { margin-top: 10px !important; }
+
+  /* الفوتر */
+  footer, .site-footer { padding-top: 12px !important; }
+}
+
+/* ===== Calculator tabs (single card) ===== */
+.calc-tabs-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.calc-tabs-bar {
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+  background: var(--card-bg-elevated);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.calc-tab-btn {
+  flex: 1;
+  padding: 9px 8px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .18s ease;
+}
+.calc-tab-btn:hover { color: var(--text-color); }
+.calc-tab-btn.is-active {
+  background: rgba(227,179,65,0.14);
+  border-color: var(--border-gold);
+  color: var(--gold-primary);
+}
+.calc-tabs-body { padding: 4px 0; }
+.calc-tabs-body > * { margin-bottom: 0 !important; border: none !important; background: transparent !important; }
+.calc-tabs-loading { padding: 28px; text-align: center; color: var(--text-muted); font-size: 13px; }
+@media (max-width: 480px) {
+  .calc-tab-btn { font-size: 12px; padding: 8px 4px; }
+}
+
+/* ========================================================================
+   COMPACT PASS 2 — ضغط كارت الأونصة والمحول + تمييز الشريط السفلي + كروت المقالات
+   (نفس التصميم والبيانات، مساحات أقل فقط)
+   ======================================================================== */
+
+/* 1) كارت الأونصة العالمية — أصغر (ذهب / فضة / كريبتو) */
+.ounce-card:not(.gap-card) { padding: 10px 13px; border-radius: 14px; min-height: 0; }
+.ounce-card:not(.gap-card) .ounce-header { margin-bottom: 4px; font-size: 11px; }
+.ounce-card:not(.gap-card) .ounce-price { font-size: 28px; margin: 2px 0; letter-spacing: -0.5px; }
+.ounce-card:not(.gap-card) .ounce-footer { margin-top: 3px; font-size: 11px; }
+.ounce-card:not(.gap-card) .badge-change { font-size: 11px; padding: 3px 8px; }
+.ounce-card:not(.gap-card)::before { width: 70px; height: 70px; }
+.global-ounce-section { margin-bottom: 8px; }
+@media (min-width: 1024px) {
+  .ounce-card:not(.gap-card) { padding: 13px 17px !important; }
+  .ounce-card:not(.gap-card) .ounce-price { font-size: 30px !important; }
+}
+@media (max-width: 680px) {
+  .ounce-card:not(.gap-card) .ounce-price { font-size: 25px; }
+}
+
+/* 2) كارت محول العملات — أصغر */
+.converter-box { padding: 9px !important; min-height: 0; margin-bottom: 10px; }
+.converter-box .converter-label { margin-bottom: 5px; }
+.converter-row { min-height: 36px !important; padding: 4px 8px !important; }
+.converter-box .converter-code { font-size: 14px; }
+.converter-input { font-size: 15px !important; }
+.converter-note { margin-top: 5px !important; }
+@media (min-width: 1024px) {
+  .converter-box { padding: 12px !important; }
+  .converter-row { min-height: 40px !important; }
+}
+
+/* محول العملات وحاسبة العملات الرقمية — حجم أصغر مع بقاء الحقول واضحة */
+.converter-box {
+  max-width: 620px;
+  padding: 7px !important;
+  margin-inline: auto;
+  margin-bottom: 7px !important;
+  border-radius: 12px;
+}
+.converter-box .converter-label { margin-bottom: 2px !important; }
+.converter-box .converter-row { min-height: 34px !important; padding: 3px 7px !important; border-radius: 9px !important; }
+.converter-box .converter-divider { height: 20px !important; margin-block: 2px !important; }
+.converter-box .converter-divider .swap-btn { width: 27px; height: 27px; }
+.converter-box .converter-note { margin-top: 3px !important; }
+
+.crypto-calc-card {
+  max-width: 620px;
+  margin-inline: auto;
+  padding: 9px;
+  border-radius: 12px;
+}
+.crypto-calc-card .calc-row { margin-bottom: 7px; }
+.crypto-calc-card .calc-input { min-height: 36px; padding-block: 6px; }
+.crypto-calc-card .calc-result-box { padding: 7px 10px; }
+@media (min-width: 1024px) {
+  .converter-box { padding: 9px !important; }
+  .converter-box .converter-row { min-height: 36px !important; }
+}
+
+/* 3) الشريط السفلي — تمييز واضح للقسم النشط */
+.nav-item {
+  position: relative;
+  padding: 5px 12px !important;
+  border-radius: 12px;
+}
+.nav-item.active {
+  color: var(--gold-primary);
+  background: none;
+  box-shadow: none;
+  font-weight: 800;
+}
+.nav-item.active i { color: var(--gold-primary); transform: translateY(-1px); }
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 26px; height: 3px;
+  border-radius: 3px;
+  background: var(--gold-bright);
+  box-shadow: 0 0 10px rgba(227,179,65,0.6);
+}
+body.light-mode .nav-item.active { color: var(--gold-primary); }
+body.light-mode .nav-item.active i { color: var(--gold-primary); }
+
+/* 4) كروت المدونة والمقالات — أصغر */
+.related-article-card { padding: 8px 10px !important; border-radius: 10px; gap: 7px; }
+.related-article-card h3 { font-size: 13px !important; line-height: 1.4; margin-bottom: 3px !important; }
+.related-article-card p { font-size: 12px !important; line-height: 1.45; }
+.related-article-card .news-source { margin-top: 4px !important; font-size: 11px; }
+.related-articles { gap: 6px; }
+
+.blog-compact-card { padding: 14px 16px !important; gap: 5px !important; min-width: 0; }
+.blog-compact-card h3 { font-size: 14px !important; line-height: 1.5; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.blog-compact-card p { font-size: 12.5px; color: var(--text-muted); margin: 0; line-height: 1.5; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.blog-compact-card .blog-card-date { font-size: 11.5px; color: var(--text-muted); opacity: .75; margin-top: 2px; }
+
+/* 5) كارت البيتكوين الثابت أعلى صفحة العملات الرقمية — أصغر شويه بس */
+.ounce-card.crypto-ounce-card { padding: 9px 12px; border-radius: 12px; }
+.ounce-card.crypto-ounce-card .ounce-header { margin-bottom: 3px; font-size: 10.5px; }
+.ounce-card.crypto-ounce-card .ounce-price { font-size: 21px; margin: 1px 0; }
+.ounce-card.crypto-ounce-card .updated-stamp { margin: 3px 0 1px; }
+.ounce-card.crypto-ounce-card .badge-change { font-size: 10.5px; padding: 2px 7px; }
+@media (min-width: 1024px) {
+  .ounce-card.crypto-ounce-card { padding: 11px 15px !important; }
+  .ounce-card.crypto-ounce-card .ounce-price { font-size: 24px !important; }
+}
+@media (max-width: 680px) {
+  .ounce-card.crypto-ounce-card .ounce-price { font-size: 20px; }
 }
