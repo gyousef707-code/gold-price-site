@@ -6,7 +6,7 @@ import LivePrice from '../components/LivePrice.jsx';
 import UpdatedStamp from '../components/UpdatedStamp.jsx';
 import MarketStatus from '../components/MarketStatus.jsx';
 import GapGauge from '../components/GapGauge.jsx';
-import HistoryTable from '../components/HistoryTable.jsx';
+const PriceHistoryChart = lazy(() => import('../components/PriceHistoryChart.jsx'));
 
 import useApiData from '../hooks/useApiData.js';
 import { useLang } from '../context/LangContext.jsx';
@@ -16,6 +16,7 @@ import { shareCard } from '../lib/shareCard.js';
 // الأجزاء دي تحت الشاشة الأولى (تحت السكرول)، فبنأجل تحميل الكود بتاعها
 // لحد ما المستخدم يقرب منها فعلاً، بدل ما تتحمّل كلها من أول لحظة.
 // الشكل والمحتوى النهائي بيفضلوا زي ما هم بالظبط.
+import CalcTabs from '../components/CalcTabs.jsx';
 const RelatedArticles = lazy(() => import('../components/RelatedArticles.jsx'));
 const GoldCalculator = lazy(() => import('../components/calculators/GoldCalculator.jsx'));
 const ZakatCalculator = lazy(() => import('../components/calculators/ZakatCalculator.jsx'));
@@ -91,7 +92,6 @@ export default function GoldPage({ initialGoldData = null } = {}) {
         </div>
       </section>
 
-      {loading && <p className="loading-text">{t('loading')}</p>}
       {error && !loading && <p className="error-text">{t('error')}</p>}
 
       <section className="carats-unified-section gold-carats-section">
@@ -119,7 +119,7 @@ export default function GoldPage({ initialGoldData = null } = {}) {
                   <div className="gold-v-row">
                     <span className="gold-v-label">{t('price.sell')}</span>
                     <span className="gold-v-value sell-price">
-                      <LivePrice value={p?.sell ?? null} decimals={0} />
+                      <LivePrice value={p?.sell ?? null} decimals={0} skeleton />
                     </span>
                   </div>
                   {changePct != null && (
@@ -130,7 +130,7 @@ export default function GoldPage({ initialGoldData = null } = {}) {
                   <div className="gold-v-row">
                     <span className="gold-v-label">{t('price.buy')}</span>
                     <span className="gold-v-value buy-price">
-                      <LivePrice value={p?.buy ?? null} decimals={0} />
+                      <LivePrice value={p?.buy ?? null} decimals={0} skeleton />
                     </span>
                   </div>
                 </Link>
@@ -155,7 +155,7 @@ export default function GoldPage({ initialGoldData = null } = {}) {
             <div className="gold-v-row">
               <span className="gold-v-label">{t('price.sell')}</span>
               <span className="gold-v-value sell-price">
-                <LivePrice value={data?.pound?.sell ?? null} decimals={0} />
+                <LivePrice value={data?.pound?.sell ?? null} decimals={0} skeleton />
               </span>
             </div>
             {changePct != null && (
@@ -166,7 +166,7 @@ export default function GoldPage({ initialGoldData = null } = {}) {
             <div className="gold-v-row">
               <span className="gold-v-label">{t('price.buy')}</span>
               <span className="gold-v-value buy-price">
-                <LivePrice value={data?.pound?.buy ?? null} decimals={0} />
+                <LivePrice value={data?.pound?.buy ?? null} decimals={0} skeleton />
               </span>
             </div>
           </div>
@@ -177,13 +177,14 @@ export default function GoldPage({ initialGoldData = null } = {}) {
             <div className="ounce-header"><span>{t('gold.gap')}</span></div>
             <div className="gap-card-container">
               <div className="dollar-side-boxes">
-                <div className="mini-dollar-box">
-                  <div className="md-title">{t('gap.shops')}</div>
-                  <div className="md-value">{Number(data.implied_usd_rate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م</div>
-                </div>
+                {/* دولار البنك فوق، ودولار الصاغة تحته */}
                 <div className="mini-dollar-box">
                   <div className="md-title">{t('gap.bank')}</div>
                   <div className="md-value">{Number(data.bank_usd_rate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م</div>
+                </div>
+                <div className="mini-dollar-box">
+                  <div className="md-title">{t('gap.shops')}</div>
+                  <div className="md-value">{Number(data.implied_usd_rate).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ج.م</div>
                 </div>
               </div>
               <GapGauge value={data.gap_value} max={10} label={t('gap.value')} />
@@ -193,18 +194,15 @@ export default function GoldPage({ initialGoldData = null } = {}) {
 
       </section>
 
-      <HistoryTable
-        endpoint="/api/public/gold-history"
-        titleAr="تطور سعر الذهب خلال آخر 30 يوم"
-        titleEn="Gold price history (last 30 days)"
-        primaryKey="karat24_sell"
-        columns={[
-          { key: 'karat24_sell', labelAr: 'عيار 24', labelEn: 'Karat 24' },
-          { key: 'karat21_sell', labelAr: 'عيار 21', labelEn: 'Karat 21' },
-          { key: 'ounce_egp_sell', labelAr: 'الأونصة (ج.م)', labelEn: 'Ounce (EGP)' },
-          { key: 'pound_sell', labelAr: 'جنيه الذهب', labelEn: 'Gold pound' },
-        ]}
-      />
+      <Suspense fallback={null}>
+        <PriceHistoryChart
+          endpoint="/api/public/gold-history"
+          titleAr="تطور سعر الذهب خلال آخر 30 يوم"
+          titleEn="Gold price — last 30 days"
+          dataKey="karat21_sell"
+          tone="gold"
+        />
+      </Suspense>
 
       <TradingViewChart symbol="OANDA:XAUUSD" id="tradingview-gold" />
 
@@ -212,11 +210,13 @@ export default function GoldPage({ initialGoldData = null } = {}) {
         <div className="section-title-bar">
           <h2><FaIcon icon="fa-solid fa-calculator" /> {lang === 'en' ? 'Gold tools' : 'أدوات الذهب'}</h2>
         </div>
-        <Suspense fallback={null}>
-          <GoldCalculator />
-          <div id="tool-zakat-calc"><ZakatCalculator /></div>
-          <div id="tool-gold-savings"><SavingsCalculator metal="gold" /></div>
-        </Suspense>
+        <CalcTabs
+          tabs={[
+            { id: 'tool-gold-value', label: lang === 'en' ? 'Gold value' : 'قيمة الذهب', render: () => <GoldCalculator /> },
+            { id: 'tool-zakat-calc', label: lang === 'en' ? 'Zakat' : 'الزكاة', render: () => <ZakatCalculator /> },
+            { id: 'tool-gold-savings', label: lang === 'en' ? 'Savings' : 'الادخار', render: () => <SavingsCalculator metal="gold" /> },
+          ]}
+        />
       </section>
 
       <section id="tool-gold-karats">
