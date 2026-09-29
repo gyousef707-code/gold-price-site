@@ -11,16 +11,17 @@ export default function SilverCalculator() {
   const [karat, setKarat] = useState('925');
   const [priceType, setPriceType] = useState('sell');
   const [currency, setCurrency] = useState('egp');
+  const [making, setMaking] = useState(0);
 
   const result = useMemo(() => {
     const p = data?.silverPrices?.[karat];
     if (!p) return null;
     const perGram = p[priceType];
-    const egp = perGram * weight;
+    const egp = (perGram + (Number(making) || 0)) * weight;
     if (currency === 'egp') return egp;
     if (data?.bank_usd_rate) return egp / data.bank_usd_rate;
     return null;
-  }, [data, weight, karat, priceType, currency]);
+  }, [data, weight, karat, priceType, currency, making]);
 
   return (
     <div className="calc-card" id="tool-silver-calc">
@@ -53,6 +54,12 @@ export default function SilverCalculator() {
             <option value="egp">{t('calc.egp')}</option>
             <option value="usd">{t('calc.usd')}</option>
           </select>
+        </div>
+      </div>
+      <div className="calc-row">
+        <div className="calc-group" style={{ flex: 1 }}>
+          <label>{t('calc.making')}</label>
+          <NumberInput value={making} onChange={setMaking} className="calc-input calc-input-num" />
         </div>
       </div>
       <div className="calc-result-box">
