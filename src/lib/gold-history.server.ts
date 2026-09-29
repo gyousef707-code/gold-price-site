@@ -55,6 +55,10 @@ export async function recordDailySnapshotIfMissing(prices: {
   }
 }
 
+// بنجيب الأيام كلها بأمر MGET واحد لكل دفعة (بدل GET لكل يوم) — ضروري لما
+// المدى يوصل لسنة، عشان استضافة Cloudflare بتحدد عدد الطلبات الخارجية في الطلب الواحد.
+const MGET_CHUNK = 50;
+
 export async function getRecentHistory(days = 30): Promise<DailySnapshot[]> {
   try {
     const dates: string[] = [];
@@ -62,17 +66,29 @@ export async function getRecentHistory(days = 30): Promise<DailySnapshot[]> {
       const d = new Date(Date.now() + 2 * 60 * 60 * 1000 - i * 24 * 60 * 60 * 1000);
       dates.push(d.toISOString().slice(0, 10));
     }
-    const results = await Promise.all(
-      dates.map(async (date) => {
+    const chunks: string[][] = [];
+    for (let i = 0; i < dates.length; i += MGET_CHUNK) chunks.push(dates.slice(i, i + MGET_CHUNK));
+
+    const parts = await Promise.all(
+      chunks.map(async (chunk) => {
         try {
-          const raw = await upstash("GET", `gold:history:${date}`);
-          return raw ? (JSON.parse(raw) as DailySnapshot) : null;
+          const raws = (await upstash("MGET", ...chunk.map((d) => `gold:history:${d}`))) as Array<
+            string | null
+          >;
+          return (raws ?? []).map((raw) => {
+            try {
+              return raw ? (JSON.parse(raw) as DailySnapshot) : null;
+            } catch {
+              return null;
+            }
+          });
         } catch {
-          return null;
+          return [] as Array<DailySnapshot | null>;
         }
       }),
     );
-    return results.filter((r): r is DailySnapshot => r !== null);
+    // الترتيب من الأحدث للأقدم زي ما كان
+    return parts.flat().filter((r): r is DailySnapshot => r !== null);
   } catch {
     return [];
   }
