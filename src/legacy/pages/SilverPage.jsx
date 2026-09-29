@@ -112,8 +112,8 @@ export default function SilverPage() {
       <Suspense fallback={null}>
         <PriceHistoryChart
           endpoint="/api/public/silver-history"
-          titleAr="تطور سعر الفضة خلال آخر 30 يوم"
-          titleEn="Silver price — last 30 days"
+          titleAr="تطور سعر فضة عيار 999"
+          titleEn="999 silver price trend"
           dataKey="silver999_sell"
           tone="silver"
         />
