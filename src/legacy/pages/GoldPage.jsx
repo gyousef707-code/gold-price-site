@@ -197,8 +197,8 @@ export default function GoldPage({ initialGoldData = null } = {}) {
       <Suspense fallback={null}>
         <PriceHistoryChart
           endpoint="/api/public/gold-history"
-          titleAr="تطور سعر الذهب خلال آخر 30 يوم"
-          titleEn="Gold price — last 30 days"
+          titleAr="تطور سعر ذهب عيار 21"
+          titleEn="21K gold price trend"
           dataKey="karat21_sell"
           tone="gold"
         />
