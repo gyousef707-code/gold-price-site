@@ -32,6 +32,8 @@ export async function recordSilverSnapshotIfMissing(silverPrices: Record<string,
   }
 }
 
+const MGET_CHUNK = 50;
+
 export async function getRecentSilverHistory(days = 30): Promise<SilverDailySnapshot[]> {
   try {
     const dates: string[] = [];
@@ -39,17 +41,28 @@ export async function getRecentSilverHistory(days = 30): Promise<SilverDailySnap
       const d = new Date(Date.now() + 2 * 60 * 60 * 1000 - i * 24 * 60 * 60 * 1000);
       dates.push(d.toISOString().slice(0, 10));
     }
-    const results = await Promise.all(
-      dates.map(async (date) => {
+    const chunks: string[][] = [];
+    for (let i = 0; i < dates.length; i += MGET_CHUNK) chunks.push(dates.slice(i, i + MGET_CHUNK));
+
+    const parts = await Promise.all(
+      chunks.map(async (chunk) => {
         try {
-          const raw = await upstash("GET", `silver:history:${date}`);
-          return raw ? (JSON.parse(raw) as SilverDailySnapshot) : null;
+          const raws = (await upstash("MGET", ...chunk.map((d) => `silver:history:${d}`))) as Array<
+            string | null
+          >;
+          return (raws ?? []).map((raw) => {
+            try {
+              return raw ? (JSON.parse(raw) as SilverDailySnapshot) : null;
+            } catch {
+              return null;
+            }
+          });
         } catch {
-          return null;
+          return [] as Array<SilverDailySnapshot | null>;
         }
       }),
     );
-    return results.filter((r): r is SilverDailySnapshot => r !== null);
+    return parts.flat().filter((r): r is SilverDailySnapshot => r !== null);
   } catch {
     return [];
   }
