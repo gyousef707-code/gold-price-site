@@ -2983,3 +2983,25 @@ body.light-mode .nav-item.active i { color: var(--gold-primary); }
 @media (max-width: 680px) {
   .ounce-card.crypto-ounce-card .ounce-price { font-size: 20px; }
 }
+/* ==========================================================================
+   ديسكتوب فقط (900px+): تظبيط شكل كروت الذهب والفضة والأونصة
+   ========================================================================== */
+@media (min-width: 900px) {
+  .card-change-badge {
+    position: static;
+    inset-inline-start: auto;
+    margin: 4px auto 2px;
+    font-size: 11px;
+    padding: 2px 9px;
+  }
+  .gold-carats-section .gold-card.pound-card {
+    justify-content: center;
+    gap: 2px;
+  }
+  .gold-carats-section .gold-card.pound-card .gold-v-row:last-child { margin-top: 0; }
+  .gold-carats-section .gold-card.pound-card .gold-v-row { max-width: 240px; }
+  .ounce-card:not(.gap-card) .ounce-header {
+    justify-content: flex-start;
+    gap: 12px;
+  }
+}
