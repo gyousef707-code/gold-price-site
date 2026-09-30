@@ -45,6 +45,7 @@ export default function PriceHistoryChart({
   titleEn,
   dataKey,
   tone = 'gold',
+  livePrice = null, // اختياري: سعر اللحظة، بيتحط كآخر نقطة عشان الرسم يطابق الكارت اللي فوقه
 }) {
   const { data, loading } = useApiData(`${endpoint}?days=365`, { intervalMs: 60 * 60 * 1000 });
   const { lang } = useLang();
@@ -57,14 +58,29 @@ export default function PriceHistoryChart({
   const gradId = `hist-grad-${tone}`;
 
   // البيانات جاية من الأحدث للأقدم — بنعكسها عشان المحور يمشي بالوقت
-  const all = useMemo(
-    () =>
-      [...rows]
-        .reverse()
-        .filter((r) => r?.[dataKey] != null)
-        .map((r) => ({ date: r.date, ts: new Date(`${r.date}T00:00:00Z`).getTime(), value: Number(r[dataKey]) })),
-    [rows, dataKey],
-  );
+  const all = useMemo(() => {
+    const arr = [...rows]
+      .reverse()
+      .filter((r) => r?.[dataKey] != null)
+      .map((r) => ({
+        date: r.date,
+        ts: new Date(`${r.date}T00:00:00Z`).getTime(),
+        value: Number(r[dataKey]),
+        estimated: Array.isArray(r.estimated) && r.estimated.includes(dataKey),
+      }));
+    // آخر نقطة = سعر اللحظة (لقطة اليوم بتتسجل مع أول زيارة، فممكن تكون أقدم من السعر الحالي)
+    const lp = Number(livePrice);
+    if (arr.length && Number.isFinite(lp) && lp > 0) {
+      const today = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString().slice(0, 10);
+      const last = arr[arr.length - 1];
+      if (last.date === today) {
+        arr[arr.length - 1] = { ...last, value: lp, estimated: false };
+      } else if (last.date < today) {
+        arr.push({ date: today, ts: new Date(`${today}T00:00:00Z`).getTime(), value: lp, estimated: false });
+      }
+    }
+    return arr;
+  }, [rows, dataKey, livePrice]);
 
   // كام يوم فعلاً متاح في الأرشيف (من أقدم لقطة لآخر لقطة)
   const spanDays = all.length > 1 ? Math.round((all[all.length - 1].ts - all[0].ts) / DAY_MS) : 0;
@@ -99,6 +115,7 @@ export default function PriceHistoryChart({
   }, [all, range.days, en]);
 
   const title = en ? titleEn : titleAr;
+  const hasEstimate = series.some((x) => x.estimated);
   const first = series[0]?.value ?? null;
   const last = series[series.length - 1]?.value ?? null;
   const changePct =
@@ -230,6 +247,13 @@ export default function PriceHistoryChart({
                 </AreaChart>
               </ResponsiveContainer>
             </div>
+            {hasEstimate && (
+              <p className="price-chart-meta" style={{ fontSize: 11, margin: '4px 10px 0', textAlign: 'center' }}>
+                {en
+                  ? 'Older days are estimated from the 21K price; new days are recorded exactly.'
+                  : 'الأيام القديمة تقديرية (محسوبة من سعر عيار 21)، والأيام الجديدة بتتسجل بسعرها الفعلي.'}
+              </p>
+            )}
           </>
         )}
       </div>
