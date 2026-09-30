@@ -162,7 +162,7 @@ export default function PriceHistoryChart({
             {/* direction:ltr ضروري: الصفحة RTL فكانت أرقام المحور بتتحط جوه الرسم فوق الخط */}
             <div className="price-chart-plot" style={{ direction: 'ltr' }}>
               <ResponsiveContainer width="100%" height={230}>
-                <AreaChart data={series} margin={{ top: 8, right: 0, left: 6, bottom: 0 }}>
+                <AreaChart accessibilityLayer={false} data={series} margin={{ top: 8, right: 0, left: 6, bottom: 0 }}>
                   <defs>
                     <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor={stroke} stopOpacity={0.4} />
