@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Link, useParams, Navigate } from '@/lib/router-compat.jsx';
 import Seo from '../components/Seo.jsx';
 import JsonLd from '../components/JsonLd.jsx';
@@ -5,6 +6,8 @@ import RelatedArticles from '../components/RelatedArticles.jsx';
 import useApiData from '../hooks/useApiData.js';
 import { goldKarats, goldKaratsDesc } from '../data/gold.js';
 import { breadcrumbJsonLd } from '@/lib/jsonld.js';
+
+const PriceHistoryChart = lazy(() => import('../components/PriceHistoryChart.jsx'));
 
 const RELATED_BY_KARAT = {
   '24': ['gold-karat-types-explained', 'difference-21-24-karat'],
@@ -53,6 +56,17 @@ export default function GoldKaratPage() {
         </div>
         <Link to="/#tool-gold-calc" className="btn">احسب قيمة ذهبك</Link>
       </div>
+
+      <Suspense fallback={null}>
+        <PriceHistoryChart
+          endpoint="/api/public/gold-history"
+          titleAr={`تطور سعر ذهب عيار ${karat}`}
+          titleEn={`${karat}K gold price trend`}
+          dataKey={`karat${karat}_sell`}
+          livePrice={price?.sell ?? null}
+          tone="gold"
+        />
+      </Suspense>
 
       <p>{info.intro}</p>
       {info.detail && <p>{info.detail}</p>}
