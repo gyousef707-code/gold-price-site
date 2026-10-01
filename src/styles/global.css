@@ -3007,3 +3007,26 @@ body.light-mode .nav-item.active i { color: var(--gold-primary); }
 }
 .gold-card.pound-card > a { width: 100%; align-items: center; justify-content: center; }
 .gold-card.pound-card > a .gold-v-row { width: 100%; }
+/* ==========================================================================
+   ديسكتوب فقط (900px+): صفحة العملات وصفحة الأدوات
+   - العناوين والنصوص بتتحاذى مع عمود الكروت (بدل ما تلزق في طرف الشاشة)
+   - كارت محول العملات بنفس عرض كروت العملات اللي تحته
+   ========================================================================== */
+@media (min-width: 900px) {
+  /* صفحة العملات */
+  .page-wrap > section:has(.converter-box),
+  .page-wrap > section:has(.currency-list-new) {
+    max-width: 700px;
+    margin-inline: auto;
+  }
+  .converter-box { max-width: 700px; padding: 14px !important; }
+  .converter-box .converter-row { min-height: 46px !important; padding: 5px 10px !important; }
+  .converter-box .converter-divider { height: 26px !important; }
+
+  /* صفحة الأدوات */
+  .tools-hero,
+  .tools-section {
+    max-width: 42rem;
+    margin-inline: auto;
+  }
+}
