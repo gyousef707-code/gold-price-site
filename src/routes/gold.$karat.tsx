@@ -1,18 +1,97 @@
-import { createFileRoute } from "@tanstack/react-router";
-import GoldKaratPage from "@/legacy/pages/GoldKaratPage.jsx";
-import { goldKarats } from "@/legacy/data/gold.js";
-import { seoMeta } from "@/lib/seo";
+import { lazy, Suspense } from 'react';
+import { Link, useParams, Navigate } from '@/lib/router-compat.jsx';
+import Seo from '../components/Seo.jsx';
+import JsonLd from '../components/JsonLd.jsx';
+import RelatedArticles from '../components/RelatedArticles.jsx';
+import useApiData from '../hooks/useApiData.js';
+import { goldKarats, goldKaratsDesc } from '../data/gold.js';
+import { breadcrumbJsonLd } from '@/lib/jsonld.js';
 
-export const Route = createFileRoute("/gold/$karat")({
-  head: ({ params }) => {
-    const info = (goldKarats as any[]).find((k) => String(k.karat) === params.karat);
-    return seoMeta({
-      title: info?.title ?? `سعر الذهب عيار ${params.karat} | ذهبي`,
-      description:
-        info?.description ?? `سعر جرام الذهب عيار ${params.karat} اليوم في مصر بيع وشراء لحظة بلحظة.`,
-      path: `/gold/${params.karat}`,
-      type: "article",
-    });
-  },
-  component: GoldKaratPage,
-});
+const PriceHistoryChart = lazy(() => import('../components/PriceHistoryChart.jsx'));
+
+const RELATED_BY_KARAT = {
+  '24': ['gold-karat-types-explained', 'difference-21-24-karat'],
+  '22': ['gold-karat-types-explained', 'gold-price-today-egypt'],
+  '21': ['difference-21-24-karat', 'gold-price-today-egypt'],
+  '18': ['gold-karat-types-explained', 'gold-vs-silver-investment'],
+  '14': ['gold-karat-types-explained', 'why-gold-price-differs-shops'],
+  '12': ['gold-karat-types-explained', 'why-gold-price-differs-shops'],
+};
+
+export default function GoldKaratPage() {
+  const { karat } = useParams();
+  const info = goldKarats.find((g) => g.karat === karat);
+  const { data } = useApiData('/api/public/gold-price', { intervalMs: 60000 });
+
+  if (!info) return <Navigate to="/tools" replace />;
+
+  const price = data?.caratPrices?.[karat];
+  const otherKarats = goldKaratsDesc.filter((g) => g.karat !== karat);
+
+  return (
+    <div className="page-wrap">
+      <Seo title={info.title} description={info.description} path={`/gold/${karat}`} type="article" />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: 'الرئيسية', path: '/' },
+          { name: 'الأدوات', path: '/tools' },
+          { name: `عيار ${karat}`, path: `/gold/${karat}` },
+        ])}
+      />
+
+      <div className="breadcrumb">
+        <Link to="/">الرئيسية</Link> / <Link to="/tools">الأدوات</Link> / عيار {karat}
+      </div>
+      <span className="eyebrow">أسعار الذهب</span>
+      <h1>{info.h1}</h1>
+
+      <div className="live-cta">
+        <div>
+          <p style={{ fontWeight: 700, marginBottom: 4 }}>
+            البيع: {price ? price.sell.toLocaleString('en-US') : '—'} ج.م
+          </p>
+          <p style={{ margin: 0 }}>
+            الشراء: {price ? price.buy.toLocaleString('en-US') : '—'} ج.م
+          </p>
+        </div>
+        <Link to="/#tool-gold-calc" className="btn">احسب قيمة ذهبك</Link>
+      </div>
+
+      <Suspense fallback={null}>
+        <PriceHistoryChart
+          endpoint="/api/public/gold-history"
+          titleAr={`تطور سعر ذهب عيار ${karat}`}
+          titleEn={`${karat}K gold price trend`}
+          dataKey={`karat${karat}_sell`}
+          livePrice={price?.sell ?? null}
+          tone="gold"
+        />
+      </Suspense>
+
+      <p>{info.intro}</p>
+      {info.detail && <p>{info.detail}</p>}
+
+      {info.specRows.length > 0 && (
+        <table className="spec-table">
+          <tbody>
+            {info.specRows.map(([label, value], i) => (
+              <tr key={i}><th>{label}</th><td>{value}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      <RelatedArticles slugs={RELATED_BY_KARAT[karat]} />
+
+      <div className="related-box">
+        <h3>اقرأ أيضًا - باقي العيارات</h3>
+        <ul>
+          {otherKarats.map((g) => (
+            <li key={g.karat}><Link to={`/gold/${g.karat}`}>سعر عيار {g.karat} اليوم</Link></li>
+          ))}
+          <li><Link to="/gold/pound">سعر الجنيه الذهب اليوم</Link></li>
+        </ul>
+      </div>
+    </div>
+  );
+}
