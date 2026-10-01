@@ -3005,3 +3005,5 @@ body.light-mode .nav-item.active i { color: var(--gold-primary); }
     gap: 12px;
   }
 }
+.gold-card.pound-card > a { width: 100%; align-items: center; justify-content: center; }
+.gold-card.pound-card > a .gold-v-row { width: 100%; }
