@@ -89,6 +89,7 @@ export default function GoldKaratPage() {
           {otherKarats.map((g) => (
             <li key={g.karat}><Link to={`/gold/${g.karat}`}>سعر عيار {g.karat} اليوم</Link></li>
           ))}
+          <li><Link to="/gold/pound">سعر الجنيه الذهب اليوم</Link></li>
         </ul>
       </div>
     </div>
