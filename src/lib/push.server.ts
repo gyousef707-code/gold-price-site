@@ -5,9 +5,29 @@ import {
 } from "@block65/webcrypto-web-push";
 import { upstash } from "./upstash.server";
 
+// تنبيه سعر مستهدف واحد مخزّن مع اشتراك الجهاز.
+// ref = السعر وقت التفعيل (بيحدد الاتجاه: لو الهدف أعلى منه ننتظر الصعود، وإلا الهبوط)
+// firedAt = وقت ما التنبيه اتبعت (التنبيه بيتبعت مرة واحدة بس لكل تفعيل)
+export type StoredAlert = { target: number; ref: number | null; firedAt?: number };
+
+export const ALERT_KEYS = [
+  "gold24",
+  "gold21",
+  "gold18",
+  "goldPound",
+  "silver999",
+  "silver925",
+  "silver900",
+  "usdSaygha",
+  "marketGap",
+] as const;
+export type AlertKeyName = (typeof ALERT_KEYS)[number];
+export type StoredAlerts = Partial<Record<AlertKeyName, StoredAlert>>;
+
 export type StoredSubscription = {
   endpoint: string;
   keys: { p256dh: string; auth: string };
+  alerts?: StoredAlerts;
 };
 
 async function sha256Hex(input: string) {
@@ -27,8 +47,92 @@ const SUBS_HASH_KEY = "push:subs:hash";
 
 export async function saveSubscription(sub: StoredSubscription) {
   const id = await sha256Hex(sub.endpoint);
-  await upstash("HSET", SUBS_HASH_KEY, id, JSON.stringify(sub));
+  // الجهاز بيعيد الاشتراك كل ما الصفحة تتفتح — لازم نحافظ على تنبيهاته
+  // المخزّنة بدل ما نمسحها بنسخة الاشتراك الجديدة (اللي مفيهاش تنبيهات).
+  let alerts: StoredAlerts | undefined;
+  try {
+    const raw = await upstash("HGET", SUBS_HASH_KEY, id);
+    if (raw) alerts = (JSON.parse(raw) as StoredSubscription).alerts;
+  } catch {
+    // لو القراءة فشلت نكمل تسجيل الاشتراك عادي
+  }
+  const record: StoredSubscription = {
+    endpoint: sub.endpoint,
+    keys: sub.keys,
+    ...(alerts ? { alerts } : {}),
+  };
+  await upstash("HSET", SUBS_HASH_KEY, id, JSON.stringify(record));
   return id;
+}
+
+async function readSubscriptionById(id: string): Promise<StoredSubscription | null> {
+  const raw = await upstash("HGET", SUBS_HASH_KEY, id);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as StoredSubscription;
+  } catch {
+    return null;
+  }
+}
+
+// بيرجّع تنبيهات الجهاز (أو null لو الجهاز مش مشترك أصلاً)
+export async function getSubscriptionAlerts(endpoint: string): Promise<StoredAlerts | null> {
+  const sub = await readSubscriptionById(await sha256Hex(endpoint));
+  if (!sub) return null;
+  return sub.alerts ?? {};
+}
+
+// بيستبدل تنبيهات الجهاز بالمجموعة المفعّلة اللي جاية من الصفحة.
+// - لو التنبيه نفس الهدف وما اتبعتش قبل كده، بنحافظ على ref القديم (الاتجاه ثابت).
+// - لو الهدف اتغيّر أو التنبيه كان اتبعت قبل كده وإنت فعّلته تاني، بنبدأ من جديد.
+export async function setSubscriptionAlerts(
+  endpoint: string,
+  incoming: Partial<Record<string, { target: unknown; ref: unknown }>>,
+): Promise<StoredAlerts | null> {
+  const id = await sha256Hex(endpoint);
+  const sub = await readSubscriptionById(id);
+  if (!sub) return null;
+
+  const old = sub.alerts ?? {};
+  const next: StoredAlerts = {};
+  for (const key of ALERT_KEYS) {
+    const item = incoming[key];
+    if (!item) continue;
+    const target = Number(item.target);
+    if (!Number.isFinite(target)) continue;
+    const refNum = item.ref == null ? NaN : Number(item.ref);
+    const ref = Number.isFinite(refNum) ? refNum : null;
+    const existing = old[key];
+    if (existing && existing.target === target && !existing.firedAt) {
+      next[key] = existing;
+    } else {
+      next[key] = { target, ref };
+    }
+  }
+
+  sub.alerts = next;
+  await upstash("HSET", SUBS_HASH_KEY, id, JSON.stringify(sub));
+  return next;
+}
+
+// تعديلات صغيرة من الفحص الدوري (تثبيت ref أو تعليم تنبيه إنه اتبعت).
+// بنقرأ السجل من جديد قبل الكتابة، وبنعدّل التنبيه بس لو لسه نفس الهدف،
+// عشان لو المستخدم غيّر تنبيهاته في نفس اللحظة ما نمسحش تعديله.
+async function patchSubscriptionAlerts(
+  id: string,
+  patches: Array<{ key: AlertKeyName; target: number; ref?: number; firedAt?: number }>,
+) {
+  const sub = await readSubscriptionById(id);
+  if (!sub?.alerts) return;
+  let changed = false;
+  for (const p of patches) {
+    const a = sub.alerts[p.key];
+    if (!a || a.target !== p.target || a.firedAt) continue;
+    if (p.ref !== undefined) a.ref = p.ref;
+    if (p.firedAt !== undefined) a.firedAt = p.firedAt;
+    changed = true;
+  }
+  if (changed) await upstash("HSET", SUBS_HASH_KEY, id, JSON.stringify(sub));
 }
 
 async function removeSubscriptionById(id: string) {
@@ -72,14 +176,17 @@ function getVapid(): VapidKeys {
   return { subject, publicKey, privateKey };
 }
 
-export async function sendPushToAll(payload: {
-  title: string;
-  body: string;
-  url?: string;
-  tag?: string;
-}) {
+export async function sendPushToAll(
+  payload: {
+    title: string;
+    body: string;
+    url?: string;
+    tag?: string;
+  },
+  preloaded?: Array<{ id: string; sub: StoredSubscription }>,
+) {
   const vapid = getVapid();
-  const subs = await getAllSubscriptions();
+  const subs = preloaded ?? (await getAllSubscriptions());
   let sent = 0;
   let removed = 0;
 
@@ -200,4 +307,121 @@ export function computeSnapshot(gold: any, currency: any, crypto: any): Snapshot
     usd: currency?.rates?.usd?.sell ?? null,
     btc: crypto?.coins?.find((c: any) => c.id === "bitcoin")?.price_usd ?? null,
   };
+}
+
+// -------- تنبيهات السعر المستهدف (لكل جهاز على حدة) --------
+
+const ALERT_LABELS: Record<AlertKeyName, { ar: string; unit: string }> = {
+  gold24: { ar: "عيار 24", unit: "ج.م" },
+  gold21: { ar: "عيار 21", unit: "ج.م" },
+  gold18: { ar: "عيار 18", unit: "ج.م" },
+  goldPound: { ar: "الجنيه الذهب", unit: "ج.م" },
+  silver999: { ar: "فضة عيار 999", unit: "ج.م" },
+  silver925: { ar: "فضة عيار 925", unit: "ج.م" },
+  silver900: { ar: "فضة عيار 900", unit: "ج.م" },
+  usdSaygha: { ar: "دولار الصاغة", unit: "ج.م" },
+  marketGap: { ar: "فجوة السوق", unit: "%" },
+};
+
+export type LiveAlertPrices = Partial<Record<AlertKeyName, number | null>>;
+
+export function computeAlertPrices(gold: any, silver: any): LiveAlertPrices {
+  const num = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? v : null);
+  return {
+    gold24: num(gold?.caratPrices?.["24"]?.sell),
+    gold21: num(gold?.caratPrices?.["21"]?.sell),
+    gold18: num(gold?.caratPrices?.["18"]?.sell),
+    goldPound: num(gold?.pound?.sell),
+    silver999: num(silver?.silverPrices?.["999"]?.sell),
+    silver925: num(silver?.silverPrices?.["925"]?.sell),
+    silver900: num(silver?.silverPrices?.["900"]?.sell),
+    usdSaygha: num(gold?.implied_usd_rate),
+    marketGap: num(gold?.gap_value),
+  };
+}
+
+// هل في أي جهاز عنده تنبيه فضة لسه ما اتبعتش؟ (عشان ما نجيبش أسعار الفضة من غير لزوم)
+export function anySilverAlerts(subs: Array<{ sub: StoredSubscription }>) {
+  return subs.some(({ sub }) =>
+    (["silver999", "silver925", "silver900"] as const).some(
+      (k) => sub.alerts?.[k] && !sub.alerts[k]!.firedAt,
+    ),
+  );
+}
+
+function fmt(n: number, unit: string) {
+  return unit === "%"
+    ? `${n.toFixed(2)}%`
+    : `${n.toLocaleString("en-US", { maximumFractionDigits: 2 })} ${unit}`;
+}
+
+// بيفحص تنبيهات كل الأجهزة مقابل الأسعار الحالية ويبعت Push خاص بكل جهاز
+// وصل هدفه. التنبيه بيتبعت مرة واحدة بس، وبعدها بيتعلّم إنه اتبعت.
+export async function processPriceAlerts(
+  subs: Array<{ id: string; sub: StoredSubscription }>,
+  prices: LiveAlertPrices,
+) {
+  let fired = 0;
+  let failed = 0;
+  let vapid: VapidKeys | null = null;
+
+  for (const { id, sub } of subs) {
+    if (!sub.alerts) continue;
+    const patches: Array<{ key: AlertKeyName; target: number; ref?: number; firedAt?: number }> = [];
+    const hits: Array<{ key: AlertKeyName; target: number; price: number }> = [];
+
+    for (const key of ALERT_KEYS) {
+      const a = sub.alerts[key];
+      const price = prices[key];
+      if (!a || a.firedAt || price == null) continue;
+
+      // مفيش سعر مرجعي (الصفحة ما كانتش عارفة السعر الحي وقت التفعيل):
+      // نثبّت السعر الحالي كمرجع الأول، ونبدأ المقارنة من الفحص الجاي.
+      if (a.ref == null) {
+        patches.push({ key, target: a.target, ref: price });
+        continue;
+      }
+
+      const goingUp = a.target >= a.ref;
+      const reached = goingUp ? price >= a.target : price <= a.target;
+      if (reached) hits.push({ key, target: a.target, price });
+    }
+
+    for (const h of hits) {
+      const label = ALERT_LABELS[h.key];
+      try {
+        vapid ??= getVapid();
+        const request = await buildPushPayload(
+          {
+            data: JSON.stringify({
+              title: "وصل السعر لهدفك 🎯",
+              body: `${label.ar} وصل ${fmt(h.price, label.unit)} (هدفك ${fmt(h.target, label.unit)})`,
+              url: "/alerts",
+              tag: `alert-${h.key}`,
+            }),
+            options: { ttl: 3600, urgency: "high" },
+          },
+          sub as WebPushSubscription,
+          vapid,
+        );
+        const res = await fetch(sub.endpoint, request as RequestInit);
+        if (res.status === 404 || res.status === 410) {
+          await removeSubscriptionById(id); // الجهاز مبقاش مشترك
+          break;
+        }
+        if (res.ok) {
+          patches.push({ key: h.key, target: h.target, firedAt: Date.now() });
+          fired++;
+        } else {
+          failed++; // هيحاول تاني في الفحص الجاي
+        }
+      } catch {
+        failed++;
+      }
+    }
+
+    if (patches.length) await patchSubscriptionAlerts(id, patches).catch(() => {});
+  }
+
+  return { fired, failed };
 }
