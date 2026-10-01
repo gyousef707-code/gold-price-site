@@ -139,7 +139,7 @@ export default function GoldPage({ initialGoldData = null } = {}) {
           })}
 
           {/* كارت الجنيه الذهب جنب عيار 12 و14 */}
-          <div className="gold-card pound-card">
+          <div className="gold-card pound-card clickable-card">
             <button
               className="card-share-btn"
               title={t('share.price')}
@@ -148,27 +148,29 @@ export default function GoldPage({ initialGoldData = null } = {}) {
             >
               <FaIcon icon="fa-solid fa-share-nodes" />
             </button>
-            <div className="gold-card-icon-top"><FaIcon icon="fa-solid fa-sack-dollar" /></div>
-            <div className="gold-carat-wrap pound-wrap">
-              <span className="pound-title">{t('gold.pound')}</span>
-            </div>
-            <div className="gold-v-row">
-              <span className="gold-v-label">{t('price.sell')}</span>
-              <span className="gold-v-value sell-price">
-                <LivePrice value={data?.pound?.sell ?? null} decimals={0} skeleton />
-              </span>
-            </div>
-            {changePct != null && (
-              <span className={`card-change-badge ${changePct >= 0 ? 'positive' : 'negative'}`}>
-                {changePct >= 0 ? '▲' : '▼'} {Math.abs(changePct).toFixed(2)}%
-              </span>
-            )}
-            <div className="gold-v-row">
-              <span className="gold-v-label">{t('price.buy')}</span>
-              <span className="gold-v-value buy-price">
-                <LivePrice value={data?.pound?.buy ?? null} decimals={0} skeleton />
-              </span>
-            </div>
+            <Link to="/gold/pound" style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
+              <div className="gold-card-icon-top"><FaIcon icon="fa-solid fa-sack-dollar" /></div>
+              <div className="gold-carat-wrap pound-wrap">
+                <span className="pound-title">{t('gold.pound')}</span>
+              </div>
+              <div className="gold-v-row">
+                <span className="gold-v-label">{t('price.sell')}</span>
+                <span className="gold-v-value sell-price">
+                  <LivePrice value={data?.pound?.sell ?? null} decimals={0} skeleton />
+                </span>
+              </div>
+              {changePct != null && (
+                <span className={`card-change-badge ${changePct >= 0 ? 'positive' : 'negative'}`}>
+                  {changePct >= 0 ? '▲' : '▼'} {Math.abs(changePct).toFixed(2)}%
+                </span>
+              )}
+              <div className="gold-v-row">
+                <span className="gold-v-label">{t('price.buy')}</span>
+                <span className="gold-v-value buy-price">
+                  <LivePrice value={data?.pound?.buy ?? null} decimals={0} skeleton />
+                </span>
+              </div>
+            </Link>
           </div>
         </div>
 
@@ -227,6 +229,7 @@ export default function GoldPage({ initialGoldData = null } = {}) {
           {goldKaratsDesc.map((g) => (
             <Link key={g.karat} to={`/gold/${g.karat}`}>{t('karat')} {g.karat}</Link>
           ))}
+          <Link to="/gold/pound">{t('gold.pound')}</Link>
         </div>
       </section>
 
