@@ -322,4 +322,9 @@
   <url>
     <loc>https://www.zahaby1.com/blog/gold-customs-rules-travel-egypt</loc>
   </url>
+  <url>
+    <loc>https://www.zahaby1.com/gold/pound</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
