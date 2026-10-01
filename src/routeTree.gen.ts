@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AlertsRouteImport } from './routes/alerts'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CurrenciesRouteImport } from './routes/currencies'
 import { Route as DisclaimerRouteImport } from './routes/disclaimer'
@@ -33,6 +34,7 @@ import { Route as ApiPublicGoldPriceRouteImport } from './routes/api/public/gold
 import { Route as ApiPublicNewsRouteImport } from './routes/api/public/news'
 import { Route as ApiPublicSilverHistoryRouteImport } from './routes/api/public/silver-history'
 import { Route as ApiPublicSilverPriceRouteImport } from './routes/api/public/silver-price'
+import { Route as ApiPushAlertsRouteImport } from './routes/api/push/alerts'
 import { Route as ApiPushCheckRouteImport } from './routes/api/push/check'
 import { Route as ApiPushSubscribeRouteImport } from './routes/api/push/subscribe'
 import { Route as ApiPushUnsubscribeRouteImport } from './routes/api/push/unsubscribe'
@@ -51,6 +53,11 @@ const SplatRoute = SplatRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AlertsRoute = AlertsRouteImport.update({
+  id: '/alerts',
+  path: '/alerts',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -158,6 +165,11 @@ const ApiPublicSilverPriceRoute = ApiPublicSilverPriceRouteImport.update({
   path: '/api/public/silver-price',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPushAlertsRoute = ApiPushAlertsRouteImport.update({
+  id: '/api/push/alerts',
+  path: '/api/push/alerts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPushCheckRoute = ApiPushCheckRouteImport.update({
   id: '/api/push/check',
   path: '/api/push/check',
@@ -183,6 +195,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
+  '/alerts': typeof AlertsRoute
   '/contact': typeof ContactRoute
   '/currencies': typeof CurrenciesRoute
   '/disclaimer': typeof DisclaimerRoute
@@ -204,6 +217,7 @@ export interface FileRoutesByFullPath {
   '/api/public/news': typeof ApiPublicNewsRoute
   '/api/public/silver-history': typeof ApiPublicSilverHistoryRoute
   '/api/public/silver-price': typeof ApiPublicSilverPriceRoute
+  '/api/push/alerts': typeof ApiPushAlertsRoute
   '/api/push/check': typeof ApiPushCheckRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
@@ -213,6 +227,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
+  '/alerts': typeof AlertsRoute
   '/contact': typeof ContactRoute
   '/currencies': typeof CurrenciesRoute
   '/disclaimer': typeof DisclaimerRoute
@@ -234,6 +249,7 @@ export interface FileRoutesByTo {
   '/api/public/news': typeof ApiPublicNewsRoute
   '/api/public/silver-history': typeof ApiPublicSilverHistoryRoute
   '/api/public/silver-price': typeof ApiPublicSilverPriceRoute
+  '/api/push/alerts': typeof ApiPushAlertsRoute
   '/api/push/check': typeof ApiPushCheckRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
@@ -244,6 +260,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
+  '/alerts': typeof AlertsRoute
   '/contact': typeof ContactRoute
   '/currencies': typeof CurrenciesRoute
   '/disclaimer': typeof DisclaimerRoute
@@ -265,6 +282,7 @@ export interface FileRoutesById {
   '/api/public/news': typeof ApiPublicNewsRoute
   '/api/public/silver-history': typeof ApiPublicSilverHistoryRoute
   '/api/public/silver-price': typeof ApiPublicSilverPriceRoute
+  '/api/push/alerts': typeof ApiPushAlertsRoute
   '/api/push/check': typeof ApiPushCheckRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
@@ -276,6 +294,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/about'
+    | '/alerts'
     | '/contact'
     | '/currencies'
     | '/disclaimer'
@@ -297,6 +316,7 @@ export interface FileRouteTypes {
     | '/api/public/news'
     | '/api/public/silver-history'
     | '/api/public/silver-price'
+    | '/api/push/alerts'
     | '/api/push/check'
     | '/api/push/subscribe'
     | '/api/push/unsubscribe'
@@ -306,6 +326,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/about'
+    | '/alerts'
     | '/contact'
     | '/currencies'
     | '/disclaimer'
@@ -327,6 +348,7 @@ export interface FileRouteTypes {
     | '/api/public/news'
     | '/api/public/silver-history'
     | '/api/public/silver-price'
+    | '/api/push/alerts'
     | '/api/push/check'
     | '/api/push/subscribe'
     | '/api/push/unsubscribe'
@@ -336,6 +358,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/about'
+    | '/alerts'
     | '/contact'
     | '/currencies'
     | '/disclaimer'
@@ -357,6 +380,7 @@ export interface FileRouteTypes {
     | '/api/public/news'
     | '/api/public/silver-history'
     | '/api/public/silver-price'
+    | '/api/push/alerts'
     | '/api/push/check'
     | '/api/push/subscribe'
     | '/api/push/unsubscribe'
@@ -367,6 +391,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
   AboutRoute: typeof AboutRoute
+  AlertsRoute: typeof AlertsRoute
   ContactRoute: typeof ContactRoute
   CurrenciesRoute: typeof CurrenciesRoute
   DisclaimerRoute: typeof DisclaimerRoute
@@ -388,6 +413,7 @@ export interface RootRouteChildren {
   ApiPublicNewsRoute: typeof ApiPublicNewsRoute
   ApiPublicSilverHistoryRoute: typeof ApiPublicSilverHistoryRoute
   ApiPublicSilverPriceRoute: typeof ApiPublicSilverPriceRoute
+  ApiPushAlertsRoute: typeof ApiPushAlertsRoute
   ApiPushCheckRoute: typeof ApiPushCheckRoute
   ApiPushSubscribeRoute: typeof ApiPushSubscribeRoute
   ApiPushUnsubscribeRoute: typeof ApiPushUnsubscribeRoute
@@ -415,6 +441,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/alerts': {
+      id: '/alerts'
+      path: '/alerts'
+      fullPath: '/alerts'
+      preLoaderRoute: typeof AlertsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -564,6 +597,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicSilverPriceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/push/alerts': {
+      id: '/api/push/alerts'
+      path: '/api/push/alerts'
+      fullPath: '/api/push/alerts'
+      preLoaderRoute: typeof ApiPushAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/push/check': {
       id: '/api/push/check'
       path: '/api/push/check'
@@ -599,6 +639,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
   AboutRoute: AboutRoute,
+  AlertsRoute: AlertsRoute,
   ContactRoute: ContactRoute,
   CurrenciesRoute: CurrenciesRoute,
   DisclaimerRoute: DisclaimerRoute,
@@ -620,6 +661,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicNewsRoute: ApiPublicNewsRoute,
   ApiPublicSilverHistoryRoute: ApiPublicSilverHistoryRoute,
   ApiPublicSilverPriceRoute: ApiPublicSilverPriceRoute,
+  ApiPushAlertsRoute: ApiPushAlertsRoute,
   ApiPushCheckRoute: ApiPushCheckRoute,
   ApiPushSubscribeRoute: ApiPushSubscribeRoute,
   ApiPushUnsubscribeRoute: ApiPushUnsubscribeRoute,
