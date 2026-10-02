@@ -9,17 +9,11 @@ body {
   --dot-rgb: 227, 179, 65;
   --dot-a: 0.22;
   --glow-a: 0.1;
-  --hdr-dot-a: 0.2;
-  background-image: radial-gradient(ellipse 80% 320px at 50% -60px, rgba(227, 179, 65, 0.08), transparent 70%);
-  background-repeat: no-repeat;
 }
 body.light-mode {
   --dot-rgb: 183, 129, 18;
   --dot-a: 0.26;
   --glow-a: 0.12;
-  --hdr-dot-a: 0.34;
-  /* دفء خفيف تحت الهيدر عشان يكمّل معاه بدل ما يبان قطع حاد */
-  background-image: linear-gradient(180deg, #f8f2e3 0, var(--bg-color) 300px);
 }
 
 /* ---- الكروت: نقط ذهبية في ركن الكارت بتتلاشى ناحية المحتوى ---- */
@@ -74,53 +68,72 @@ body .tool-card-pro.tone-blue { --dot-rgb: 88, 166, 255; }
 body.light-mode .tool-card-pro.tone-blue { --dot-rgb: 39, 105, 168; }
 
 /* =====================================================================
-   الهيدر
+   الهيدر — تصميم مستقل عن باقي الصفحة: خلفية داكنة دافئة + شبكة معينات
+   ذهبية رفيعة (بدل نقط الكروت) + خط ذهبي لامع تحته، في الوضعين.
    ===================================================================== */
 .app-header > * { position: relative; z-index: 1; }
 
-/* طبقة النقط خلف الهيدر (بتظهر في النص وتتلاشى ناحية الأطراف) */
+.app-header,
+body.light-mode .app-header {
+  background:
+    radial-gradient(ellipse 65% 170% at 92% -20%, rgba(232, 199, 102, 0.3), transparent 62%),
+    linear-gradient(180deg, #2a2211 0%, #15110a 100%);
+  border-bottom: 0;
+  box-shadow: 0 14px 26px -16px rgba(0, 0, 0, 0.7);
+}
+/* الوضع الغامق: نفس الفكرة بس أغمق شوية عشان تتماشى مع باقي التطبيق */
+body:not(.light-mode) .app-header {
+  background:
+    radial-gradient(ellipse 65% 170% at 92% -20%, rgba(227, 179, 65, 0.22), transparent 62%),
+    linear-gradient(180deg, #1c1608 0%, #10131a 100%);
+}
+
+/* شبكة المعينات: خطوط ذهبية مائلة بتتلاشى من ناحية الشعار لناحية الأزرار */
 .app-header::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: radial-gradient(circle at center, rgba(var(--dot-rgb), var(--hdr-dot-a)) 0.9px, transparent 1.6px) 0 0 / 8px 8px;
-  -webkit-mask-image: radial-gradient(ellipse 62% 150% at 50% 50%, #000 0%, transparent 100%);
-  mask-image: radial-gradient(ellipse 62% 150% at 50% 50%, #000 0%, transparent 100%);
+  background:
+    repeating-linear-gradient(45deg, rgba(232, 199, 102, 0.16) 0 1px, transparent 1px 14px),
+    repeating-linear-gradient(-45deg, rgba(232, 199, 102, 0.16) 0 1px, transparent 1px 14px);
+  -webkit-mask-image: linear-gradient(to left, #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 90%);
+  mask-image: linear-gradient(to left, #000 0%, rgba(0, 0, 0, 0.55) 45%, transparent 90%);
 }
 
-/* خط ذهبي رفيع تحت الهيدر بيتلاشى من الأطراف */
+/* خط ذهبي لامع تحت الهيدر */
 .app-header::after {
   content: "";
   position: absolute;
   inset-inline: 0;
-  bottom: -1px;
+  bottom: 0;
   height: 2px;
   pointer-events: none;
-  background: linear-gradient(90deg, transparent 0%, rgba(var(--dot-rgb), 0.75) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, #b98a1c 18%, #f3d77a 50%, #b98a1c 82%, transparent 100%);
 }
 
-/* الوضع النهاري: هيدر شامبانيا دافئ بدل الأبيض العادي */
-body.light-mode .app-header {
-  background:
-    radial-gradient(ellipse 55% 150% at 85% 50%, rgba(232, 199, 102, 0.3), transparent 70%),
-    linear-gradient(180deg, #fffdf8 0%, #faf1d9 100%);
-  border-bottom-color: transparent;
-  box-shadow: 0 12px 28px -16px rgba(141, 100, 12, 0.5);
-}
-body.light-mode .app-header .icon-btn {
-  background: rgba(255, 255, 255, 0.78);
-  border-color: rgba(183, 129, 18, 0.4);
-  color: var(--gold-dark);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.95) inset, 0 3px 8px -3px rgba(141, 100, 12, 0.35);
-}
-body.light-mode .app-header .icon-btn:hover {
-  background: #ffffff;
-  border-color: var(--gold-primary);
-}
+/* الشعار والأزرار على الخلفية الداكنة (في الوضعين) */
+.app-header .logo-text,
 body.light-mode .app-header .logo-text {
-  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.9));
+  background: linear-gradient(135deg, #f7df93 0%, #e8c766 45%, #c8941a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: none;
+}
+.app-header .logo-dot { color: #f08a3c; }
+.app-header .icon-btn,
+body.light-mode .app-header .icon-btn {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(232, 199, 102, 0.38);
+  color: #f0cf72;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+}
+.app-header .icon-btn:hover,
+body.light-mode .app-header .icon-btn:hover {
+  background: rgba(232, 199, 102, 0.16);
+  border-color: #e8c766;
 }
 
 /* القايمة السفلية في الوضع النهاري بنفس الدفء */
@@ -129,3 +142,16 @@ body.light-mode .bottom-nav {
   border-top-color: rgba(183, 129, 18, 0.3);
   box-shadow: 0 -12px 28px -18px rgba(141, 100, 12, 0.5);
 }
+
+/* =====================================================================
+   الفضة في الوضع النهاري: الأرقام كانت فضي فاتح على أبيض فمش باينة
+   ===================================================================== */
+body.light-mode .silver-carat-num {
+  background: linear-gradient(135deg, #334155 0%, #64748b 50%, #1e293b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+body.light-mode .silver-carat-label { color: #64748b; }
+body.light-mode .price-chart-card.silver .price-chart-last { color: #475569; }
+body.light-mode .silver-card-icon-top { color: #64748b; }
