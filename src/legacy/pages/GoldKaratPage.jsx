@@ -8,6 +8,7 @@ import { goldKarats, goldKaratsDesc } from '../data/gold.js';
 import { breadcrumbJsonLd } from '@/lib/jsonld.js';
 
 const PriceHistoryChart = lazy(() => import('../components/PriceHistoryChart.jsx'));
+import LazyOnView from '../components/LazyOnView.jsx';
 
 const RELATED_BY_KARAT = {
   '24': ['gold-karat-types-explained', 'difference-21-24-karat'],
@@ -57,16 +58,18 @@ export default function GoldKaratPage() {
         <Link to="/#tool-gold-calc" className="btn">احسب قيمة ذهبك</Link>
       </div>
 
-      <Suspense fallback={null}>
-        <PriceHistoryChart
-          endpoint="/api/public/gold-history"
-          titleAr={`تطور سعر ذهب عيار ${karat}`}
-          titleEn={`${karat}K gold price trend`}
-          dataKey={`karat${karat}_sell`}
-          livePrice={price?.sell ?? null}
-          tone="gold"
-        />
-      </Suspense>
+      <LazyOnView minHeight={290}>
+        <Suspense fallback={null}>
+          <PriceHistoryChart
+            endpoint="/api/public/gold-history"
+            titleAr={`تطور سعر ذهب عيار ${karat}`}
+            titleEn={`${karat}K gold price trend`}
+            dataKey={`karat${karat}_sell`}
+            livePrice={price?.sell ?? null}
+            tone="gold"
+          />
+        </Suspense>
+      </LazyOnView>
 
       <p>{info.intro}</p>
       {info.detail && <p>{info.detail}</p>}
