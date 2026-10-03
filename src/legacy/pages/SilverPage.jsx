@@ -1,13 +1,15 @@
+import { lazy, Suspense } from 'react';
 import TradingViewChart from '../components/TradingViewChart.jsx';
-import HistoryTable from '../components/HistoryTable.jsx';
+const PriceHistoryChart = lazy(() => import('../components/PriceHistoryChart.jsx'));
 import FaIcon from '../components/FaIcon.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
 import LivePrice from '../components/LivePrice.jsx';
 import UpdatedStamp from '../components/UpdatedStamp.jsx';
 import MarketStatus from '../components/MarketStatus.jsx';
 
-import SilverCalculator from '../components/calculators/SilverCalculator.jsx';
-import SavingsCalculator from '../components/calculators/SavingsCalculator.jsx';
+import CalcTabs from '../components/CalcTabs.jsx';
+const SilverCalculator = lazy(() => import('../components/calculators/SilverCalculator.jsx'));
+const SavingsCalculator = lazy(() => import('../components/calculators/SavingsCalculator.jsx'));
 import useApiData from '../hooks/useApiData.js';
 import { useLang } from '../context/LangContext.jsx';
 import { shareCard } from '../lib/shareCard.js';
@@ -63,7 +65,6 @@ export default function SilverPage() {
       </section>
 
 
-      {loading && <p className="loading-text">{t('loading')}</p>}
       {error && !loading && <p className="error-text">{t('error')}</p>}
 
       <section className="carats-unified-section">
@@ -88,7 +89,7 @@ export default function SilverPage() {
                 <div className="silver-v-row">
                   <span className="silver-v-label">{t('price.sell')}</span>
                   <span className="silver-v-value sell-price">
-                    <LivePrice value={p?.sell ?? null} decimals={0} />
+                    <LivePrice value={p?.sell ?? null} decimals={0} skeleton />
                   </span>
                 </div>
                 {changePct != null && (
@@ -99,7 +100,7 @@ export default function SilverPage() {
                 <div className="silver-v-row">
                   <span className="silver-v-label">{t('price.buy')}</span>
                   <span className="silver-v-value buy-price">
-                    <LivePrice value={p?.buy ?? null} decimals={0} />
+                    <LivePrice value={p?.buy ?? null} decimals={0} skeleton />
                   </span>
                 </div>
               </div>
@@ -108,16 +109,15 @@ export default function SilverPage() {
         </div>
       </section>
 
-      <HistoryTable
-        endpoint="/api/public/silver-history"
-        titleAr="تطور سعر الفضة خلال آخر 30 يوم"
-        titleEn="Silver price history (last 30 days)"
-        primaryKey="silver999_sell"
-        columns={[
-          { key: 'silver999_sell', labelAr: 'عيار 999', labelEn: 'Purity 999' },
-          { key: 'silver925_sell', labelAr: 'عيار 925', labelEn: 'Purity 925' },
-        ]}
-      />
+      <Suspense fallback={null}>
+        <PriceHistoryChart
+          endpoint="/api/public/silver-history"
+          titleAr="تطور سعر فضة عيار 999"
+          titleEn="999 silver price trend"
+          dataKey="silver999_sell"
+          tone="silver"
+        />
+      </Suspense>
 
       <TradingViewChart symbol="OANDA:XAGUSD" id="tradingview-silver" />
 
@@ -125,8 +125,12 @@ export default function SilverPage() {
         <div className="section-title-bar">
           <h2><FaIcon icon="fa-solid fa-calculator" /> {lang === 'en' ? 'Silver tools' : 'أدوات الفضة'}</h2>
         </div>
-        <SilverCalculator />
-        <div id="tool-silver-savings"><SavingsCalculator metal="silver" /></div>
+        <CalcTabs
+          tabs={[
+            { id: 'tool-silver-calc-value', label: lang === 'en' ? 'Silver value' : 'قيمة الفضة', render: () => <SilverCalculator /> },
+            { id: 'tool-silver-savings', label: lang === 'en' ? 'Savings' : 'الادخار', render: () => <SavingsCalculator metal="silver" /> },
+          ]}
+        />
       </section>
 
       <RelatedArticles slugs={['gold-vs-silver-investment', 'gold-price-today-egypt', 'best-time-to-buy-gold']} />

@@ -21,9 +21,6 @@ export type AlertKey =
   | "silver999"
   | "silver925"
   | "silver900"
-  | "silver800"
-  | "silver720"
-  | "silver500"
   | "usdSaygha"
   | "marketGap";
 
@@ -39,9 +36,6 @@ export const DEFAULT_ALERT_PREFERENCES: AlertPreferences = {
   silver999: { ...EMPTY },
   silver925: { ...EMPTY },
   silver900: { ...EMPTY },
-  silver800: { ...EMPTY },
-  silver720: { ...EMPTY },
-  silver500: { ...EMPTY },
   usdSaygha: { ...EMPTY },
   marketGap: { ...EMPTY },
 };

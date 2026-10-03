@@ -1,12 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { jsonOk, jsonErr } from "@/lib/api-response";
-import { getGoldPrices, getCurrencyRates, getCryptoPrices } from "@/lib/market.server";
+import {
+  getGoldPrices,
+  getCurrencyRates,
+  getCryptoPrices,
+  getSilverPrices,
+} from "@/lib/market.server";
 import {
   getSnapshot,
   saveSnapshot,
   buildChangeMessage,
   computeSnapshot,
   sendPushToAll,
+  getAllSubscriptions,
+  anySilverAlerts,
+  computeAlertPrices,
+  processPriceAlerts,
   getRotationIndex,
   saveRotationIndex,
   ROTATION_ORDER,
@@ -41,10 +50,14 @@ export const Route = createFileRoute("/api/push/check")({
           const which = ROTATION_ORDER[idx % ROTATION_ORDER.length]!;
           const message = buildChangeMessage(prev, now, which);
 
+          // الاشتراكات بتتجاب مرة واحدة بس (أمر Upstash واحد) وتتستخدم للإشعار العام
+          // ولتنبيهات الأسعار المستهدفة الخاصة بكل جهاز.
+          const subs = await getAllSubscriptions();
+
           let result = { sent: 0, removed: 0, total: 0 };
           let telegramSent = false;
           if (message) {
-            result = await sendPushToAll({ ...message, url: "/", tag: "price-update" });
+            result = await sendPushToAll({ ...message, url: "/", tag: "price-update" }, subs);
             try {
               await sendTelegramMessage(`💰 <b>${message.title}</b>\n${message.body}\n\n🔗 zahaby1.com`);
               telegramSent = true;
@@ -53,10 +66,20 @@ export const Route = createFileRoute("/api/push/check")({
             }
           }
 
+          // تنبيهات السعر المستهدف: فحص مستقل عن الدورة أعلاه، بيشتغل في كل استدعاء.
+          // فشله ما بيوقفش باقي الفحص.
+          let alerts = { fired: 0, failed: 0 };
+          try {
+            const silver = anySilverAlerts(subs) ? await getSilverPrices().catch(() => null) : null;
+            alerts = await processPriceAlerts(subs, computeAlertPrices(gold, silver));
+          } catch {
+            // نكمل عادي
+          }
+
           await saveSnapshot(now);
           await saveRotationIndex(idx + 1);
 
-          return jsonOk({ changed: !!message, which, message, telegramSent, ...result });
+          return jsonOk({ changed: !!message, which, message, telegramSent, alerts, ...result });
         } catch (e) {
           return jsonErr(e);
         }

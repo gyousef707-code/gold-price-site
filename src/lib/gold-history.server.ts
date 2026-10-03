@@ -20,7 +20,38 @@ export type DailySnapshot = {
   karat21_sell: number | null;
   ounce_egp_sell: number | null;
   pound_sell: number | null;
+  // باقي العيارات — بتتسجل من أول يوم اتفعّل فيه التحديث ده.
+  // الأيام القديمة اللي مفيهاش القيم دي بتتحسب تقريبيًا وقت القراءة (شوف backfillKarats)
+  karat22_sell?: number | null;
+  karat18_sell?: number | null;
+  karat14_sell?: number | null;
+  karat12_sell?: number | null;
+  // أسماء الحقول اللي اتحسبت تقريبيًا (مش متسجلة فعليًا) — بتتحط وقت القراءة بس، مبتتخزنش
+  estimated?: string[];
 };
+
+// العيارات اللي بتتحسب تقريبيًا للأيام القديمة من سعر عيار 21 (نسبة العيار / 21)
+const BACKFILL_KARATS = [22, 18, 14, 12] as const;
+
+// للأيام اللي اتسجلت قبل ما نبدأ نحفظ باقي العيارات: بنقدّر السعر من عيار 21
+// بنسبة (العيار ÷ 21). فرق التقدير عن السعر الفعلي في السوق حوالي 0.05% تقريبًا.
+export function backfillKarats(rows: DailySnapshot[]): DailySnapshot[] {
+  return rows.map((row) => {
+    const base = row.karat21_sell;
+    if (base == null) return row;
+    const out: DailySnapshot = { ...row };
+    const estimated: string[] = [];
+    for (const k of BACKFILL_KARATS) {
+      const key = `karat${k}_sell` as const;
+      if (out[key] == null) {
+        out[key] = Math.round((base * k) / 21);
+        estimated.push(key);
+      }
+    }
+    if (estimated.length) out.estimated = estimated;
+    return out;
+  });
+}
 
 function todayCairo(): string {
   // مصر مفيهاش توقيت صيفي حاليًا وفرقها +2 عن UTC ثابت عمليًا لأغراض
@@ -43,6 +74,10 @@ export async function recordDailySnapshotIfMissing(prices: {
       date,
       karat24_sell: prices.caratPrices?.[24]?.sell ?? null,
       karat21_sell: prices.caratPrices?.[21]?.sell ?? null,
+      karat22_sell: prices.caratPrices?.[22]?.sell ?? null,
+      karat18_sell: prices.caratPrices?.[18]?.sell ?? null,
+      karat14_sell: prices.caratPrices?.[14]?.sell ?? null,
+      karat12_sell: prices.caratPrices?.[12]?.sell ?? null,
       ounce_egp_sell: prices.ounce_egp?.sell ?? null,
       pound_sell: prices.pound?.sell ?? null,
     };
@@ -55,6 +90,10 @@ export async function recordDailySnapshotIfMissing(prices: {
   }
 }
 
+// بنجيب الأيام كلها بأمر MGET واحد لكل دفعة (بدل GET لكل يوم) — ضروري لما
+// المدى يوصل لسنة، عشان استضافة Cloudflare بتحدد عدد الطلبات الخارجية في الطلب الواحد.
+const MGET_CHUNK = 50;
+
 export async function getRecentHistory(days = 30): Promise<DailySnapshot[]> {
   try {
     const dates: string[] = [];
@@ -62,17 +101,29 @@ export async function getRecentHistory(days = 30): Promise<DailySnapshot[]> {
       const d = new Date(Date.now() + 2 * 60 * 60 * 1000 - i * 24 * 60 * 60 * 1000);
       dates.push(d.toISOString().slice(0, 10));
     }
-    const results = await Promise.all(
-      dates.map(async (date) => {
+    const chunks: string[][] = [];
+    for (let i = 0; i < dates.length; i += MGET_CHUNK) chunks.push(dates.slice(i, i + MGET_CHUNK));
+
+    const parts = await Promise.all(
+      chunks.map(async (chunk) => {
         try {
-          const raw = await upstash("GET", `gold:history:${date}`);
-          return raw ? (JSON.parse(raw) as DailySnapshot) : null;
+          const raws = (await upstash("MGET", ...chunk.map((d) => `gold:history:${d}`))) as Array<
+            string | null
+          >;
+          return (raws ?? []).map((raw) => {
+            try {
+              return raw ? (JSON.parse(raw) as DailySnapshot) : null;
+            } catch {
+              return null;
+            }
+          });
         } catch {
-          return null;
+          return [] as Array<DailySnapshot | null>;
         }
       }),
     );
-    return results.filter((r): r is DailySnapshot => r !== null);
+    // الترتيب من الأحدث للأقدم زي ما كان
+    return backfillKarats(parts.flat().filter((r): r is DailySnapshot => r !== null));
   } catch {
     return [];
   }

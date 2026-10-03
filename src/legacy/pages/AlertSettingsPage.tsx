@@ -4,6 +4,8 @@ import { useLang } from "../context/LangContext.jsx";
 import FaIcon from "../components/FaIcon.jsx";
 import useApiData from "../hooks/useApiData.js";
 import useAlertPreferences, { type AlertKey } from "../hooks/useAlertPreferences";
+import { subscribeToPush } from "../hooks/useNotifications.js";
+import { fetchServerAlerts, pushAlertsToServer } from "../lib/alertSync";
 
 // صف واحد: تسمية العيار + حقل السعر المستهدف (متعبّى بالسعر الحي أول
 // مرة) + زرار زيادة/نقصان + زرار التفعيل/الإلغاء.
@@ -28,7 +30,7 @@ function AlertTargetRow({
   livePrice: number | null;
   step: number;
   onCommitTarget: (key: AlertKey, value: number | null) => void;
-  onToggleEnabled: (key: AlertKey, enabled: boolean) => void;
+  onToggleEnabled: (key: AlertKey, enabled: boolean, target?: number) => void;
   en: boolean;
   unit?: string;
 }) {
@@ -104,8 +106,13 @@ function AlertTargetRow({
           className={`alert-target-btn${enabled ? " active" : ""}`}
           disabled={!enabled && !hasValidTarget}
           onClick={() => {
-            if (!enabled) commit();
-            onToggleEnabled(akey, !enabled);
+            if (enabled) {
+              onToggleEnabled(akey, false);
+              return;
+            }
+            const num = Number(draft);
+            commit();
+            onToggleEnabled(akey, true, num);
           }}
         >
           {enabled ? (en ? "Alert active ✓" : "التنبيه مفعّل ✓") : en ? "Activate alert" : "تفعيل التنبيه"}
@@ -118,7 +125,9 @@ function AlertTargetRow({
 export default function AlertSettingsPage() {
   const { lang } = useLang();
   const en = lang === "en";
-  const { prefs, setTarget, setEnabled } = useAlertPreferences();
+  const { prefs, setTarget, setEnabled, loaded } = useAlertPreferences();
+  const [status, setStatus] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
+  const [reconciled, setReconciled] = useState(false);
 
   // نفس الـ endpoints المستخدمة في صفحتي الذهب والفضة، عشان الحقول تتعبّى
   // بالسعر اللحظي الحقيقي نفسه من غير أي مصدر تاني أو تكرار منطق.
@@ -133,11 +142,97 @@ export default function AlertSettingsPage() {
     silver999: silverData?.silverPrices?.["999"]?.sell,
     silver925: silverData?.silverPrices?.["925"]?.sell,
     silver900: silverData?.silverPrices?.["900"]?.sell,
-    silver800: silverData?.silverPrices?.["800"]?.sell,
-    silver720: silverData?.silverPrices?.["720"]?.sell,
-    silver500: silverData?.silverPrices?.["500"]?.sell,
     usdSaygha: goldData?.implied_usd_rate,
     marketGap: goldData?.gap_value,
+  };
+
+  const livePricesRef = useRef(livePrices);
+  useEffect(() => {
+    livePricesRef.current = livePrices;
+  });
+
+  // أول ما الصفحة تفتح: لو السيرفر بعت تنبيه فعلاً (وصل الهدف) نقفله هنا كمان،
+  // عشان ما يفضلش شكله "مفعّل" وهو خلاص اتبعت. لازم يخلص قبل أول مزامنة.
+  useEffect(() => {
+    if (!loaded) return;
+    let cancelled = false;
+    (async () => {
+      const server = await fetchServerAlerts();
+      if (cancelled) return;
+      if (server) {
+        let firedCount = 0;
+        (Object.keys(server) as AlertKey[]).forEach((k) => {
+          const s = server[k];
+          if (s?.firedAt && prefs[k].enabled && prefs[k].target === s.target) {
+            setEnabled(k, false);
+            firedCount++;
+          }
+        });
+        if (firedCount) {
+          setStatus({
+            kind: "ok",
+            text: en
+              ? "A price you were watching reached its target — the alert was sent and is now off."
+              : "سعر كنت متابعه وصل لهدفك — التنبيه اتبعت واتقفل. فعّله تاني لو عايز تنبيه جديد.",
+          });
+        }
+      }
+      setReconciled(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded]);
+
+  // أي تغيير في التنبيهات بيتبعت للسيرفر (بعد نص ثانية من آخر تعديل)، والسيرفر
+  // هو اللي بيقارن بالأسعار كل دقيقة ويبعت الإشعار حتى لو الموقع مقفول.
+  useEffect(() => {
+    if (!loaded || !reconciled) return;
+    const t = setTimeout(async () => {
+      const r = await pushAlertsToServer(prefs, livePricesRef.current);
+      if (r === "not-subscribed") {
+        setStatus({
+          kind: "err",
+          text: en
+            ? "Notifications aren't enabled on this device, so alerts can't be delivered. Allow notifications for this site and activate again."
+            : "الإشعارات مش مفعّلة على الجهاز ده فالتنبيه مش هيوصلك. اسمح بالإشعارات للموقع وفعّل التنبيه تاني.",
+        });
+      } else if (r === "failed") {
+        setStatus({
+          kind: "err",
+          text: en
+            ? "Couldn't save your alerts to the server. Check your connection and try again."
+            : "مقدرناش نحفظ تنبيهاتك على السيرفر. اتأكد من النت وجرّب تاني.",
+        });
+      }
+    }, 600);
+    return () => clearTimeout(t);
+  }, [prefs, loaded, reconciled, en]);
+
+  const handleToggle = async (key: AlertKey, next: boolean, target?: number) => {
+    if (!next) {
+      setEnabled(key, false);
+      return;
+    }
+    const live = livePrices[key];
+    if (live != null && target != null && target === live) {
+      setStatus({
+        kind: "err",
+        text: en
+          ? "Your target equals the current price. Move it with + / − so we can notify you when it gets there."
+          : "السعر المستهدف نفس السعر الحالي. عدّله بزرار + أو − عشان نبلّغك لما السعر يوصله.",
+      });
+      return;
+    }
+    // طلب إذن الإشعارات + تسجيل الجهاز (لازم يحصل من ضغطة المستخدم نفسها)
+    const res = await subscribeToPush();
+    if (!res.ok) {
+      setStatus({ kind: "err", text: res.reason });
+      return;
+    }
+    setStatus(null);
+    setEnabled(key, true);
   };
 
   const row = (
@@ -158,7 +253,7 @@ export default function AlertSettingsPage() {
       livePrice={livePrices[key] ?? null}
       step={opts?.step ?? 5}
       onCommitTarget={setTarget}
-      onToggleEnabled={setEnabled}
+      onToggleEnabled={handleToggle}
       en={en}
       unit={opts?.unit}
     />
@@ -176,9 +271,15 @@ export default function AlertSettingsPage() {
       </div>
       <p className="alert-settings-intro">
         {en
-          ? "Each field starts at today's live price — adjust it with + / − or type your own target, then activate the alert. Everything is saved on this device only."
-          : "كل حقل بيبدأ بالسعر الحي لحظة بلحظة — عدّله بزرار +/- أو اكتب سعرك المستهدف بنفسك، وبعدين فعّل التنبيه. كل حاجة بتتحفظ على الجهاز ده بس."}
+          ? "Each field starts at today's live price — adjust it with + / − or type your own target, then activate the alert. Each alert is sent once, when the price reaches your target — even if the site is closed."
+          : "كل حقل بيبدأ بالسعر الحي لحظة بلحظة — عدّله بزرار +/- أو اكتب سعرك المستهدف بنفسك، وبعدين فعّل التنبيه. والتنبيه بيوصلك مرة واحدة لما السعر يوصل هدفك، حتى لو الموقع مقفول."}
       </p>
+
+      {status && (
+        <p className={`alert-status alert-status-${status.kind}`} role="status">
+          {status.text}
+        </p>
+      )}
 
       {/* تنبيهات الذهب */}
       <div className="alert-section">
@@ -211,9 +312,6 @@ export default function AlertSettingsPage() {
         {row("silver999", "عيار 999", "Purity 999")}
         {row("silver925", "عيار 925", "Purity 925")}
         {row("silver900", "عيار 900", "Purity 900")}
-        {row("silver800", "عيار 800", "Purity 800")}
-        {row("silver720", "عيار 720", "Purity 720")}
-        {row("silver500", "عيار 500", "Purity 500")}
       </div>
 
       {/* تنبيهات العملات ودولار الصاغة */}

@@ -1,0 +1,131 @@
+/* =====================================================================
+   خلفيات منقّطة (Halftone) للكروت + هيدر الوضع النهاري
+   ملف مستقل بيتحمّل بعد global.css (من styles.css) — من غير ما يغيّر أي
+   كلاس أو كود React. لو حبيت تشيله: امسح السطر @import بتاعه من styles.css.
+   ===================================================================== */
+
+/* ---- ألوان النقط حسب الثيم (RGB عشان نتحكم في الشفافية) ---- */
+body {
+  --dot-rgb: 227, 179, 65;
+  --dot-a: 0.22;
+  --glow-a: 0.1;
+  --hdr-dot-a: 0.2;
+  background-image: radial-gradient(ellipse 80% 320px at 50% -60px, rgba(227, 179, 65, 0.08), transparent 70%);
+  background-repeat: no-repeat;
+}
+body.light-mode {
+  --dot-rgb: 183, 129, 18;
+  --dot-a: 0.26;
+  --glow-a: 0.12;
+  --hdr-dot-a: 0.34;
+  /* دفء خفيف تحت الهيدر عشان يكمّل معاه بدل ما يبان قطع حاد */
+  background-image: linear-gradient(180deg, #f8f2e3 0, var(--bg-color) 300px);
+}
+
+/* ---- الكروت: نقط ذهبية في ركن الكارت بتتلاشى ناحية المحتوى ---- */
+body :is(
+    .gold-card, .silver-card, .ounce-card, .carats-box-main, .currency-card-new,
+    .tool-card, .tool-card-pro, .alert-section, .chart-card, .price-chart-card,
+    .calc-card, .converter-box
+  ),
+body.light-mode :is(
+    .gold-card, .silver-card, .ounce-card, .carats-box-main, .currency-card-new,
+    .tool-card, .tool-card-pro, .alert-section, .chart-card, .price-chart-card,
+    .calc-card, .converter-box
+  ) {
+  --surf: var(--card-bg);
+  background:
+    linear-gradient(var(--fade-angle, 135deg), transparent 0%, var(--surf) var(--fade-end, 78%)),
+    radial-gradient(circle at 0% 0%, rgba(var(--dot-rgb), var(--glow-a)), transparent 55%),
+    radial-gradient(circle at center, rgba(var(--dot-rgb), var(--dot-a)) var(--dot-r, 1px), transparent calc(var(--dot-r, 1px) + 0.7px))
+      0 0 / var(--dot-size, 10px) var(--dot-size, 10px),
+    var(--surf);
+}
+
+/* كروت صغيرة (عيارات الذهب والفضة): نقط أصغر وأقرب لبعض */
+body :is(.gold-card, .silver-card),
+body.light-mode :is(.gold-card, .silver-card) {
+  --dot-size: 8px;
+  --dot-r: 0.9px;
+  --fade-end: 70%;
+}
+
+/* كارت عيار 21 المميز: نفس الفكرة مع لمعة ذهبية أقوى */
+body .gold-card.hero-karat,
+body.light-mode .gold-card.hero-karat {
+  --surf: var(--card-bg);
+  background:
+    linear-gradient(135deg, transparent 0%, var(--surf) 78%),
+    radial-gradient(circle at 0% 0%, rgba(var(--dot-rgb), 0.24), transparent 62%),
+    radial-gradient(circle at center, rgba(var(--dot-rgb), calc(var(--dot-a) + 0.04)) 0.9px, transparent 1.6px) 0 0 / 8px 8px,
+    var(--surf);
+}
+
+/* ---- ألوان مخصّصة لكل نوع ---- */
+body .silver-card,
+body .tool-card-pro.tone-silver { --dot-rgb: 174, 183, 193; }
+body.light-mode .silver-card,
+body.light-mode .tool-card-pro.tone-silver { --dot-rgb: 100, 116, 139; }
+
+body .tool-card-pro.tone-crypto { --dot-rgb: 247, 147, 26; }
+body.light-mode .tool-card-pro.tone-crypto { --dot-rgb: 217, 119, 6; }
+
+body .tool-card-pro.tone-blue { --dot-rgb: 88, 166, 255; }
+body.light-mode .tool-card-pro.tone-blue { --dot-rgb: 39, 105, 168; }
+
+/* =====================================================================
+   الهيدر
+   ===================================================================== */
+.app-header > * { position: relative; z-index: 1; }
+
+/* طبقة النقط خلف الهيدر (بتظهر في النص وتتلاشى ناحية الأطراف) */
+.app-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, rgba(var(--dot-rgb), var(--hdr-dot-a)) 0.9px, transparent 1.6px) 0 0 / 8px 8px;
+  -webkit-mask-image: radial-gradient(ellipse 62% 150% at 50% 50%, #000 0%, transparent 100%);
+  mask-image: radial-gradient(ellipse 62% 150% at 50% 50%, #000 0%, transparent 100%);
+}
+
+/* خط ذهبي رفيع تحت الهيدر بيتلاشى من الأطراف */
+.app-header::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -1px;
+  height: 2px;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent 0%, rgba(var(--dot-rgb), 0.75) 50%, transparent 100%);
+}
+
+/* الوضع النهاري: هيدر شامبانيا دافئ بدل الأبيض العادي */
+body.light-mode .app-header {
+  background:
+    radial-gradient(ellipse 55% 150% at 85% 50%, rgba(232, 199, 102, 0.3), transparent 70%),
+    linear-gradient(180deg, #fffdf8 0%, #faf1d9 100%);
+  border-bottom-color: transparent;
+  box-shadow: 0 12px 28px -16px rgba(141, 100, 12, 0.5);
+}
+body.light-mode .app-header .icon-btn {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(183, 129, 18, 0.4);
+  color: var(--gold-dark);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.95) inset, 0 3px 8px -3px rgba(141, 100, 12, 0.35);
+}
+body.light-mode .app-header .icon-btn:hover {
+  background: #ffffff;
+  border-color: var(--gold-primary);
+}
+body.light-mode .app-header .logo-text {
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.9));
+}
+
+/* القايمة السفلية في الوضع النهاري بنفس الدفء */
+body.light-mode .bottom-nav {
+  background: linear-gradient(180deg, #fffdf8 0%, #faf1d9 100%);
+  border-top-color: rgba(183, 129, 18, 0.3);
+  box-shadow: 0 -12px 28px -18px rgba(141, 100, 12, 0.5);
+}
