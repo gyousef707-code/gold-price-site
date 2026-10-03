@@ -50,3 +50,33 @@ body .crypto-row-nolink:active { transform: none; }
   body .crypto-row { grid-template-columns: 28px 36px 1fr 160px 90px !important; padding: 14px 18px !important; }
   body .crypto-row .crypto-card-icon { width: 36px !important; height: 36px !important; }
 }
+
+/* =====================================================================
+   إصلاح 1: كروت الحاسبة (الذهب والفضة) — نفس تظليل باقي الصفحة
+   السبب: .calc-tabs-body > * كان بيمسح خلفية الكارت الداخلي، والغلاف
+   (.calc-tabs-card) نفسه كان لونه سادة. فبنطبّق التظليل على الغلاف.
+   ===================================================================== */
+body :is(.calc-tabs-card),
+body.light-mode :is(.calc-tabs-card) {
+  --surf: var(--card-bg);
+  background:
+    linear-gradient(var(--fade-angle, 135deg), transparent 0%, var(--surf) var(--fade-end, 78%)),
+    radial-gradient(circle at 0% 0%, rgba(var(--dot-rgb), var(--glow-a)), transparent 55%),
+    radial-gradient(circle at center, rgba(var(--dot-rgb), var(--dot-a)) var(--dot-r, 1px), transparent calc(var(--dot-r, 1px) + 0.7px))
+      0 0 / var(--dot-size, 10px) var(--dot-size, 10px),
+    var(--surf);
+}
+
+/* =====================================================================
+   إصلاح 2: أرقام عيارات الفضة مش باينة في الوضع الفاتح
+   السبب: لون الرقم فضي فاتح (#c0c0c0 إلى #e8e8e8) على كارت أبيض.
+   ===================================================================== */
+body.light-mode .silver-carat-num {
+  background: linear-gradient(135deg, #475569 0%, #64748b 50%, #334155 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+body.light-mode .silver-carat-label { color: #596575; }
+body.light-mode .silver-card-icon-top { color: #64748b; opacity: 1; }
+body.light-mode .price-chart-card.silver .price-chart-last { color: #475569; }
