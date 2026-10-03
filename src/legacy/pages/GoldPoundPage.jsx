@@ -7,6 +7,7 @@ import { goldKaratsDesc } from '../data/gold.js';
 import { breadcrumbJsonLd } from '@/lib/jsonld.js';
 
 const PriceHistoryChart = lazy(() => import('../components/PriceHistoryChart.jsx'));
+import LazyOnView from '../components/LazyOnView.jsx';
 
 // صفحة الجنيه الذهب (/gold/pound) — نفس شكل صفحات العيارات.
 // الجنيه = 8 جرام ذهب عيار 21، وأرشيف سعره (pound_sell) بيتسجل يوميًا أصلًا.
@@ -41,16 +42,18 @@ export default function GoldPoundPage() {
         <Link to="/#tool-gold-calc" className="btn">احسب قيمة ذهبك</Link>
       </div>
 
-      <Suspense fallback={null}>
-        <PriceHistoryChart
-          endpoint="/api/public/gold-history"
-          titleAr="تطور سعر الجنيه الذهب"
-          titleEn="Gold pound price trend"
-          dataKey="pound_sell"
-          livePrice={pound?.sell ?? null}
-          tone="gold"
-        />
-      </Suspense>
+      <LazyOnView minHeight={290}>
+        <Suspense fallback={null}>
+          <PriceHistoryChart
+            endpoint="/api/public/gold-history"
+            titleAr="تطور سعر الجنيه الذهب"
+            titleEn="Gold pound price trend"
+            dataKey="pound_sell"
+            livePrice={pound?.sell ?? null}
+            tone="gold"
+          />
+        </Suspense>
+      </LazyOnView>
 
       <p>
         الجنيه الذهب قطعة ذهب عيار 21 وزنها 8 جرامات، وهو من أكتر أشكال ادخار الذهب انتشارًا في مصر
