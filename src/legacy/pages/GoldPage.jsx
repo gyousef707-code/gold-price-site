@@ -7,6 +7,7 @@ import UpdatedStamp from '../components/UpdatedStamp.jsx';
 import MarketStatus from '../components/MarketStatus.jsx';
 import GapGauge from '../components/GapGauge.jsx';
 const PriceHistoryChart = lazy(() => import('../components/PriceHistoryChart.jsx'));
+import LazyOnView from '../components/LazyOnView.jsx';
 
 import useApiData from '../hooks/useApiData.js';
 import { useLang } from '../context/LangContext.jsx';
@@ -196,15 +197,17 @@ export default function GoldPage({ initialGoldData = null } = {}) {
 
       </section>
 
-      <Suspense fallback={null}>
-        <PriceHistoryChart
-          endpoint="/api/public/gold-history"
-          titleAr="تطور سعر ذهب عيار 21"
-          titleEn="21K gold price trend"
-          dataKey="karat21_sell"
-          tone="gold"
-        />
-      </Suspense>
+      <LazyOnView minHeight={290}>
+        <Suspense fallback={null}>
+          <PriceHistoryChart
+            endpoint="/api/public/gold-history"
+            titleAr="تطور سعر ذهب عيار 21"
+            titleEn="21K gold price trend"
+            dataKey="karat21_sell"
+            tone="gold"
+          />
+        </Suspense>
+      </LazyOnView>
 
       <TradingViewChart symbol="OANDA:XAUUSD" id="tradingview-gold" />
 
