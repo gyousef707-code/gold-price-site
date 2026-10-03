@@ -1,0 +1,52 @@
+/* =====================================================================
+   صفوف العملات الرقمية: نفس حجم وتظليل كروت صفحة العملات
+   ملف مستقل بيتحمّل بعد theme-patterns.css (من styles.css).
+   لو حبيت تشيله: امسح سطر @import بتاعه من styles.css.
+   ===================================================================== */
+
+/* ---- التظليل (نقط ذهبية + لمعة في الركن): نفس كروت العملات بالظبط ---- */
+body :is(.crypto-row),
+body.light-mode :is(.crypto-row) {
+  --surf: var(--card-bg);
+  background:
+    linear-gradient(var(--fade-angle, 135deg), transparent 0%, var(--surf) var(--fade-end, 78%)),
+    radial-gradient(circle at 0% 0%, rgba(var(--dot-rgb), var(--glow-a)), transparent 55%),
+    radial-gradient(circle at center, rgba(var(--dot-rgb), var(--dot-a)) var(--dot-r, 1px), transparent calc(var(--dot-r, 1px) + 0.7px))
+      0 0 / var(--dot-size, 10px) var(--dot-size, 10px),
+    var(--surf);
+}
+
+/* ---- الحجم: نفس قياسات currency-card-new ---- */
+body .crypto-list { gap: 6px !important; }
+
+body .crypto-row {
+  grid-template-columns: 22px 32px 1fr auto auto !important;
+  gap: 10px !important;
+  padding: 10px 12px !important;
+  border-radius: 12px !important;
+}
+body .crypto-row .crypto-card-icon { width: 32px !important; height: 32px !important; }
+body .crypto-row-name { font-size: 17px !important; }
+body .crypto-row-symbol { font-size: 12px !important; }
+body .crypto-row .crypto-card-price-egp { font-size: 18px !important; }
+body .crypto-row .crypto-card-price-usd { font-size: 12px !important; }
+body .crypto-row .badge-change { font-size: 12px !important; padding: 3px 7px !important; }
+
+/* حركة الهوفر نفس العملات */
+body .crypto-row:hover { transform: translateX(-2px); }
+body .crypto-row:active { transform: translateX(-2px) scale(0.98); }
+body .crypto-row-nolink:hover,
+body .crypto-row-nolink:active { transform: none; }
+
+/* شاشات صغيرة (زي العملات بالظبط: خط أصغر شوية) */
+@media (max-width: 400px) {
+  body .crypto-row { padding: 8px 10px !important; gap: 8px !important; grid-template-columns: 20px 32px 1fr auto auto !important; }
+  body .crypto-row-name { font-size: 15px !important; }
+  body .crypto-row .crypto-card-price-egp { font-size: 16px !important; }
+}
+
+/* كمبيوتر: عمود السعر والشارة زي ما كانوا بس بحجم أكبر */
+@media (min-width: 900px) {
+  body .crypto-row { grid-template-columns: 28px 36px 1fr 160px 90px !important; padding: 14px 18px !important; }
+  body .crypto-row .crypto-card-icon { width: 36px !important; height: 36px !important; }
+}
