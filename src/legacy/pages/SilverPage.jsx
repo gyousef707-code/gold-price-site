@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import TradingViewChart from '../components/TradingViewChart.jsx';
 const PriceHistoryChart = lazy(() => import('../components/PriceHistoryChart.jsx'));
+import LazyOnView from '../components/LazyOnView.jsx';
 import FaIcon from '../components/FaIcon.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
 import LivePrice from '../components/LivePrice.jsx';
@@ -109,15 +110,17 @@ export default function SilverPage() {
         </div>
       </section>
 
-      <Suspense fallback={null}>
-        <PriceHistoryChart
-          endpoint="/api/public/silver-history"
-          titleAr="تطور سعر فضة عيار 999"
-          titleEn="999 silver price trend"
-          dataKey="silver999_sell"
-          tone="silver"
-        />
-      </Suspense>
+      <LazyOnView minHeight={290}>
+        <Suspense fallback={null}>
+          <PriceHistoryChart
+            endpoint="/api/public/silver-history"
+            titleAr="تطور سعر فضة عيار 999"
+            titleEn="999 silver price trend"
+            dataKey="silver999_sell"
+            tone="silver"
+          />
+        </Suspense>
+      </LazyOnView>
 
       <TradingViewChart symbol="OANDA:XAGUSD" id="tradingview-silver" />
 
