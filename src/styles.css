@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 @import "./styles/global.css";
 @import "./styles/theme-patterns.css";
+@import "./styles/crypto-cards.css";
 @source "../src";
 
 
