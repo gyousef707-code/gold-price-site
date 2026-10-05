@@ -1,0 +1,170 @@
+/* =====================================================================
+   صفحات الدول + شاشة اختيار الدولة + زر العلم في الهيدر
+   ملف مستقل بيتحمّل بعد باقي الملفات (من styles.css). لو حبيت تشيله:
+   امسح سطر @import بتاعه من styles.css.
+   ألوان كل دولة بتيجي من ثيم الدولة (--gold-primary وإخوانها) فكل
+   الكلاسات هنا بتاخد هوية الدولة تلقائيًا.
+   ===================================================================== */
+
+/* ---------- زر العلم في الهيدر ---------- */
+.flag-btn { padding: 0; overflow: hidden; }
+.flag-btn:hover { background: var(--card-bg-elevated); color: inherit; }
+.flag-btn-img { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; display: block; }
+
+/* ---------- شاشة اختيار الدولة ---------- */
+.cpk-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(2, 6, 12, 0.66); }
+.cpk-sheet {
+  position: fixed; z-index: 2001; inset-inline: 0; bottom: 0; max-height: 88vh; overflow-y: auto;
+  background: var(--bg-color); border-top: 1px solid var(--border-gold);
+  border-radius: 22px 22px 0 0; padding: 10px 14px 26px;
+  box-shadow: 0 -18px 48px rgba(0, 0, 0, 0.45);
+  animation: cpk-up 0.26s ease-out;
+}
+@keyframes cpk-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.cpk-grab { width: 42px; height: 4px; border-radius: 4px; background: var(--border-gold); margin: 0 auto 12px; }
+.cpk-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.cpk-head h2 { font-size: 21px; font-weight: 800; color: var(--text-color); }
+.cpk-head p { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+.cpk-close {
+  width: 36px; height: 36px; border-radius: 11px; border: 1px solid var(--border-subtle);
+  background: var(--card-bg-elevated); color: var(--text-muted); cursor: pointer; font-size: 15px;
+}
+.cpk-grid { list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+@media (min-width: 560px) { .cpk-grid { grid-template-columns: repeat(3, 1fr); } .cpk-sheet { max-width: 720px; margin-inline: auto; } }
+.cpk-card {
+  --c: var(--gold-primary); --c-rgb: 227, 179, 65;
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 16px 10px 14px; border-radius: 16px; text-decoration: none; color: var(--text-color);
+  background:
+    radial-gradient(circle at 50% -10%, rgba(var(--c-rgb), 0.28), transparent 62%),
+    var(--card-bg);
+  border: 1px solid rgba(var(--c-rgb), 0.32);
+  border-bottom: 3px solid var(--c);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.cpk-card:active { transform: scale(0.97); }
+.cpk-card.current { border-color: var(--c); box-shadow: 0 0 0 1px var(--c) inset; }
+.cpk-flag {
+  width: 60px; height: 60px; border-radius: 50%; padding: 3px; margin-bottom: 4px;
+  background: conic-gradient(from 200deg, var(--c), rgba(var(--c-rgb), 0.25), var(--c));
+}
+.cpk-flag img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; background: var(--card-bg); }
+.cpk-name { font-size: 16px; font-weight: 800; }
+.cpk-cur { font-size: 12px; color: var(--text-muted); }
+.cpk-badge { position: absolute; top: 8px; inset-inline-start: 8px; font-size: 10.5px; font-weight: 800; padding: 2px 8px; border-radius: 20px; }
+.cpk-badge.here { background: var(--c); color: #0d1117; }
+.cpk-badge.soon { background: var(--card-bg-elevated); color: var(--text-muted); border: 1px solid var(--border-subtle); }
+.cpk-card.disabled { opacity: 0.5; border-color: var(--border-subtle); border-bottom-color: var(--border-subtle); background: var(--card-bg); }
+.cpk-card.disabled .cpk-flag { background: var(--border-subtle); }
+.cpk-card.disabled img { filter: grayscale(1); }
+
+/* ---------- صفحة الدولة ---------- */
+.cp { max-width: 760px; margin: 0 auto; padding: 14px 0 28px; }
+.cp-h { font-size: 17px; font-weight: 800; color: var(--text-color); margin: 0 0 12px; }
+.cp-section { margin-top: 22px; }
+
+/* الغلاف: زخرفة خاصة بكل دولة (CSS فقط، بدون صور) */
+.cp-hero {
+  --pat: none;
+  position: relative; overflow: hidden; border-radius: 22px; padding: 22px 18px 18px;
+  display: grid; grid-template-columns: auto 1fr; gap: 14px 16px; align-items: center;
+  border: 1px solid var(--border-gold);
+  background:
+    var(--pat) center bottom / auto 100% repeat-x,
+    linear-gradient(160deg, rgba(var(--dot-rgb), 0.2), transparent 65%),
+    var(--card-bg);
+}
+.cp-hero::after {
+  content: ''; position: absolute; inset-inline: 0; bottom: 0; height: 4px;
+  background: linear-gradient(90deg, var(--gold-dark), var(--gold-bright), var(--gold-dark));
+}
+.cp-flag {
+  width: 84px; height: 84px; border-radius: 50%; padding: 4px;
+  background: conic-gradient(from 200deg, var(--gold-bright), var(--gold-dark), var(--gold-bright));
+  box-shadow: 0 0 28px rgba(var(--dot-rgb), 0.35);
+}
+.cp-flag img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
+.cp-hero-text h1 { font-size: 24px; line-height: 1.25; font-weight: 800; color: var(--text-color); }
+.cp-tagline { font-size: 13.5px; color: var(--text-muted); margin-top: 4px; }
+.cp-chips { grid-column: 1 / -1; list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+.cp-chips li {
+  font-size: 12.5px; font-weight: 700; padding: 5px 12px; border-radius: 20px;
+  color: var(--gold-bright); background: rgba(var(--dot-rgb), 0.12); border: 1px solid var(--border-gold);
+}
+.cp-live { grid-column: 1 / -1; font-size: 12.5px; color: var(--text-muted); display: flex; align-items: center; gap: 7px; margin: 0; }
+.cp-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 0 rgba(63, 185, 80, 0.5); animation: cp-pulse 2s infinite; }
+@keyframes cp-pulse { 70% { box-shadow: 0 0 0 7px rgba(63, 185, 80, 0); } 100% { box-shadow: 0 0 0 0 rgba(63, 185, 80, 0); } }
+@media (prefers-reduced-motion: reduce) { .cp-dot, .cpk-sheet { animation: none; } }
+
+/* زخارف الدول */
+.cp-hero[data-pattern='dunes'] { --pat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='60' viewBox='0 0 160 60'%3E%3Cpath d='M0 44 Q40 18 80 44 T160 44 V60 H0Z' fill='%2334d399' fill-opacity='.12'/%3E%3Cpath d='M0 52 Q40 32 80 52 T160 52 V60 H0Z' fill='%2334d399' fill-opacity='.14'/%3E%3C/svg%3E"); }
+.cp-hero[data-pattern='skyline'] { --pat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='70' viewBox='0 0 200 70'%3E%3Cpath d='M0 70V48h12V36h8v12h10V28h6V8h3v20h6v22h12V40h10V30h8v18h12V16h2V4h2v12h2v34h10V42h12V34h8v36z' fill='%23ff5a5f' fill-opacity='.14'/%3E%3C/svg%3E"); }
+.cp-hero[data-pattern='waves'] { --pat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='40' viewBox='0 0 90 40'%3E%3Cpath d='M0 28 Q22 12 45 28 T90 28' fill='none' stroke='%2322c3d3' stroke-opacity='.26' stroke-width='2'/%3E%3Cpath d='M0 36 Q22 20 45 36 T90 36' fill='none' stroke='%2322c3d3' stroke-opacity='.18' stroke-width='2'/%3E%3C/svg%3E"); }
+.cp-hero[data-pattern='dhow'] { --pat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cpath d='M0 22L11 11 22 22 33 11 44 22 33 33 22 22 11 33Z' fill='none' stroke='%23d65a8e' stroke-opacity='.22' stroke-width='1.5'/%3E%3C/svg%3E"); }
+.cp-hero[data-pattern='pearls'] { --pat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Ccircle cx='14' cy='16' r='6' fill='%239db4ff' fill-opacity='.16'/%3E%3Ccircle cx='44' cy='40' r='9' fill='%239db4ff' fill-opacity='.1'/%3E%3Ccircle cx='46' cy='12' r='3' fill='%239db4ff' fill-opacity='.2'/%3E%3C/svg%3E"); }
+.cp-hero[data-pattern='khanjar'] { --pat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cpath d='M18 2L34 18 18 34 2 18Z' fill='none' stroke='%23a3c93a' stroke-opacity='.22' stroke-width='1.5'/%3E%3Ccircle cx='18' cy='18' r='2.5' fill='%23a3c93a' fill-opacity='.2'/%3E%3C/svg%3E"); }
+.cp-hero[data-pattern='petra'] { --pat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='60' viewBox='0 0 80 60'%3E%3Cpath d='M10 60V30a10 10 0 0 1 20 0v30M50 60V30a10 10 0 0 1 20 0v30' fill='none' stroke='%23e8896b' stroke-opacity='.24' stroke-width='1.6'/%3E%3C/svg%3E"); }
+
+/* أسعار العيارات */
+.cp-karat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+@media (min-width: 640px) { .cp-karat-grid { grid-template-columns: repeat(4, 1fr); } }
+.cp-karat, .cp-silver, .cp-ounce-box {
+  --surf: var(--card-bg);
+  background:
+    linear-gradient(135deg, transparent 0%, var(--surf) 78%),
+    radial-gradient(circle at 0% 0%, rgba(var(--dot-rgb), var(--glow-a)), transparent 55%),
+    radial-gradient(circle at center, rgba(var(--dot-rgb), var(--dot-a)) 1px, transparent 1.7px) 0 0 / 10px 10px,
+    var(--surf);
+  border: 1px solid var(--border-gold);
+}
+.cp-karat { border-radius: 16px; border-top: 3px solid var(--gold-primary); padding: 14px 12px 12px; text-align: center; }
+.cp-karat-name { font-size: 13px; color: var(--text-muted); margin: 0; }
+.cp-karat-name b { font-size: 34px; line-height: 1; color: var(--gold-bright); font-weight: 800; margin-inline-start: 2px; }
+.cp-karat-price { font-size: 25px; font-weight: 800; color: var(--text-color); margin: 8px 0 2px; min-height: 36px; font-variant-numeric: tabular-nums; }
+.cp-karat-unit { font-size: 12px; color: var(--text-muted); margin: 0; }
+.cp-skel { display: inline-block; width: 70%; height: 24px; border-radius: 8px; background: var(--border-subtle); vertical-align: middle; }
+
+/* الأونصة والفضة */
+.cp-ounce-box { border-radius: 16px; padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.cp-ounce-usd { font-size: 30px; font-weight: 800; color: var(--text-color); margin: 0; font-variant-numeric: tabular-nums; }
+.cp-ounce-note { font-size: 12px; color: var(--text-muted); margin: 2px 0 0; }
+.cp-ounce-side { text-align: end; }
+.cp-ounce-local { font-size: 17px; font-weight: 800; color: var(--gold-bright); margin: 0 0 4px; font-variant-numeric: tabular-nums; }
+.cp-change { display: inline-block; font-size: 12.5px; font-weight: 800; padding: 2px 9px; border-radius: 20px; }
+.cp-change.up { color: var(--success); background: rgba(63, 185, 80, 0.14); }
+.cp-change.down { color: var(--danger); background: rgba(248, 81, 73, 0.14); }
+.cp-silver-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.cp-silver { border-radius: 14px; padding: 12px; text-align: center; }
+.cp-silver-name { font-size: 13px; color: var(--text-muted); margin: 0 0 4px; }
+.cp-silver-price { font-size: 21px; font-weight: 800; color: var(--text-color); margin: 0; font-variant-numeric: tabular-nums; }
+.cp-silver-price small { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.cp-note { margin-top: 14px; font-size: 12.5px; line-height: 1.8; color: var(--text-muted); }
+.cp-error { padding: 18px; text-align: center; color: var(--text-muted); border: 1px dashed var(--border-gold); border-radius: 14px; }
+
+/* النص التعريفي والأسئلة */
+.cp-about p { font-size: 14.5px; line-height: 1.95; color: var(--text-color); opacity: 0.92; }
+.cp-faq { margin-top: 12px; display: grid; gap: 8px; }
+.cp-faq details { border: 1px solid var(--border-subtle); border-radius: 12px; background: var(--card-bg); padding: 0 14px; }
+.cp-faq summary { cursor: pointer; font-weight: 700; font-size: 14px; padding: 12px 0; color: var(--text-color); }
+.cp-faq details[open] { border-color: var(--border-gold); }
+.cp-faq details p { padding-bottom: 12px; margin: 0; font-size: 13.5px; }
+
+/* دول أخرى */
+.cp-others { margin-top: 24px; }
+.cp-others ul { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+.cp-others a {
+  display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 22px;
+  font-size: 13.5px; font-weight: 700; text-decoration: none; color: var(--text-color);
+  background: var(--card-bg); border: 1px solid var(--border-subtle);
+}
+.cp-others a:hover { border-color: var(--gold-primary); }
+.cp-others img { border-radius: 3px; }
+
+/* الوضع الفاتح: نص أوضح وزخارف أخف */
+body.light-mode .cp-hero::after { opacity: 0.9; }
+body.light-mode .cpk-overlay { background: rgba(24, 32, 42, 0.45); }
+body.light-mode .cpk-sheet { box-shadow: 0 -18px 48px rgba(24, 32, 42, 0.18); }
+body.light-mode .cp-chips li { color: var(--gold-dark); background: rgba(var(--dot-rgb), 0.1); }
+body.light-mode .cp-karat-name b { color: var(--gold-dark); }
+body.light-mode .cp-ounce-local { color: var(--gold-dark); }
+body.light-mode .cpk-badge.here { color: #fff; }
