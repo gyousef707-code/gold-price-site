@@ -3,6 +3,7 @@
 @import "./styles/global.css";
 @import "./styles/theme-patterns.css";
 @import "./styles/crypto-cards.css";
+@import "./styles/countries.css";
 @source "../src";
 
 
