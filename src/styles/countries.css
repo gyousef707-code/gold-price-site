@@ -168,3 +168,42 @@ body.light-mode .cp-chips li { color: var(--gold-dark); background: rgba(var(--d
 body.light-mode .cp-karat-name b { color: var(--gold-dark); }
 body.light-mode .cp-ounce-local { color: var(--gold-dark); }
 body.light-mode .cpk-badge.here { color: #fff; }
+
+/* ---------- اسم الدولة جنب اللوجو ---------- */
+.logo-country {
+  display: inline-block; margin-inline-start: 8px; padding: 2px 9px; border-radius: 20px;
+  font-size: 11.5px; font-weight: 800; vertical-align: middle; letter-spacing: 0;
+  color: var(--gold-bright); background: rgba(var(--dot-rgb, 227, 179, 65), 0.14);
+  border: 1px solid var(--border-gold);
+}
+body.light-mode .logo-country { color: var(--gold-dark); }
+
+/* ---------- قوائم الصفوف (العملات والعملات الرقمية) ---------- */
+.cp-rows { list-style: none; display: grid; gap: 8px; margin: 0; padding: 0; }
+.cp-row {
+  --surf: var(--card-bg);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 11px 14px; border-radius: 14px; border: 1px solid var(--border-gold);
+  background:
+    linear-gradient(135deg, transparent 0%, var(--surf) 78%),
+    radial-gradient(circle at 0% 0%, rgba(var(--dot-rgb), var(--glow-a)), transparent 55%),
+    radial-gradient(circle at center, rgba(var(--dot-rgb), var(--dot-a)) 1px, transparent 1.7px) 0 0 / 10px 10px,
+    var(--surf);
+}
+.cp-row-main { display: flex; align-items: center; gap: 11px; min-width: 0; }
+.cp-row-main img { border-radius: 4px; flex: none; }
+.cp-row-noflag { width: 28px; height: 21px; border-radius: 4px; background: var(--border-subtle); flex: none; }
+.cp-row-name { display: flex; flex-direction: column; gap: 1px; font-size: 14.5px; font-weight: 700; color: var(--text-color); min-width: 0; }
+.cp-row-val { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 6px; font-size: 16px; font-weight: 800; color: var(--text-color); font-variant-numeric: tabular-nums; text-align: end; }
+.cp-row-val small { font-size: 11.5px; font-weight: 600; color: var(--text-muted); }
+.cp-row-val em { font-style: normal; }
+.cp-sub { font-size: 11.5px; font-weight: 600; color: var(--text-muted); }
+.cp-coin-sym {
+  flex: none; min-width: 44px; height: 32px; padding: 0 8px; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 10px; font-size: 12px; font-weight: 800; color: var(--gold-bright);
+  background: rgba(var(--dot-rgb), 0.14); border: 1px solid var(--border-gold);
+}
+body.light-mode .cp-coin-sym { color: var(--gold-dark); }
+.cp-empty { justify-content: center; color: var(--text-muted); }
+.cp-search { width: 100%; margin-bottom: 10px; }
+.cp-karat-silver { border-top-color: var(--gold-bright); }
