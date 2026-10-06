@@ -1,7 +1,7 @@
 import { lazy, Suspense, useCallback, useState } from 'react';
 import { Link, useLocation } from '@/lib/router-compat.jsx';
 import FaIcon from './FaIcon.jsx';
-import { COUNTRY_CODES } from '../data/countryCodes.js';
+import { COUNTRY_CODES, COUNTRY_NAMES } from '../data/countryCodes.js';
 import { useTheme } from '../context/ThemeContext.jsx';
 import { useLang } from '../context/LangContext.jsx';
 import { SunIcon, MoonIcon, AutoIcon } from './icons.jsx';
@@ -45,6 +45,7 @@ export default function Header({ onMenuClick }) {
   const closePicker = useCallback(() => setPickerOpen(false), []);
   const seg = pathname.split('/')[1];
   const current = COUNTRY_CODES.includes(seg) ? seg : 'eg';
+  const inCountry = current !== 'eg';
 
   const cycleTheme = () => setMode(NEXT_MODE[mode] || 'dark');
 
@@ -74,9 +75,10 @@ export default function Header({ onMenuClick }) {
         </button>
       </div>
       <div className="header-right">
-        <Link to="/" className="logo-link">
+        <Link to={inCountry ? `/${current}` : '/'} className="logo-link">
           <h1 className="logo-text">
             {t('app.name')} <span className="logo-dot">●</span>
+            {inCountry ? <span className="logo-country">{COUNTRY_NAMES[current]}</span> : null}
           </h1>
         </Link>
         <button className="icon-btn" onClick={onMenuClick} aria-label={t('header.menu')}>
