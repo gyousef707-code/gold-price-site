@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link } from '@/lib/router-compat.jsx';
 import useApiData from '../hooks/useApiData.js';
+import CountryHero, { formatTime } from '../components/CountryHero.jsx';
 import {
   COUNTRIES,
   ACTIVE_COUNTRY_CODES,
   GOLD_KARATS,
   SILVER_PURITIES,
-  countryThemeCss,
   flagUrl,
   formatMoney,
 } from '../data/countries.js';
@@ -24,7 +24,7 @@ function Change({ value }) {
 
 export default function CountryPage({ code, initialData = null }) {
   const c = COUNTRIES[code];
-  const { data, error, loading } = useApiData(`/api/public/country-prices?c=${code}`, {
+  const { data, error, loading } = useApiData(`/api/public/country-prices?c=${code}&t=gold`, {
     intervalMs: 60000,
     initialData,
   });
@@ -32,10 +32,7 @@ export default function CountryPage({ code, initialData = null }) {
 
   // الوقت بيتحسب في المتصفح بس (بتوقيت الزائر) عشان ميحصلش اختلاف بين السيرفر والمتصفح
   useEffect(() => {
-    if (!data?.updated_at) return;
-    setTime(
-      new Date(data.updated_at).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
-    );
+    setTime(formatTime(data?.updated_at));
   }, [data?.updated_at]);
 
   if (!c) return null;
@@ -47,30 +44,12 @@ export default function CountryPage({ code, initialData = null }) {
 
   return (
     <div className="cp" data-country={code}>
-      {/* ثيم الدولة: متغيرات ألوان بتتطبق على الصفحة كلها (الهيدر والقائمة السفلية كمان) */}
-      <style dangerouslySetInnerHTML={{ __html: countryThemeCss(c) }} />
-
-      <section className="cp-hero" data-pattern={c.pattern}>
-        <div className="cp-flag">
-          <img src={flagUrl(c.flag, 160)} width="76" height="76" alt={`علم ${c.name}`} />
-        </div>
-        <div className="cp-hero-text">
-          <h1>أسعار الذهب في {c.name}</h1>
-          <p className="cp-tagline">{c.tagline}</p>
-        </div>
-        <ul className="cp-chips">
-          <li>{c.currencyName}</li>
-          {data?.fx ? (
-            <li>
-              1 دولار = {Number(data.fx)} {c.short}
-            </li>
-          ) : null}
-        </ul>
-        <p className="cp-live">
-          <span className="cp-dot" aria-hidden="true" />
-          {time ? `آخر تحديث ${time}` : 'السعر لحظي'}
-        </p>
-      </section>
+      <CountryHero
+        code={code}
+        title={`أسعار الذهب في ${c.name}`}
+        fx={data?.fx}
+        time={time}
+      />
 
       <section className="cp-section" aria-labelledby="cp-karats-h">
         <h2 id="cp-karats-h" className="cp-h">
