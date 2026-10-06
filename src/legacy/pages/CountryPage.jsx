@@ -1,7 +1,10 @@
-import { useEffect, useState } from 'react';
+import { lazy, useEffect, useState } from 'react';
 import { Link } from '@/lib/router-compat.jsx';
 import useApiData from '../hooks/useApiData.js';
 import CountryHero, { formatTime } from '../components/CountryHero.jsx';
+import CalcTabs from '../components/CalcTabs.jsx';
+import LazyOnView from '../components/LazyOnView.jsx';
+import FaIcon from '../components/FaIcon.jsx';
 import {
   COUNTRIES,
   ACTIVE_COUNTRY_CODES,
@@ -10,6 +13,13 @@ import {
   flagUrl,
   formatMoney,
 } from '../data/countries.js';
+
+const CountryGoldCalc = lazy(() =>
+  import('../components/CountryCalculators.jsx').then((m) => ({ default: m.CountryGoldCalc }))
+);
+const CountryZakatCalc = lazy(() =>
+  import('../components/CountryCalculators.jsx').then((m) => ({ default: m.CountryZakatCalc }))
+);
 
 function Change({ value }) {
   if (value == null || !Number.isFinite(Number(value))) return null;
@@ -112,6 +122,22 @@ export default function CountryPage({ code, initialData = null }) {
           </div>
         </section>
       ) : null}
+
+      <section id="tool-gold-calc-section" className="cp-section">
+        <div className="section-title-bar">
+          <h2>
+            <FaIcon icon="fa-solid fa-calculator" /> أدوات الذهب
+          </h2>
+        </div>
+        <LazyOnView minHeight={430}>
+          <CalcTabs
+            tabs={[
+              { id: 'tool-gold-value', label: 'قيمة الذهب', render: () => <CountryGoldCalc code={code} data={data} /> },
+              { id: 'tool-zakat-calc', label: 'الزكاة', render: () => <CountryZakatCalc code={code} data={data} /> },
+            ]}
+          />
+        </LazyOnView>
+      </section>
 
       <p className="cp-note">
         الأسعار استرشادية، محسوبة من السعر العالمي بسعر الصرف المعروض، ولا تشمل المصنعية ولا
