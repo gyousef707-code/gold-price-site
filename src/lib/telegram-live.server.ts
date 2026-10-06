@@ -10,8 +10,28 @@
 // التخزين: Cloudflare D1 (الـ binding اسمه DB — شوف wrangler.toml و migrations/).
 // لو الـ binding مش مضبوط، الأتمتة بتتجاهل نفسها بهدوء ومبتأثرش على باقي الموقع.
 
-import { sendTelegramMessage } from "./telegram.server";
+import { sendTelegramMessage, sendTelegramPhoto } from "./telegram.server";
 import { sendWhatsAppMessage } from "./whatsapp.server";
+import {
+  cairoDateTime,
+  currencyPosterHtml,
+  goldPosterHtml,
+  POSTER_CURRENCIES,
+  renderPosterPng,
+  type CurrencyPosterData,
+  type GoldPosterData,
+  type Pair,
+  type PosterAssets,
+} from "./poster.server";
+import {
+  currencyCaption,
+  currencyNarrative,
+  goldCaption,
+  goldNarrative,
+  type CcySnap,
+  type DayRange,
+  type GoldSnap,
+} from "./telegram-captions.server";
 
 // ---------------- الإعدادات (عدّل من هنا بس) ----------------
 export const TG_CONFIG = {
@@ -39,8 +59,12 @@ export type D1Like = {
 export type Deps = {
   db?: D1Like | null;
   now?: { day: string; hour: number };
+  nowDate?: Date; // لتثبيت التاريخ/الوقت في البوستر (للاختبار)
   send?: (text: string) => Promise<unknown>;
   sendWhatsApp?: (text: string) => Promise<unknown>;
+  renderPng?: (html: string) => Promise<Uint8Array>;
+  sendPhoto?: (png: Uint8Array, caption: string) => Promise<unknown>;
+  assets?: PosterAssets;
   force?: boolean; // اختبار يدوي: ابعت الملخص حتى لو اتبعت النهارده (من غير ما يلمس العلامة)
 };
 
@@ -235,12 +259,130 @@ export async function recordStats(
   await db.batch(entries.map(([item, price]) => stmt.bind(day, item, price, now)));
 }
 
-// ---------------- الفحص اللحظي ----------------
+// ---------------- لقطات الأسعار (لحساب "ماذا تغيّر") ----------------
+// كلها best-effort: لو جدول snapshots لسه متعملش (migration 0002)، بنكمل من غير مقارنات.
+async function loadSnap<T>(db: D1Like, key: string): Promise<T | null> {
+  try {
+    const row = await db.prepare("SELECT json FROM snapshots WHERE key = ?1").bind(key).first<{ json: string }>();
+    return row ? (JSON.parse(row.json) as T) : null;
+  } catch {
+    return null;
+  }
+}
+
+async function saveSnap(db: D1Like, key: string, value: unknown) {
+  try {
+    await db
+      .prepare(
+        "INSERT INTO snapshots (key, json, at) VALUES (?1, ?2, ?3) ON CONFLICT(key) DO UPDATE SET json = excluded.json, at = excluded.at",
+      )
+      .bind(key, JSON.stringify(value), Date.now())
+      .run();
+  } catch {
+    // مش مشكلة — بس المقارنة الجاية هتكون ناقصة
+  }
+}
+
+async function loadLatestCcySnapBefore(db: D1Like, day: string): Promise<CcySnap | null> {
+  try {
+    const row = await db
+      .prepare("SELECT json FROM snapshots WHERE key LIKE 'ccy:%' AND key < ?1 ORDER BY key DESC LIMIT 1")
+      .bind(`ccy:${day}`)
+      .first<{ json: string }>();
+    return row ? (JSON.parse(row.json) as CcySnap) : null;
+  } catch {
+    return null;
+  }
+}
+
+function ccySnap(gold: any, currency: any): CcySnap {
+  const out: CcySnap = {};
+  const put = (k: keyof CcySnap, v: unknown) => {
+    if (typeof v === "number" && Number.isFinite(v)) out[k] = v;
+  };
+  const r = currency?.rates ?? {};
+  put("usd", r["usd"]?.mid);
+  put("sagha", gold?.implied_usd_rate);
+  put("gap", gold?.gap_value);
+  for (const c of POSTER_CURRENCIES) put(c.code as keyof CcySnap, r[c.code]?.mid);
+  return out;
+}
+
+// ---------------- بيانات البوسترات ----------------
+const pair = (x: any): Pair => ({
+  sell: isNum(x?.sell) ? x.sell : null,
+  buy: isNum(x?.buy) ? x.buy : null,
+});
+
+function goldPosterData(gold: any, currency: any, dt: { date: string; time: string }): GoldPosterData {
+  return {
+    g24: pair(gold?.caratPrices?.["24"]),
+    g21: pair(gold?.caratPrices?.["21"]),
+    g18: pair(gold?.caratPrices?.["18"]),
+    pound: pair(gold?.pound),
+    ounce: isNum(gold?.ounce_usd) ? gold.ounce_usd : null,
+    usdBank: isNum(currency?.rates?.usd?.sell) ? currency.rates.usd.sell : null,
+    usdSagha: isNum(gold?.implied_usd_rate) ? gold.implied_usd_rate : null,
+    ...dt,
+  };
+}
+
+function currencyPosterData(gold: any, currency: any, dt: { date: string; time: string }): CurrencyPosterData {
+  const rates = currency?.rates ?? {};
+  return {
+    usd: pair(rates["usd"]),
+    sagha: isNum(gold?.implied_usd_rate) ? gold.implied_usd_rate : null,
+    gap: typeof gold?.gap_value === "number" ? gold.gap_value : null,
+    rows: POSTER_CURRENCIES.map((c) => ({ ...c, ...pair(rates[c.code]) })).filter(
+      (r) => r.buy !== null || r.sell !== null,
+    ),
+    ...dt,
+  };
+}
+
+// ---------------- الإرسال: بوستر + نص، وبديل نصي لو الصورة فشلت ----------------
+async function deliverPoster(html: string, caption: string, fallbackText: string, deps: Deps) {
+  const render = deps.renderPng ?? renderPosterPng;
+  const sendPhoto = deps.sendPhoto ?? ((png: Uint8Array, cap: string) => sendTelegramPhoto(png, cap));
+  const send = deps.send ?? ((t: string) => sendTelegramMessage(t));
+  try {
+    const png = await render(html);
+    await sendPhoto(png, caption);
+    return "photo" as const;
+  } catch {
+    // الصورة فشلت (مفيش توكن / حصة خلصت / عطل) — القناة ما تفضلش من غير تحديث
+    await send(fallbackText);
+    return "text" as const;
+  }
+}
+
+function currencyFallbackText(gold: any, currency: any): string {
+  const rates = currency?.rates ?? {};
+  const row = (emoji: string, label: string, p: Pair) =>
+    p.buy !== null || p.sell !== null
+      ? `${emoji} ${label}:  شراء ${b(fmt2(p.buy ?? 0))} • بيع ${b(fmt2(p.sell ?? 0))}`
+      : null;
+  return joinGroups(
+    [
+      [row("💵", "الدولار", pair(rates["usd"]))],
+      [isNum(gold?.implied_usd_rate) ? `💵 دولار الصاغة:  ${b(fmt2(gold.implied_usd_rate))} جنيه` : null],
+      POSTER_CURRENCIES.map((c) => row("🔸", c.name, pair(rates[c.code]))),
+      [`🌐 موقعنا الإلكتروني: ${TG_CONFIG.SITE_URL}`],
+      [`📢 قناتنا على تليجرام: ${TG_CONFIG.CHANNEL_URL}`],
+    ],
+    "\n\n",
+  );
+}
+
+const LINKS = () => ({ site: TG_CONFIG.SITE_URL, channel: TG_CONFIG.CHANNEL_URL });
+
+// ---------------- الفحص اللحظي (الذهب) ----------------
 export async function checkAndSendInstant(
   db: D1Like,
+  day: string,
   gold: any,
   currency: any,
-  send: (text: string) => Promise<unknown>,
+  deps: Deps,
 ) {
   const item = TG_CONFIG.MAIN_ITEM;
   const current = extractPrices(gold, currency)[item];
@@ -269,10 +411,32 @@ export async function checkAndSendInstant(
   if (claim.meta.changes !== 1) return { status: "claimed-elsewhere" as const };
 
   try {
-    await send(formatInstant(gold, currency));
-    return { status: "sent" as const, price: current };
+    const cur: GoldSnap = extractPrices(gold, currency);
+    // السعر المرجعي: لقطة آخر رسالة (لو موجودة)، وإلا على الأقل سعر عيار 21 اللي في last_sent
+    const prev: GoldSnap = (await loadSnap<GoldSnap>(db, "gold_last")) ?? (last ? { gold21: last.price } : {});
+    if (last && prev.gold21 === undefined) prev.gold21 = last.price;
+
+    let range: DayRange = null;
+    try {
+      const r = await db
+        .prepare("SELECT open, high, low FROM daily_stats WHERE day = ?1 AND item = ?2")
+        .bind(day, item)
+        .first<{ open: number; high: number; low: number }>();
+      if (r) range = r;
+    } catch {
+      // نكمل من غير نطاق اليوم
+    }
+
+    const dt = cairoDateTime(deps.nowDate);
+    const html = goldPosterHtml(goldPosterData(gold, currency, dt), deps.assets);
+    const caption = goldCaption(cur, prev, range, LINKS());
+    const fallback = `${goldNarrative(cur, prev, range)}\n\n${formatInstant(gold, currency)}`;
+    const mode = await deliverPoster(html, caption, fallback, deps);
+
+    await saveSnap(db, "gold_last", cur);
+    return { status: "sent" as const, price: current, mode };
   } catch (e) {
-    // فشل الإرسال: نرجّع المرجع القديم عشان المحاولة الجاية تعيد الإرسال
+    // فشل الإرسال نفسه (تيليجرام): نرجّع المرجع القديم عشان المحاولة الجاية تعيد الإرسال
     if (last) {
       await db
         .prepare("UPDATE last_sent SET price = ?1 WHERE item = ?2 AND price = ?3")
@@ -281,6 +445,41 @@ export async function checkAndSendInstant(
     } else {
       await db.prepare("DELETE FROM last_sent WHERE item = ?1").bind(item).run();
     }
+    return { status: "send-failed" as const, error: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+// ---------------- رسالة أول الصباح: العملات ----------------
+export async function sendMorningCurrenciesIfDue(
+  db: D1Like,
+  day: string,
+  gold: any,
+  currency: any,
+  deps: Deps,
+) {
+  if (!currency?.rates?.["usd"]) return { status: "no-currency-data" as const };
+
+  const flagKey = `ccy-morning:${day}`;
+  const done = await db.prepare("SELECT 1 AS x FROM daily_flags WHERE day = ?1").bind(flagKey).first();
+  if (done) return { status: "already-sent" as const };
+
+  const claim = await db
+    .prepare("INSERT OR IGNORE INTO daily_flags (day, sent_at) VALUES (?1, ?2)")
+    .bind(flagKey, Date.now())
+    .run();
+  if (claim.meta.changes !== 1) return { status: "claimed-elsewhere" as const };
+
+  try {
+    const cur = ccySnap(gold, currency);
+    const prev = await loadLatestCcySnapBefore(db, day);
+    const dt = cairoDateTime(deps.nowDate);
+    const html = currencyPosterHtml(currencyPosterData(gold, currency, dt), deps.assets);
+    const caption = currencyCaption(cur, prev, LINKS());
+    const fallback = `${currencyNarrative(cur, prev)}\n\n${currencyFallbackText(gold, currency)}`;
+    const mode = await deliverPoster(html, caption, fallback, deps);
+    return { status: "sent" as const, mode };
+  } catch (e) {
+    await db.prepare("DELETE FROM daily_flags WHERE day = ?1").bind(flagKey).run();
     return { status: "send-failed" as const, error: e instanceof Error ? e.message : String(e) };
   }
 }
@@ -327,6 +526,9 @@ export async function sendDailySummaryIfDue(
     return { status: "send-failed" as const, error: e instanceof Error ? e.message : String(e) };
   }
 
+  // لقطة إقفال العملات: بتتقارن بيها رسالة الصباح التالي
+  if (!force) await saveSnap(db, `ccy:${day}`, ccySnap(gold, currency));
+
   // واتساب اختياري: فشله ما يلغيش نجاح تيليجرام (نفس سلوك الملخص القديم)
   let whatsapp: { ok: boolean; error?: string } = { ok: true };
   if (sendWhatsApp) {
@@ -359,5 +561,8 @@ export async function runTelegramAutomation(gold: any, currency: any, deps: Deps
   }
 
   await recordStats(db, day, extractPrices(gold, currency));
-  return checkAndSendInstant(db, gold, currency, send);
+  // أول رسالة في اليوم = العملات (مرة واحدة)، وبعدها الفحص اللحظي للذهب
+  const morning = await sendMorningCurrenciesIfDue(db, day, gold, currency, deps);
+  const instant = await checkAndSendInstant(db, day, gold, currency, deps);
+  return { ...instant, morning: morning.status };
 }
