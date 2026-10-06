@@ -21,8 +21,8 @@ id = "caab58e559724f0eab423ed70ac577fa"
 # 2) فكّ التعليق عن السطور تحت وحط الـ id
 # 3) npx wrangler d1 migrations apply zahaby-db --remote
 # لحد ما تتفعّل: الأتمتة بتتجاهل نفسها (status: db-not-configured) والموقع شغال عادي.
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "zahaby-db"
-# database_id = "ضع-الـ-id-هنا"
-# migrations_dir = "migrations"
+[[d1_databases]]
+binding = "DB"
+database_name = "zahaby-db"
+database_id = "03ef4388-b7ce-4baf-832c-eb1fefeaa495"
+migrations_dir = "migrations"
