@@ -3,7 +3,7 @@
 // peg = سعر الربط الرسمي بالدولار (ثابت)، والكويت بتتحسب من سوق الصرف.
 
 export const GOLD_KARATS = [24, 22, 21, 18];
-export const SILVER_PURITIES = [999, 925];
+export const SILVER_PURITIES = [999, 925, 900, 800];
 
 // theme: ألوان الوضع الداكن (dark) والفاتح (light) — accent هو اللون الرئيسي للدولة
 export const COUNTRIES = {
@@ -212,6 +212,15 @@ export function formatMoney(value, decimals = 2) {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   });
+}
+
+// عدد خانات ذكي: الأرقام الصغيرة (زي الين) محتاجة خانات أكتر
+export function smartMoney(v) {
+  if (v == null || !Number.isFinite(Number(v))) return '—';
+  const n = Number(v);
+  const abs = Math.abs(n);
+  const d = abs >= 100 ? 2 : abs >= 1 ? 3 : abs >= 0.01 ? 4 : 5;
+  return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: d });
 }
 
 // CSS متغيرات الثيم لدولة معينة (داكن + فاتح). بيتحقن كـ <style> على الصفحة فقط.
