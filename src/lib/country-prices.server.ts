@@ -87,6 +87,7 @@ export async function getCountryCrypto(code: string) {
     id: k.id,
     symbol: k.symbol,
     name: k.name,
+    image: k.image ?? null,
     price_usd: k.price_usd,
     price_local: typeof k.price_usd === "number" ? Number((k.price_usd * fx).toFixed(4)) : null,
     change_24h: k.change_24h,
