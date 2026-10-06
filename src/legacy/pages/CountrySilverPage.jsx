@@ -1,7 +1,13 @@
-import { useEffect, useState } from 'react';
+import { lazy, useEffect, useState } from 'react';
 import useApiData from '../hooks/useApiData.js';
 import CountryHero, { formatTime } from '../components/CountryHero.jsx';
+import LazyOnView from '../components/LazyOnView.jsx';
+import FaIcon from '../components/FaIcon.jsx';
 import { COUNTRIES, SILVER_PURITIES, formatMoney } from '../data/countries.js';
+
+const CountrySilverCalc = lazy(() =>
+  import('../components/CountryCalculators.jsx').then((m) => ({ default: m.CountrySilverCalc }))
+);
 
 export default function CountrySilverPage({ code, initialData = null }) {
   const c = COUNTRIES[code];
@@ -68,6 +74,17 @@ export default function CountrySilverPage({ code, initialData = null }) {
         الأسعار استرشادية، محسوبة من سعر الأونصة العالمي بسعر صرف {c.currencyName} ({data?.fx ?? '—'} لكل
         دولار)، ولا تشمل المصنعية ولا الضريبة.
       </p>
+
+      <section id="tool-silver-calc-section" className="cp-section">
+        <div className="section-title-bar">
+          <h2>
+            <FaIcon icon="fa-solid fa-gem" /> أدوات الفضة
+          </h2>
+        </div>
+        <LazyOnView minHeight={380}>
+          <CountrySilverCalc code={code} data={data} />
+        </LazyOnView>
+      </section>
 
       <section className="cp-section cp-about" aria-labelledby="cps-about">
         <h2 id="cps-about" className="cp-h">
