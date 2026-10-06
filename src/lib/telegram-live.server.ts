@@ -114,44 +114,57 @@ const rtl = (s: string) => `${RLM}${s}`;
 const fmt = (n: number, opts?: Intl.NumberFormatOptions) => Number(n).toLocaleString("en-US", opts);
 const fmt2 = (n: number) => fmt(n, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-// مجموعات الأسطر بينها سطر فارغ؛ المجموعة الفاضية بتتشال، والسطر الناقص بيتشال
-function joinGroups(groups: Array<Array<string | null>>): string {
+// مجموعات الأسطر بينها سطر فارغ؛ المجموعة الفاضية بتتشال، والسطر الناقص بيتشال.
+// lineSep: "\n" لأسطر متلاصقة، "\n\n" لسطر فارغ بين كل سطرين (مسافات أوسع)
+function joinGroups(groups: Array<Array<string | null>>, lineSep = "\n"): string {
   return groups
     .map((g) => g.filter((l): l is string => l !== null).map(rtl))
     .filter((g) => g.length > 0)
-    .map((g) => g.join("\n"))
+    .map((g) => g.join(lineSep))
     .join("\n\n");
 }
+
+// تيليجرام ما بيدعمش تكبير الخط، فبنستخدم الخط العريض <b> للأرقام عشان تتميز
+const b = (s: string) => `<b>${s}</b>`;
+const DIVIDER = "➖➖➖➖➖➖➖➖➖➖";
 
 export function formatInstant(gold: any, currency: any): string {
   const c = (k: string) => gold?.caratPrices?.[k];
   const line = (emoji: string, label: string, v: unknown, unit = "", f = fmt) =>
-    isNum(v) ? `${emoji} ${label}: ${f(v)}${unit ? ` ${unit}` : ""}` : null;
+    isNum(v) ? `${emoji} ${label}:  ${b(f(v))}${unit ? ` ${unit}` : ""}` : null;
+  const fmtOunce = (n: number) =>
+    fmt(n, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  return joinGroups([
-    ["✨ أسعار الذهب الآن ✨"],
+  // سطر فارغ بين كل سطرين داخل المجموعة + خط فاصل بين الأقسام
+  return joinGroups(
     [
-      line("💍", "عيار 24", c("24")?.sell, "جنيه"),
-      line("💍", "عيار 21", c("21")?.sell, "جنيه"),
-      line("💍", "عيار 18", c("18")?.sell, "جنيه"),
+      [`${b("✨ أسعار الذهب الآن ✨")}\n${rtl(DIVIDER)}`],
+      [
+        line("💍", "عيار 24", c("24")?.sell, "جنيه"),
+        line("💍", "عيار 21", c("21")?.sell, "جنيه"),
+        line("💍", "عيار 18", c("18")?.sell, "جنيه"),
+      ],
+      [DIVIDER],
+      [
+        line("💎", "جنيه الذهب", gold?.pound?.sell, "جنيه"),
+        line("📊", "الأونصة بالدولار", gold?.ounce_usd, "دولار", fmtOunce),
+      ],
+      [DIVIDER],
+      [
+        line("🌟", "سعر الشراء", c("21")?.buy, "جنيه"),
+        line("🌟", "سعر البيع", c("21")?.sell, "جنيه"),
+      ],
+      [DIVIDER],
+      [
+        line("💵", "سعر الدولار", currency?.rates?.usd?.sell, "جنيه", fmt2),
+        line("💵", "دولار الصاغة", gold?.implied_usd_rate, "جنيه", fmt2),
+      ],
+      [DIVIDER],
+      [`🌐 موقعنا الإلكتروني: ${TG_CONFIG.SITE_URL}`],
+      [`📢 قناتنا على تليجرام: ${TG_CONFIG.CHANNEL_URL}`],
     ],
-    [
-      line("🪙", "جنيه الذهب", gold?.pound?.sell, "جنيه"),
-      line("📊", "الأونصة بالدولار", gold?.ounce_usd, "دولار", (n) =>
-        fmt(n, { maximumFractionDigits: 2 }),
-      ),
-    ],
-    [
-      line("🌟", "سعر الشراء", c("21")?.buy),
-      line("🌟", "سعر البيع", c("21")?.sell),
-    ],
-    [
-      line("💵", "سعر الدولار", currency?.rates?.usd?.sell, "جنيه", fmt2),
-      line("💵", "دولار الصاغة", gold?.implied_usd_rate, "جنيه", fmt2),
-    ],
-    [`🌐 موقعنا الإلكتروني: ${TG_CONFIG.SITE_URL}`],
-    [`📢 قناتنا على تليجرام: ${TG_CONFIG.CHANNEL_URL}`],
-  ]);
+    "\n\n",
+  );
 }
 
 type StatRow = { item: string; open: number; high: number; low: number; close: number };
@@ -160,7 +173,7 @@ const SUMMARY_LABELS: Array<{ key: ItemKey; label: string; decimals: number }> =
   { key: "gold24", label: "💍 عيار 24", decimals: 0 },
   { key: "gold21", label: "💍 عيار 21", decimals: 0 },
   { key: "gold18", label: "💍 عيار 18", decimals: 0 },
-  { key: "gold_pound", label: "🪙 جنيه الذهب", decimals: 0 },
+  { key: "gold_pound", label: "💎 جنيه الذهب", decimals: 0 },
   { key: "ounce_usd", label: "📊 الأونصة بالدولار", decimals: 2 },
   { key: "usd_bank", label: "💵 سعر الدولار", decimals: 2 },
   { key: "usd_sagha", label: "💵 دولار الصاغة", decimals: 2 },
@@ -182,16 +195,16 @@ export function formatSummary(day: string, rows: StatRow[]): string {
       fmt(n, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
     return [
       [
-        label,
-        `🟢 الافتتاح: ${f(r.open)}   🔴 الإغلاق: ${f(r.close)}`,
-        `⬆️ الأعلى: ${f(r.high)}   ⬇️ الأقل: ${f(r.low)}`,
+        b(label),
+        `🟢 الافتتاح: ${b(f(r.open))}   🔴 الإغلاق: ${b(f(r.close))}`,
+        `⬆️ الأعلى: ${b(f(r.high))}   ⬇️ الأقل: ${b(f(r.low))}`,
       ],
     ];
   });
 
   return joinGroups([
-    ["🌙 ملخص تداولات اليوم 🌙", `📅 ${date}`],
-    ...blocks,
+    [b("🌙 ملخص تداولات اليوم 🌙"), `📅 ${date}`, DIVIDER],
+    ...blocks.flatMap((blk) => [blk, [DIVIDER]]),
     [`🌐 موقعنا الإلكتروني: ${TG_CONFIG.SITE_URL}`],
     [`📢 قناتنا على تليجرام: ${TG_CONFIG.CHANNEL_URL}`],
   ]);
