@@ -26,3 +26,28 @@ export async function sendTelegramMessage(text: string, chatId?: string) {
   }
   return data;
 }
+
+// إرسال صورة (بوستر PNG) مع نص تحتها (caption — بحد أقصى 1024 حرف)
+export async function sendTelegramPhoto(png: Uint8Array, caption: string, chatId?: string) {
+  const token = process.env["TELEGRAM_BOT_TOKEN"];
+  const targetChatId = chatId || process.env["TELEGRAM_CHANNEL_ID"];
+  if (!token || !targetChatId) {
+    throw new Error("متغيرات تيليجرام غير مضبوطة (TELEGRAM_BOT_TOKEN / TELEGRAM_CHANNEL_ID)");
+  }
+
+  const form = new FormData();
+  form.append("chat_id", targetChatId);
+  form.append("caption", caption.slice(0, 1024));
+  form.append("parse_mode", "HTML");
+  form.append("photo", new Blob([png as unknown as BlobPart], { type: "image/png" }), "zahaby.png");
+
+  const res = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+    method: "POST",
+    body: form,
+  });
+  const data: any = await res.json();
+  if (!data.ok) {
+    throw new Error(`Telegram: ${data.description || "فشل إرسال الصورة"}`);
+  }
+  return data;
+}
