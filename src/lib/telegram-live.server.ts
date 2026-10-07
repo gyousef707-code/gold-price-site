@@ -349,7 +349,8 @@ async function deliverPoster(html: string, caption: string, fallbackText: string
     const png = await render(html);
     await sendPhoto(png, caption);
     return "photo" as const;
-  } catch {
+  } catch (e) {
+    console.error("poster failed:", e instanceof Error ? e.message : e);
     // الصورة فشلت (مفيش توكن / حصة خلصت / عطل) — القناة ما تفضلش من غير تحديث
     await send(fallbackText);
     return "text" as const;
