@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { jsonOk, jsonErr } from "@/lib/api-response";
 import { renderPosterPng } from "@/lib/poster.server";
+import { getGoldPrices, getCurrencyRates } from "@/lib/market.server";
+import { sendPosterPreview } from "@/lib/telegram-live.server";
 
 // فحص تشخيصي لتوليد البوستر: بيجرّب يصوّر صفحة صغيرة ويرجّع النتيجة أو سبب الفشل.
 // محمي بنفس CRON_SECRET. مفيش أي رسالة بتتبعت للقناة من هنا، والتوكن عمره ما بيظهر في الرد.
@@ -13,6 +15,16 @@ export const Route = createFileRoute("/api/telegram/test")({
           const url = new URL(request.url);
           if (requiredSecret && url.searchParams.get("secret") !== requiredSecret) {
             return jsonErr(new Error("غير مصرح"), 401);
+          }
+          // ?send=gold أو ?send=currency: يبعت بوستر حقيقي للقناة الآن (للمعاينة فقط)
+          const send = url.searchParams.get("send");
+          if (send === "gold" || send === "currency") {
+            const [gold, currency] = await Promise.all([
+              getGoldPrices().catch(() => null),
+              getCurrencyRates().catch(() => null),
+            ]);
+            if (!gold || !currency) return jsonErr(new Error("تعذر جلب الأسعار"), 502);
+            return jsonOk(await sendPosterPreview(send, gold, currency));
           }
           const info = {
             hasAccountId: Boolean(process.env["CF_ACCOUNT_ID"]),
