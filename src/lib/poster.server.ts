@@ -245,7 +245,15 @@ export async function renderPosterPng(html: string): Promise<Uint8Array> {
 
   // الاسم الحالي في وثائق Cloudflare "browser-run"، والقديم "browser-rendering"
   let res = await call("browser-run");
-  if (res.status === 404) res = await call("browser-rendering");
+  if (!res.ok && res.status !== 429) {
+    const first = await res.text().catch(() => "");
+    const res2 = await call("browser-rendering");
+    if (res2.ok) res = res2;
+    else {
+      const t = await res2.text().catch(() => "");
+      throw new Error(`poster-render-failed:${res.status}/${res2.status}:${first.slice(0, 80)}|${t.slice(0, 80)}`);
+    }
+  }
   if (!res.ok) {
     const t = await res.text().catch(() => "");
     throw new Error(`poster-render-failed:${res.status}:${t.slice(0, 120)}`);
