@@ -567,3 +567,32 @@ export async function runTelegramAutomation(gold: any, currency: any, deps: Deps
   const instant = await checkAndSendInstant(db, day, gold, currency, deps);
   return { ...instant, morning: morning.status };
 }
+
+// ---------------- معاينة يدوية: بوستر حقيقي للقناة بدون أي علامات أو تسجيل ----------------
+// بتتنده من /api/telegram/test?send=gold|currency. مبتغيّرش last_sent ولا العلامات اليومية.
+export async function sendPosterPreview(kind: "gold" | "currency", gold: any, currency: any) {
+  const db = await getDb().catch(() => null);
+  const dt = cairoDateTime(new Date());
+  if (kind === "gold") {
+    const cur: GoldSnap = extractPrices(gold, currency);
+    const prev: GoldSnap = (db ? await loadSnap<GoldSnap>(db, "gold_last") : null) ?? {};
+    const html = goldPosterHtml(goldPosterData(gold, currency, dt));
+    const mode = await deliverPoster(
+      html,
+      goldCaption(cur, prev, null, LINKS()),
+      `${goldNarrative(cur, prev, null)}\n\n${formatInstant(gold, currency)}`,
+      {},
+    );
+    return { kind, mode };
+  }
+  const cur = ccySnap(gold, currency);
+  const prev = db ? await loadLatestCcySnapBefore(db, cairoNow().day) : null;
+  const html = currencyPosterHtml(currencyPosterData(gold, currency, dt));
+  const mode = await deliverPoster(
+    html,
+    currencyCaption(cur, prev, LINKS()),
+    `${currencyNarrative(cur, prev)}\n\n${currencyFallbackText(gold, currency)}`,
+    {},
+  );
+  return { kind, mode };
+}
