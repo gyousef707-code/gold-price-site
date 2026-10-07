@@ -19,13 +19,24 @@ export const Route = createFileRoute("/api/telegram/test")({
             accountIdLength: (process.env["CF_ACCOUNT_ID"] ?? "").length,
             hasToken: Boolean(process.env["CF_BROWSER_TOKEN"]),
           };
+          // هل التوكن نفسه صالح؟ (بيرجّع الحالة فقط، مش التوكن)
+          let verify = "unknown";
+          try {
+            const v = await fetch("https://api.cloudflare.com/client/v4/user/tokens/verify", {
+              headers: { Authorization: `Bearer ${process.env["CF_BROWSER_TOKEN"] ?? ""}` },
+            });
+            const j = (await v.json().catch(() => null)) as any;
+            verify = `${v.status}:${j?.result?.status ?? j?.errors?.[0]?.message ?? "?"}`;
+          } catch {
+            verify = "error";
+          }
           try {
             const png = await renderPosterPng(
               `<html><body style="margin:0;background:#fff;font:60px sans-serif">test ✓</body></html>`,
             );
-            return jsonOk({ ok: true, bytes: png.length, ...info });
+            return jsonOk({ ok: true, bytes: png.length, ...info, verify });
           } catch (e) {
-            return jsonOk({ ok: false, error: e instanceof Error ? e.message : String(e), ...info });
+            return jsonOk({ ok: false, error: e instanceof Error ? e.message : String(e), ...info, verify });
           }
         } catch (e) {
           return jsonErr(e);
