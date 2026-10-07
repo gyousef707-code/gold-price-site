@@ -84,12 +84,12 @@ export function goldNarrative(cur: GoldSnap, prev: GoldSnap, range: DayRange): s
       cur[k] != null && prev[k] != null ? Math.sign((cur[k] as number) - (prev[k] as number)) : 0,
     );
     if (others.every((s) => s === direction)) {
-      lines.push("وتحرّكت بقية العيارات وجنيه الذهب في نفس الاتجاه");
+      lines.push("باقي العيارات وجنيه الذهب في نفس الاتجاه");
     }
   }
   if (lines.length) {
     mk.push(b("🌍 في الأسواق"));
-    mk.push(...lines.map((l) => `▫️ ${l}`));
+    mk.push(...lines.map((l) => `🔸 ${l}`));
   }
 
   return groups([head, day, mk]);
