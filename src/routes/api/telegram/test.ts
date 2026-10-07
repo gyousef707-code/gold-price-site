@@ -18,12 +18,15 @@ export const Route = createFileRoute("/api/telegram/test")({
             hasAccountId: Boolean(process.env["CF_ACCOUNT_ID"]),
             accountIdLength: (process.env["CF_ACCOUNT_ID"] ?? "").length,
             hasToken: Boolean(process.env["CF_BROWSER_TOKEN"]),
+            tokenLength: (process.env["CF_BROWSER_TOKEN"] ?? "").length,
+            tokenStart: (process.env["CF_BROWSER_TOKEN"] ?? "").slice(0, 5),
+            tokenHasBadChars: /[^\x21-\x7e]/.test(process.env["CF_BROWSER_TOKEN"]?.trim() ?? ""),
           };
           // هل التوكن نفسه صالح؟ (بيرجّع الحالة فقط، مش التوكن)
           let verify = "unknown";
           try {
             const v = await fetch("https://api.cloudflare.com/client/v4/user/tokens/verify", {
-              headers: { Authorization: `Bearer ${process.env["CF_BROWSER_TOKEN"] ?? ""}` },
+              headers: { Authorization: `Bearer ${(process.env["CF_BROWSER_TOKEN"] ?? "").trim()}` },
             });
             const j = (await v.json().catch(() => null)) as any;
             verify = `${v.status}:${j?.result?.status ?? j?.errors?.[0]?.message ?? "?"}`;
