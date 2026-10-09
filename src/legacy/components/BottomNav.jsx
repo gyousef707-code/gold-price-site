@@ -21,6 +21,10 @@ export default function BottomNav() {
           key={tab.to}
           to={cpath(country, tab.to)}
           end={tab.end}
+          // الراوتر بيحط كلاس active تلقائي على الرابط /sa لأي صفحة تحته (/sa/silver...)،
+          // فبنقفله هنا، والتفعيل بيتحدد من NavLink بس.
+          activeProps={{}}
+          activeOptions={{ exact: true }}
           className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
         >
           <FaIcon icon={tab.icon} />
