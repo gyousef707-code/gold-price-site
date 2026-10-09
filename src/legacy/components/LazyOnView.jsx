@@ -7,6 +7,11 @@ export default function LazyOnView({ children, minHeight = 290, rootMargin = '30
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
 
+  // لو جاي من رابط أداة (#tool-...) نعرض المحتوى فوراً عشان الأداة تتلاقي وتتفتح
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hash.startsWith('#tool-')) setVisible(true);
+  }, []);
+
   useEffect(() => {
     if (visible) return;
     const el = ref.current;
