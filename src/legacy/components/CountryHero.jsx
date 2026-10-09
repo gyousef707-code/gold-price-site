@@ -1,8 +1,26 @@
+import { useEffect } from 'react';
 import { COUNTRIES, flagUrl } from '../data/countries.js';
+
+// لو الرابط فيه #tool-... (جاي من صفحة الأدوات) بنمرّر للأداة بعد ما تظهر في الصفحة
+function useToolHashScroll() {
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const hash = window.location.hash.replace('#', '');
+    if (!hash.startsWith('tool-')) return undefined;
+    const timers = [200, 700, 1400].map((ms) =>
+      setTimeout(() => {
+        const el = document.getElementById(hash);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, ms)
+    );
+    return () => timers.forEach(clearTimeout);
+  }, []);
+}
 
 // غلاف مشترك لكل صفحات الدولة: علم + عنوان + عملة + وقت التحديث
 export default function CountryHero({ code, title, subtitle, fx, time, live = true }) {
   const c = COUNTRIES[code];
+  useToolHashScroll();
   if (!c) return null;
   return (
     <section className="cp-hero" data-pattern={c.pattern}>
