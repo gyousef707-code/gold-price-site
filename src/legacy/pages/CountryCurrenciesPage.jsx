@@ -53,7 +53,7 @@ export default function CountryCurrenciesPage({ code, initialData = null }) {
     <div className="cp" data-country={code}>
       <CountryHero code={code} title={`أسعار العملات في ${c.name}`} fx={data?.fx} time={time} />
 
-      <section className="cp-section" aria-labelledby="cpc-conv">
+      <section id="tool-currency-converter" className="cp-section" aria-labelledby="cpc-conv">
         <h2 id="cpc-conv" className="cp-h">
           محوّل العملات
         </h2>
