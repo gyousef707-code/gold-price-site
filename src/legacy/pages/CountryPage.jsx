@@ -9,7 +9,6 @@ import {
   COUNTRIES,
   ACTIVE_COUNTRY_CODES,
   GOLD_KARATS,
-  SILVER_PURITIES,
   flagUrl,
   formatMoney,
 } from '../data/countries.js';
@@ -49,7 +48,6 @@ export default function CountryPage({ code, initialData = null }) {
   const dec = c.decimals ?? 2;
   const money = (v) => formatMoney(v, dec);
   const karatPrice = (k) => data?.karats?.find((x) => x.karat === k)?.gram;
-  const silverPrice = (p) => data?.silver?.grams?.find((x) => x.purity === p)?.gram;
   const others = ACTIVE_COUNTRY_CODES.filter((x) => x !== code);
 
   return (
@@ -61,7 +59,7 @@ export default function CountryPage({ code, initialData = null }) {
         time={time}
       />
 
-      <section className="cp-section" aria-labelledby="cp-karats-h">
+      <section id="tool-gold-karats" className="cp-section" aria-labelledby="cp-karats-h">
         <h2 id="cp-karats-h" className="cp-h">
           سعر جرام الذهب بـ{c.currencyName}
         </h2>
@@ -104,24 +102,6 @@ export default function CountryPage({ code, initialData = null }) {
           </div>
         </div>
       </section>
-
-      {data?.silver ? (
-        <section className="cp-section" aria-labelledby="cp-silver-h">
-          <h2 id="cp-silver-h" className="cp-h">
-            سعر جرام الفضة بـ{c.currencyName}
-          </h2>
-          <div className="cp-silver-grid">
-            {SILVER_PURITIES.map((p) => (
-              <article key={p} className="cp-silver">
-                <p className="cp-silver-name">فضة {p}</p>
-                <p className="cp-silver-price">
-                  {money(silverPrice(p))} <small>{c.short}</small>
-                </p>
-              </article>
-            ))}
-          </div>
-        </section>
-      ) : null}
 
       <section id="tool-gold-calc-section" className="cp-section">
         <div className="section-title-bar">
