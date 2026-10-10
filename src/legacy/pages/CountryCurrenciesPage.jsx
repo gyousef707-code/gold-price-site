@@ -1,127 +1,112 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import FaIcon from '../components/FaIcon.jsx';
+import CurrencyConverter from '../components/CurrencyConverter.jsx';
+import LivePrice from '../components/LivePrice.jsx';
+import UpdatedStamp from '../components/UpdatedStamp.jsx';
+import CountryHero from '../components/CountryHero.jsx';
 import useApiData from '../hooks/useApiData.js';
-import NumberInput from '../components/NumberInput.jsx';
-import CountryHero, { formatTime } from '../components/CountryHero.jsx';
-import { COUNTRIES, flagUrl, smartMoney } from '../data/countries.js';
+import { useLang } from '../context/LangContext.jsx';
+import { CURRENCY_META, CURRENCY_ORDER } from '../data/currencies.js';
+import { COUNTRIES } from '../data/countries.js';
 
-// أسماء وأعلام العملات (مختصرة عشان الصفحة تفضل خفيفة)
-const CUR = {
-  usd: ['دولار أمريكي', 'us'],
-  eur: ['يورو', 'eu'],
-  gbp: ['جنيه إسترليني', 'gb'],
-  sar: ['ريال سعودي', 'sa'],
-  aed: ['درهم إماراتي', 'ae'],
-  kwd: ['دينار كويتي', 'kw'],
-  qar: ['ريال قطري', 'qa'],
-  bhd: ['دينار بحريني', 'bh'],
-  omr: ['ريال عماني', 'om'],
-  jod: ['دينار أردني', 'jo'],
-  egp: ['جنيه مصري', 'eg'],
-  chf: ['فرنك سويسري', 'ch'],
-  jpy: ['ين ياباني', 'jp'],
-  cny: ['يوان صيني', 'cn'],
-  try: ['ليرة تركية', 'tr'],
-};
+// عدد خانات مناسب لحجم الرقم (الأرقام الصغيرة زي الين محتاجة خانات أكتر)
+const decFor = (v) => (v >= 100 ? 2 : v >= 1 ? 3 : v >= 0.01 ? 4 : 5);
 
+// نفس صفحة العملات في مصر: محوّل عملات + قائمة كروت، لكن مقابل عملة الدولة
 export default function CountryCurrenciesPage({ code, initialData = null }) {
   const c = COUNTRIES[code];
-  const { data, error } = useApiData(`/api/public/country-prices?c=${code}&t=currencies`, {
+  const { lang } = useLang();
+  const { data, loading, error } = useApiData(`/api/public/country-prices?c=${code}&t=currencies`, {
     intervalMs: 2 * 60000,
     initialData,
   });
-  const [time, setTime] = useState('');
-  useEffect(() => {
-    setTime(formatTime(data?.updated_at));
-  }, [data?.updated_at]);
+  const [selected, setSelected] = useState(null);
+  const converterRef = useRef(null);
 
-  const [amount, setAmount] = useState(100);
-  const [from, setFrom] = useState(c?.currency || 'usd');
-  const [to, setTo] = useState('usd');
-
-  // قيمة وحدة من كل عملة بعملة الدولة (عملة الدولة نفسها = 1)
-  const table = useMemo(() => {
-    if (!data?.rates || !c) return null;
-    return { ...data.rates, [c.currency]: 1 };
-  }, [data, c]);
+  // الـ API بيرجّع أرقام مجرّدة، والمحوّل محتاج { mid } زي مصر
+  const rates = useMemo(() => {
+    if (!data?.rates) return null;
+    const out = {};
+    for (const [k, v] of Object.entries(data.rates)) out[k] = { mid: v };
+    return out;
+  }, [data]);
 
   if (!c) return null;
-  const codes = table ? Object.keys(table) : [];
-  const result = table && table[from] && table[to] ? (Number(amount) || 0) * (table[from] / table[to]) : null;
-  const rows = data?.rates ? Object.entries(data.rates) : [];
+  const local = c.currency;
+  const order = [...CURRENCY_ORDER.filter((k) => k !== local), 'egp'];
+
+  const pick = (k) => {
+    setSelected(k);
+    converterRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
 
   return (
     <div className="cp" data-country={code}>
-      <CountryHero code={code} title={`أسعار العملات في ${c.name}`} fx={data?.fx} time={time} />
+      <CountryHero code={code} title={`أسعار العملات في ${c.name}`} fx={data?.fx} live={false} />
 
-      <section id="tool-currency-converter" className="cp-section" aria-labelledby="cpc-conv">
-        <h2 id="cpc-conv" className="cp-h">
-          محوّل العملات
-        </h2>
-        <div className="calc-card">
-          <div className="calc-row">
-            <div className="calc-group">
-              <label>المبلغ</label>
-              <NumberInput value={amount} onChange={setAmount} className="calc-input calc-input-num" />
-            </div>
-          </div>
-          <div className="calc-row">
-            <div className="calc-group">
-              <label>من</label>
-              <select className="calc-input calc-select" value={from} onChange={(e) => setFrom(e.target.value)}>
-                {(codes.length ? codes : [c.currency]).map((k) => (
-                  <option key={k} value={k}>
-                    {(CUR[k] || [k.toUpperCase()])[0]}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="calc-group">
-              <label>إلى</label>
-              <select className="calc-input calc-select" value={to} onChange={(e) => setTo(e.target.value)}>
-                {(codes.length ? codes : ['usd']).map((k) => (
-                  <option key={k} value={k}>
-                    {(CUR[k] || [k.toUpperCase()])[0]}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div className="calc-result-box">
-            <div className="calc-result-label">النتيجة</div>
-            <div className="calc-result-value">{result != null ? smartMoney(result) : '—'}</div>
-            <div className="calc-result-unit">{(CUR[to] || [to.toUpperCase()])[0]}</div>
-          </div>
+      <section id="tool-currency-converter" ref={converterRef}>
+        <div className="section-title-bar">
+          <h2>
+            <FaIcon icon="fa-solid fa-right-left" /> محوّل العملات
+          </h2>
         </div>
+        <CurrencyConverter rates={rates} selected={selected} base={local} />
+        <UpdatedStamp lang={lang} date={data?.updated_at} />
       </section>
 
-      <section className="cp-section" aria-labelledby="cpc-list">
-        <h2 id="cpc-list" className="cp-h">
-          سعر كل عملة مقابل {c.currencyName}
-        </h2>
-        {error && !data ? (
-          <p className="cp-error">تعذر تحميل الأسعار حاليًا، حاول تاني بعد شوية.</p>
-        ) : (
-          <ul className="cp-rows">
-            {(rows.length ? rows : Array.from({ length: 6 }, (_, i) => [`sk${i}`, null])).map(([k, v]) => {
-              const [name, flag] = CUR[k] || [k.toUpperCase(), null];
-              return (
-                <li key={k} className="cp-row">
-                  <span className="cp-row-main">
-                    {flag ? (
-                      <img src={flagUrl(flag, 40)} width="28" height="21" alt="" loading="lazy" />
-                    ) : (
-                      <span className="cp-row-noflag" />
-                    )}
-                    <span className="cp-row-name">{v == null ? <span className="cp-skel" /> : name}</span>
-                  </span>
-                  <span className="cp-row-val">
-                    {v == null ? '—' : smartMoney(v)} <small>{c.short}</small>
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+      <section>
+        <div className="section-title-bar">
+          <h2>
+            <FaIcon icon="fa-solid fa-list" /> أسعار العملات مقابل {c.currencyName}
+          </h2>
+        </div>
+        {loading && !data && <p className="loading-text">جاري التحميل...</p>}
+        {error && !data && !loading && <p className="error-text">تعذر تحميل الأسعار حاليًا، حاول تاني بعد شوية.</p>}
+        <div className="currency-list-new">
+          {order.map((k) => {
+            const v = data?.rates?.[k];
+            const meta = CURRENCY_META[k];
+            if (!meta) return null;
+            return (
+              <div
+                key={k}
+                role="button"
+                tabIndex={0}
+                className={`currency-card-new${selected === k ? ' selected' : ''}`}
+                onClick={() => pick(k)}
+                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && pick(k)}
+                title="استخدمها في المحول"
+              >
+                <div className="currency-card-left">
+                  <div className="currency-card-flag">
+                    <img
+                      src={`https://flagcdn.com/32x24/${meta.flag}.png`}
+                      width="24"
+                      height="18"
+                      alt={k}
+                      loading="lazy"
+                      style={{ borderRadius: 4 }}
+                    />
+                  </div>
+                  <div className="currency-card-info">
+                    <div className="currency-card-name">{meta.name}</div>
+                    <div className="currency-card-code">
+                      {k.toUpperCase()} / {local.toUpperCase()}
+                    </div>
+                  </div>
+                </div>
+                <div className="currency-card-right">
+                  <div className="currency-card-price-box">
+                    <div className="currency-card-price-label">السعر</div>
+                    <div className="currency-card-price-value">
+                      <LivePrice value={v ?? null} decimals={v != null ? decFor(v) : 2} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </section>
 
       <p className="cp-note">
