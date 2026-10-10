@@ -4,6 +4,7 @@ import useApiData from '../hooks/useApiData.js';
 import CountryHero, { formatTime } from '../components/CountryHero.jsx';
 import CalcTabs from '../components/CalcTabs.jsx';
 import LazyOnView from '../components/LazyOnView.jsx';
+import CountryOunceCard from '../components/CountryOunceCard.jsx';
 import FaIcon from '../components/FaIcon.jsx';
 import {
   COUNTRIES,
@@ -59,6 +60,15 @@ export default function CountryPage({ code, initialData = null }) {
         time={time}
       />
 
+      <CountryOunceCard
+        code={code}
+        title="سعر أونصة الذهب العالمية"
+        ounceUsd={data?.ounce_usd}
+        ounceLocal={data?.ounce_local}
+        change={data?.ounce_change_percent}
+        updatedAt={data?.updated_at}
+      />
+
       <section id="tool-gold-karats" className="cp-section" aria-labelledby="cp-karats-h">
         <h2 id="cp-karats-h" className="cp-h">
           سعر جرام الذهب بـ{c.currencyName}
@@ -83,24 +93,6 @@ export default function CountryPage({ code, initialData = null }) {
             })}
           </div>
         )}
-      </section>
-
-      <section className="cp-section cp-ounce" aria-labelledby="cp-ounce-h">
-        <h2 id="cp-ounce-h" className="cp-h">
-          الأونصة العالمية
-        </h2>
-        <div className="cp-ounce-box">
-          <div>
-            <p className="cp-ounce-usd">{data ? `$${formatMoney(data.ounce_usd, 2)}` : '—'}</p>
-            <p className="cp-ounce-note">دولار أمريكي للأونصة</p>
-          </div>
-          <div className="cp-ounce-side">
-            <p className="cp-ounce-local">
-              {data ? `${money(data.ounce_local)} ${c.short}` : '—'}
-            </p>
-            <Change value={data?.ounce_change_percent} />
-          </div>
-        </div>
       </section>
 
       <section id="tool-gold-calc-section" className="cp-section">
