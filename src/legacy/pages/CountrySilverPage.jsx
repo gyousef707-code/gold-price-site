@@ -2,6 +2,7 @@ import { lazy, useEffect, useState } from 'react';
 import useApiData from '../hooks/useApiData.js';
 import CountryHero, { formatTime } from '../components/CountryHero.jsx';
 import LazyOnView from '../components/LazyOnView.jsx';
+import CountryOunceCard from '../components/CountryOunceCard.jsx';
 import FaIcon from '../components/FaIcon.jsx';
 import { COUNTRIES, SILVER_PURITIES, formatMoney } from '../data/countries.js';
 
@@ -30,6 +31,16 @@ export default function CountrySilverPage({ code, initialData = null }) {
     <div className="cp" data-country={code}>
       <CountryHero code={code} title={`أسعار الفضة في ${c.name}`} fx={data?.fx} time={time} />
 
+      <CountryOunceCard
+        code={code}
+        title="سعر أونصة الفضة العالمية"
+        ounceUsd={silver?.ounce_usd}
+        ounceLocal={silver?.ounce_local}
+        change={silver?.change_percent}
+        updatedAt={data?.updated_at}
+        volatility={0.00015}
+      />
+
       <section className="cp-section" aria-labelledby="cps-h">
         <h2 id="cps-h" className="cp-h">
           سعر جرام الفضة بـ{c.currencyName}
@@ -51,23 +62,6 @@ export default function CountrySilverPage({ code, initialData = null }) {
             ))}
           </div>
         )}
-      </section>
-
-      <section className="cp-section cp-ounce" aria-labelledby="cps-oz">
-        <h2 id="cps-oz" className="cp-h">
-          أونصة الفضة العالمية
-        </h2>
-        <div className="cp-ounce-box">
-          <div>
-            <p className="cp-ounce-usd">{silver ? `$${formatMoney(silver.ounce_usd, 2)}` : '—'}</p>
-            <p className="cp-ounce-note">دولار أمريكي للأونصة</p>
-          </div>
-          <div className="cp-ounce-side">
-            <p className="cp-ounce-local">
-              {silver ? `${money(silver.ounce_local)} ${c.short}` : '—'}
-            </p>
-          </div>
-        </div>
       </section>
 
       <p className="cp-note">
