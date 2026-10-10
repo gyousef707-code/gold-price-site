@@ -207,3 +207,12 @@ body.light-mode .cp-coin-sym { color: var(--gold-dark); }
 .cp-empty { justify-content: center; color: var(--text-muted); }
 .cp-search { width: 100%; margin-bottom: 10px; }
 .cp-karat-silver { border-top-color: var(--gold-bright); }
+
+/* ---------- حاسبة الزكاة: قيم الملخص مكانتش بتظهر في الوضع الفاتح ----------
+   السبب: لون القيمة كان var(--text-primary) ومتغير مش معرّف، فبيستخدم اللون الاحتياطي
+   (أبيض تقريباً) على خلفية فاتحة. وكمان حدود الصندوق كانت شفافة. */
+.zakat-summary-row strong { color: var(--text-color); }
+.zakat-summary { border-color: var(--border-gold); }
+.zakat-summary-row + .zakat-summary-row { border-top-color: var(--border-subtle, var(--border-gold)); }
+body.light-mode .zakat-summary-row strong.zk-good { color: #1a7f37; }
+body.light-mode .zakat-summary-row strong.zk-bad { color: #cf222e; }
