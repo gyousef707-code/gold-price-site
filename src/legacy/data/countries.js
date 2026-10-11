@@ -3,6 +3,17 @@
 // peg = سعر الربط الرسمي بالدولار (ثابت)، والكويت بتتحسب من سوق الصرف.
 
 export const GOLD_KARATS = [24, 22, 21, 18];
+// كل العيارات اللي ليها صفحة مستقلة (/sa/gold/21) ونقاء كل عيار
+export const KARATS_ALL = [24, 22, 21, 18, 14, 12];
+export const KARAT_PURITY = { 24: 0.999, 22: 0.916, 21: 0.875, 18: 0.75, 14: 0.583, 12: 0.5 };
+export const KARAT_INFO = {
+  24: { percent: '99.9', label: 'الذهب الخالص', use: 'يُستخدم أساساً في السبائك والعملات الذهبية والادخار، ولا يناسب المجوهرات اليومية لأنه لين وسهل التشوّه.' },
+  22: { percent: '91.6', label: 'ذهب عالي النقاء', use: 'من العيارات المعروفة في المجوهرات التقليدية، يجمع بين النقاء العالي والقدرة على التشكيل.' },
+  21: { percent: '87.5', label: 'العيار الأشهر', use: 'من أكثر العيارات تداولاً في المجوهرات بالمنطقة العربية، لتوازنه بين النقاء والمتانة.' },
+  18: { percent: '75', label: 'ذهب متين', use: 'أصلب من العيارات الأعلى، لذلك يُستخدم كثيراً في الأطقم المرصّعة بالأحجار والمجوهرات العصرية.' },
+  14: { percent: '58.3', label: 'ذهب اقتصادي', use: 'أقل سعراً وأكثر صلابة، ويناسب الاستخدام اليومي والقطع التي تتعرض للاحتكاك.' },
+  12: { percent: '50', label: 'نصف ذهب', use: 'نسبة الذهب فيه النصف تقريباً، فهو الأقل سعراً بين العيارات المتداولة.' },
+};
 export const SILVER_PURITIES = [999, 925, 900, 800];
 
 // theme: ألوان الوضع الداكن (dark) والفاتح (light) — accent هو اللون الرئيسي للدولة
@@ -21,6 +32,7 @@ export const COUNTRIES = {
   },
   sa: {
     code: 'sa',
+    tz: 'Asia/Riyadh',
     path: '/sa',
     name: 'السعودية',
     flag: 'sa',
@@ -45,6 +57,7 @@ export const COUNTRIES = {
   },
   ae: {
     code: 'ae',
+    tz: 'Asia/Dubai',
     path: '/ae',
     name: 'الإمارات',
     flag: 'ae',
@@ -69,6 +82,7 @@ export const COUNTRIES = {
   },
   kw: {
     code: 'kw',
+    tz: 'Asia/Kuwait',
     path: '/kw',
     name: 'الكويت',
     flag: 'kw',
@@ -93,6 +107,7 @@ export const COUNTRIES = {
   },
   qa: {
     code: 'qa',
+    tz: 'Asia/Qatar',
     path: '/qa',
     name: 'قطر',
     flag: 'qa',
@@ -117,6 +132,7 @@ export const COUNTRIES = {
   },
   bh: {
     code: 'bh',
+    tz: 'Asia/Bahrain',
     path: '/bh',
     name: 'البحرين',
     flag: 'bh',
@@ -141,6 +157,7 @@ export const COUNTRIES = {
   },
   om: {
     code: 'om',
+    tz: 'Asia/Muscat',
     path: '/om',
     name: 'عُمان',
     flag: 'om',
@@ -165,6 +182,7 @@ export const COUNTRIES = {
   },
   jo: {
     code: 'jo',
+    tz: 'Asia/Amman',
     path: '/jo',
     name: 'الأردن',
     flag: 'jo',
