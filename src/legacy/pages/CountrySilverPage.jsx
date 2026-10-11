@@ -3,6 +3,7 @@ import useApiData from '../hooks/useApiData.js';
 import CountryHero, { formatTime } from '../components/CountryHero.jsx';
 import LazyOnView from '../components/LazyOnView.jsx';
 import CountryOunceCard from '../components/CountryOunceCard.jsx';
+import TradingViewChart from '../components/TradingViewChart.jsx';
 import FaIcon from '../components/FaIcon.jsx';
 import { COUNTRIES, SILVER_PURITIES, formatMoney } from '../data/countries.js';
 
@@ -78,6 +79,16 @@ export default function CountrySilverPage({ code, initialData = null }) {
         <LazyOnView minHeight={380}>
           <CountrySilverCalc code={code} data={data} />
         </LazyOnView>
+      </section>
+
+      <section className="cp-section" aria-labelledby="cps-chart-h">
+        <h2 id="cps-chart-h" className="cp-h">
+          الرسم البياني لسعر الفضة العالمي
+        </h2>
+        <LazyOnView minHeight={380}>
+          <TradingViewChart symbol="OANDA:XAGUSD" id={`tradingview-silver-${code}`} timezone={c.tz} />
+        </LazyOnView>
+        <p className="cp-note">الرسم بالدولار للأونصة العالمية (XAG/USD)، وهو الأساس اللي بيتحسب منه سعر كل عيار.</p>
       </section>
 
       <section className="cp-section cp-about" aria-labelledby="cps-about">
