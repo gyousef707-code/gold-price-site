@@ -5,6 +5,7 @@ import CountryHero, { formatTime } from '../components/CountryHero.jsx';
 import CalcTabs from '../components/CalcTabs.jsx';
 import LazyOnView from '../components/LazyOnView.jsx';
 import CountryOunceCard from '../components/CountryOunceCard.jsx';
+import TradingViewChart from '../components/TradingViewChart.jsx';
 import FaIcon from '../components/FaIcon.jsx';
 import {
   COUNTRIES,
@@ -80,7 +81,7 @@ export default function CountryPage({ code, initialData = null }) {
             {GOLD_KARATS.map((k) => {
               const v = karatPrice(k);
               return (
-                <article key={k} className="cp-karat">
+                <Link key={k} to={`${c.path}/gold/${k}`} className="cp-karat" aria-label={`سعر الذهب عيار ${k} في ${c.name}`}>
                   <p className="cp-karat-name">
                     <b>{k}</b> عيار
                   </p>
@@ -88,7 +89,7 @@ export default function CountryPage({ code, initialData = null }) {
                     {data ? money(v) : <span className="cp-skel" aria-hidden="true" />}
                   </p>
                   <p className="cp-karat-unit">{c.short} / جرام</p>
-                </article>
+                </Link>
               );
             })}
           </div>
@@ -109,6 +110,16 @@ export default function CountryPage({ code, initialData = null }) {
             ]}
           />
         </LazyOnView>
+      </section>
+
+      <section className="cp-section" aria-labelledby="cp-chart-h">
+        <h2 id="cp-chart-h" className="cp-h">
+          الرسم البياني لسعر الذهب العالمي
+        </h2>
+        <LazyOnView minHeight={380}>
+          <TradingViewChart symbol="OANDA:XAUUSD" id={`tradingview-gold-${code}`} timezone={c.tz} />
+        </LazyOnView>
+        <p className="cp-note">الرسم بالدولار للأونصة العالمية (XAU/USD)، وهو الأساس اللي بيتحسب منه سعر كل عيار.</p>
       </section>
 
       <p className="cp-note">
