@@ -216,3 +216,19 @@ body.light-mode .cp-coin-sym { color: var(--gold-dark); }
 .zakat-summary-row + .zakat-summary-row { border-top-color: var(--border-subtle, var(--border-gold)); }
 body.light-mode .zakat-summary-row strong.zk-good { color: #1a7f37; }
 body.light-mode .zakat-summary-row strong.zk-bad { color: #cf222e; }
+
+/* ---------- كروت العيارات بقت روابط + صفحة العيار ---------- */
+a.cp-karat { display: block; text-decoration: none; color: inherit; transition: transform 0.15s ease, border-color 0.15s ease; }
+a.cp-karat:hover { border-color: var(--gold-primary); }
+a.cp-karat:active { transform: scale(0.98); }
+.cp-karat-hero { padding: 20px 16px 16px; }
+.cp-karat-hero .cp-karat-price { font-size: 38px; }
+.cp-karat-usd { margin: 8px 0 0; font-size: 13px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.cp-chips-nav { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; }
+.cp-chips-nav a {
+  display: inline-block; padding: 8px 16px; border-radius: 22px; font-size: 13.5px; font-weight: 700; text-decoration: none;
+  color: var(--text-color); background: var(--card-bg); border: 1px solid var(--border-subtle);
+}
+.cp-chips-nav a:hover { border-color: var(--gold-primary); }
+.cp-chips-nav a.active { color: var(--gold-bright); border-color: var(--gold-primary); background: rgba(var(--dot-rgb), 0.14); }
+body.light-mode .cp-chips-nav a.active { color: var(--gold-dark); }
