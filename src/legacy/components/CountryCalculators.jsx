@@ -37,10 +37,10 @@ const toCurrency = (local, currency, data) => {
   return data?.fx ? local / data.fx : null;
 };
 
-export function CountryGoldCalc({ code, data }) {
+export function CountryGoldCalc({ code, data, initialKarat = 21 }) {
   const c = COUNTRIES[code];
   const [weight, setWeight] = useState(10);
-  const [karat, setKarat] = useState('21');
+  const [karat, setKarat] = useState(String(initialKarat));
   const [currency, setCurrency] = useState('local');
   const [making, setMaking] = useState(0);
 
