@@ -1,4 +1,4 @@
-import { lazy, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link } from '@/lib/router-compat.jsx';
 import useApiData from '../hooks/useApiData.js';
 import CountryHero, { formatTime } from '../components/CountryHero.jsx';
@@ -18,6 +18,8 @@ import {
 const CountryGoldCalc = lazy(() =>
   import('../components/CountryCalculators.jsx').then((m) => ({ default: m.CountryGoldCalc }))
 );
+
+const PriceHistoryChart = lazy(() => import('../components/PriceHistoryChart.jsx'));
 
 const GRAMS_PER_OUNCE = 31.1034768;
 const WEIGHTS = [1, 5, 10, 20, 50, 100];
@@ -111,6 +113,22 @@ export default function CountryKaratPage({ code, karat, initialData = null }) {
         </div>
         <LazyOnView minHeight={380}>
           <CountryGoldCalc code={code} data={data} initialKarat={karat} />
+        </LazyOnView>
+      </section>
+
+      <section className="cp-section" aria-label={`تطور سعر الذهب عيار ${karat}`}>
+        <LazyOnView minHeight={330}>
+          <Suspense fallback={null}>
+            <PriceHistoryChart
+              endpoint={`/api/public/country-history?c=${code}`}
+              titleAr={`تطور سعر ذهب عيار ${karat} في ${c.name}`}
+              titleEn={`Gold ${karat}K price trend`}
+              dataKey={`karat${karat}`}
+              unitAr={c.short}
+              unitEn={c.currency.toUpperCase()}
+              livePrice={gram}
+            />
+          </Suspense>
         </LazyOnView>
       </section>
 
