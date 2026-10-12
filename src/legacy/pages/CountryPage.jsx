@@ -1,4 +1,4 @@
-import { lazy, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Link } from '@/lib/router-compat.jsx';
 import useApiData from '../hooks/useApiData.js';
 import CountryHero, { formatTime } from '../components/CountryHero.jsx';
@@ -15,6 +15,7 @@ import {
   formatMoney,
 } from '../data/countries.js';
 
+const PriceHistoryChart = lazy(() => import('../components/PriceHistoryChart.jsx'));
 const CountryGoldCalc = lazy(() =>
   import('../components/CountryCalculators.jsx').then((m) => ({ default: m.CountryGoldCalc }))
 );
@@ -109,6 +110,22 @@ export default function CountryPage({ code, initialData = null }) {
               { id: 'tool-zakat-calc', label: 'الزكاة', render: () => <CountryZakatCalc code={code} data={data} /> },
             ]}
           />
+        </LazyOnView>
+      </section>
+
+      <section className="cp-section" aria-label="تطور سعر الذهب عيار 21">
+        <LazyOnView minHeight={330}>
+          <Suspense fallback={null}>
+            <PriceHistoryChart
+              endpoint={`/api/public/country-history?c=${code}`}
+              titleAr={`تطور سعر ذهب عيار 21 في ${c.name}`}
+              titleEn="Gold 21K price trend"
+              dataKey="karat21"
+              unitAr={c.short}
+              unitEn={c.currency.toUpperCase()}
+              livePrice={karatPrice(21) ?? null}
+            />
+          </Suspense>
         </LazyOnView>
       </section>
 
