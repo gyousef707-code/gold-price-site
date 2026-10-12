@@ -1,4 +1,4 @@
-import { lazy, useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import useApiData from '../hooks/useApiData.js';
 import CountryHero, { formatTime } from '../components/CountryHero.jsx';
 import LazyOnView from '../components/LazyOnView.jsx';
@@ -7,6 +7,7 @@ import TradingViewChart from '../components/TradingViewChart.jsx';
 import FaIcon from '../components/FaIcon.jsx';
 import { COUNTRIES, SILVER_PURITIES, formatMoney } from '../data/countries.js';
 
+const PriceHistoryChart = lazy(() => import('../components/PriceHistoryChart.jsx'));
 const CountrySilverCalc = lazy(() =>
   import('../components/CountryCalculators.jsx').then((m) => ({ default: m.CountrySilverCalc }))
 );
@@ -78,6 +79,23 @@ export default function CountrySilverPage({ code, initialData = null }) {
         </div>
         <LazyOnView minHeight={380}>
           <CountrySilverCalc code={code} data={data} />
+        </LazyOnView>
+      </section>
+
+      <section className="cp-section" aria-label="تطور سعر الفضة عيار 999">
+        <LazyOnView minHeight={330}>
+          <Suspense fallback={null}>
+            <PriceHistoryChart
+              endpoint={`/api/public/country-history?c=${code}`}
+              titleAr={`تطور سعر فضة عيار 999 في ${c.name}`}
+              titleEn="Silver 999 price trend"
+              dataKey="silver999"
+              tone="silver"
+              unitAr={c.short}
+              unitEn={c.currency.toUpperCase()}
+              livePrice={gramOf(999) ?? null}
+            />
+          </Suspense>
         </LazyOnView>
       </section>
 
