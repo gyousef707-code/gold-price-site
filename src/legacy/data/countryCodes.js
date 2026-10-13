@@ -1,6 +1,6 @@
 // أكواد الدول المفعّلة وأسماؤها وعملاتها: ملف صغير جداً عشان الهيدر والتنقل ومسارات الدول
 // ميحمّلوش بيانات الدول كاملة (الألوان والنصوص) في الملف الرئيسي.
-export const COUNTRY_CODES = ["sa", "ae", "kw", "qa", "bh", "om", "jo"];
+export const COUNTRY_CODES = ["sa", "ae", "kw", "qa", "bh", "om", "jo", "tn", "dz", "ma"];
 export const COUNTRY_NAMES = {
   sa: "السعودية",
   ae: "الإمارات",
@@ -9,6 +9,9 @@ export const COUNTRY_NAMES = {
   bh: "البحرين",
   om: "عُمان",
   jo: "الأردن",
+  tn: "تونس",
+  dz: "الجزائر",
+  ma: "المغرب",
 };
 export const COUNTRY_CURRENCIES = {
   sa: "ريال سعودي",
@@ -18,4 +21,7 @@ export const COUNTRY_CURRENCIES = {
   bh: "دينار بحريني",
   om: "ريال عماني",
   jo: "دينار أردني",
+  tn: "دينار تونسي",
+  dz: "دينار جزائري",
+  ma: "درهم مغربي",
 };
