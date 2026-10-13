@@ -7,7 +7,9 @@ import CountryHero from '../components/CountryHero.jsx';
 import useApiData from '../hooks/useApiData.js';
 import { useLang } from '../context/LangContext.jsx';
 import { CURRENCY_META, CURRENCY_ORDER } from '../data/currencies.js';
-import { COUNTRIES } from '../data/countries.js';
+
+const META = { ...CURRENCY_META, ...EXTRA_CURRENCY_META };
+import { COUNTRIES, EXTRA_CURRENCY_META } from '../data/countries.js';
 
 // عدد خانات مناسب لحجم الرقم (الأرقام الصغيرة زي الين محتاجة خانات أكتر)
 const decFor = (v) => (v >= 100 ? 2 : v >= 1 ? 3 : v >= 0.01 ? 4 : 5);
@@ -50,7 +52,7 @@ export default function CountryCurrenciesPage({ code, initialData = null }) {
             <FaIcon icon="fa-solid fa-right-left" /> محوّل العملات
           </h2>
         </div>
-        <CurrencyConverter rates={rates} selected={selected} base={local} />
+        <CurrencyConverter rates={rates} selected={selected} base={local} meta={META} />
         <UpdatedStamp lang={lang} date={data?.updated_at} />
       </section>
 
@@ -65,7 +67,7 @@ export default function CountryCurrenciesPage({ code, initialData = null }) {
         <div className="currency-list-new">
           {order.map((k) => {
             const v = data?.rates?.[k];
-            const meta = CURRENCY_META[k];
+            const meta = META[k];
             if (!meta) return null;
             return (
               <div
