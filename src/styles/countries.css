@@ -232,3 +232,8 @@ a.cp-karat:active { transform: scale(0.98); }
 .cp-chips-nav a:hover { border-color: var(--gold-primary); }
 .cp-chips-nav a.active { color: var(--gold-bright); border-color: var(--gold-primary); background: rgba(var(--dot-rgb), 0.14); }
 body.light-mode .cp-chips-nav a.active { color: var(--gold-dark); }
+
+/* ---------- زخارف شمال أفريقيا ---------- */
+.cp-hero[data-pattern='carthage'] { --pat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='64' viewBox='0 0 60 64'%3E%3Cpath d='M6 62V38a12 12 0 0 1 24 0v24M34 62V38a12 12 0 0 1 24 0v24' fill='none' stroke='%23e0525a' stroke-opacity='.24' stroke-width='1.6'/%3E%3Ccircle cx='18' cy='22' r='2.4' fill='%23e0525a' fill-opacity='.22'/%3E%3Ccircle cx='46' cy='22' r='2.4' fill='%23e0525a' fill-opacity='.22'/%3E%3C/svg%3E"); }
+.cp-hero[data-pattern='casbah'] { --pat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cpath d='M38 10a18 18 0 1 0 14 28 14 14 0 1 1-14-28z' fill='none' stroke='%2334b57a' stroke-opacity='.26' stroke-width='1.6'/%3E%3Cpath d='M50 12l1.8 3.8 4.2.6-3 3 .7 4.2-3.7-2-3.7 2 .7-4.2-3-3 4.2-.6z' fill='%2334b57a' fill-opacity='.22'/%3E%3C/svg%3E"); }
+.cp-hero[data-pattern='zellige'] { --pat: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cpath d='M22 3l4.4 8.6L36 8.8l-2.8 9.4L42 22l-8.8 3.8L36 35.2l-9.6-2.8L22 41l-4.4-8.6L8 35.2l2.8-9.4L2 22l8.8-3.8L8 8.8l9.6 2.8z' fill='none' stroke='%234f86e8' stroke-opacity='.26' stroke-width='1.5'/%3E%3C/svg%3E"); }
