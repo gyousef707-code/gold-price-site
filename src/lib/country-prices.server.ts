@@ -14,9 +14,38 @@ function activeCountry(code: string) {
   return c && c.active && !c.isHome ? c : null;
 }
 
-// سعر الصرف: عملة الدولة مقابل 1 دولار (الربط الرسمي أو من السوق)
+// أسعار الصرف العالمية مقابل الدولار (للعملات اللي مش مربوطة زي التونسي والجزائري والمغربي).
+// المصدر بيتحدث مرة في اليوم تقريباً، فبنخزّن آخر نتيجة في الذاكرة 6 ساعات، ولو فشل جلب جديد
+// بنكمل بآخر نتيجة سليمة بدل ما نعرض رقم مخترع.
+const OPEN_FX_URL = "https://open.er-api.com/v6/latest/USD";
+const OPEN_FX_TTL_MS = 6 * 60 * 60 * 1000;
+let openFxCache: { at: number; rates: Record<string, number> } | null = null;
+
+async function getOpenRates(): Promise<Record<string, number> | null> {
+  if (openFxCache && Date.now() - openFxCache.at < OPEN_FX_TTL_MS) return openFxCache.rates;
+  try {
+    const res = await fetch(OPEN_FX_URL, { signal: AbortSignal.timeout(6000) });
+    if (res.ok) {
+      const data: any = await res.json();
+      if (data?.rates && typeof data.rates === "object") {
+        openFxCache = { at: Date.now(), rates: data.rates };
+        return openFxCache.rates;
+      }
+    }
+  } catch {
+    // نكمل بآخر نتيجة محفوظة
+  }
+  return openFxCache?.rates ?? null;
+}
+
+// سعر الصرف: عملة الدولة مقابل 1 دولار (الربط الرسمي، أو من مصدر الصرف)
 async function resolveFx(c: any, rates: any) {
   if (typeof c.peg === "number") return { fx: c.peg as number, source: "peg" as const };
+  if (c.fxSource === "open") {
+    const open = await getOpenRates();
+    const v = open?.[String(c.currency).toUpperCase()];
+    if (typeof v === "number" && v > 0) return { fx: v, source: "market" as const };
+  }
   const usdMid = rates?.rates?.usd?.mid;
   const localMid = rates?.rates?.[c.currency]?.mid;
   if (usdMid && localMid) return { fx: usdMid / localMid, source: "market" as const };
@@ -25,14 +54,19 @@ async function resolveFx(c: any, rates: any) {
 }
 
 // سعر صرف كل العملات المش مربوطة بالدولار (الكويت حالياً) من سوق الصرف، عشان نسجّلها مع اللقطة
-function floatingFxMap(rates: any): Record<string, number> {
+async function floatingFxMap(rates: any): Promise<Record<string, number>> {
   const out: Record<string, number> = {};
   const usdMid = rates?.rates?.usd?.mid;
-  if (!usdMid) return out;
+  const open = await getOpenRates();
   for (const c of Object.values(COUNTRIES as Record<string, any>)) {
     if (!c.active || c.isHome || typeof c.peg === "number") continue;
+    if (c.fxSource === "open") {
+      const v = open?.[String(c.currency).toUpperCase()];
+      if (typeof v === "number" && v > 0) out[c.currency] = Number(v.toFixed(5));
+      continue;
+    }
     const localMid = rates?.rates?.[c.currency]?.mid;
-    if (localMid) out[c.currency] = Number((usdMid / localMid).toFixed(5));
+    if (usdMid && localMid) out[c.currency] = Number((usdMid / localMid).toFixed(5));
   }
   return out;
 }
@@ -50,11 +84,13 @@ export async function getCountryPrices(code: string) {
   const { fx, source } = await resolveFx(c, rates);
   const gramOf = (ounce: number, purity: number) => (ounce / GRAMS_PER_OUNCE) * purity * fx;
   // لقطة يومية للأسعار العالمية (مرة واحدة في اليوم) — بتخدم شارت "تطور السعر" لكل الدول
-  void recordGlobalSnapshotIfMissing({
-    gold_usd: ounceUsd,
-    silver_usd: (silver as any)?.ounce_usd ? Number((silver as any).ounce_usd) : null,
-    fx: floatingFxMap(rates),
-  });
+  void floatingFxMap(rates).then((floatFx) =>
+    recordGlobalSnapshotIfMissing({
+      gold_usd: ounceUsd,
+      silver_usd: (silver as any)?.ounce_usd ? Number((silver as any).ounce_usd) : null,
+      fx: floatFx,
+    }),
+  );
   return {
     country: c.code,
     currency: c.currency,
