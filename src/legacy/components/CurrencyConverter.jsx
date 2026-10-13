@@ -4,7 +4,7 @@ import LivePrice from './LivePrice.jsx';
 import NumberInput from './NumberInput.jsx';
 import FaIcon from './FaIcon.jsx';
 
-export default function CurrencyConverter({ rates, selected, base = 'egp' }) {
+export default function CurrencyConverter({ rates, selected, base = 'egp', meta = CURRENCY_META }) {
   const [amount, setAmount] = useState(100);
   const [from, setFrom] = useState('usd');
   const [to, setTo] = useState(base);
@@ -13,7 +13,7 @@ export default function CurrencyConverter({ rates, selected, base = 'egp' }) {
 
   // لما المستخدم يدوس على أى عملة فى القائمة، تتبدل مكان الدولار أوتوماتيك
   useEffect(() => {
-    if (!selected || !CURRENCY_META[selected]) return;
+    if (!selected || !meta[selected]) return;
     setFrom(selected);
     setTo((prev) => (prev === selected ? base : prev));
   }, [selected]);
@@ -35,7 +35,7 @@ export default function CurrencyConverter({ rates, selected, base = 'egp' }) {
   const flag = (code) => (
     <img
       className="converter-flag-img"
-      src={`https://flagcdn.com/24x18/${CURRENCY_META[code].flag}.png`}
+      src={`https://flagcdn.com/24x18/${meta[code].flag}.png`}
       width="24"
       height="18"
       alt={code}
@@ -53,7 +53,7 @@ export default function CurrencyConverter({ rates, selected, base = 'egp' }) {
           <FaIcon icon="fa-solid fa-chevron-down" className="converter-select-arrow" />
           <select value={from} onChange={(e) => setFrom(e.target.value)} aria-label="من">
             {allCodes.map((c) => (
-              <option key={c} value={c}>{CURRENCY_META[c].name}</option>
+              <option key={c} value={c}>{meta[c].name}</option>
             ))}
           </select>
         </div>
@@ -80,7 +80,7 @@ export default function CurrencyConverter({ rates, selected, base = 'egp' }) {
           <FaIcon icon="fa-solid fa-chevron-down" className="converter-select-arrow" />
           <select value={to} onChange={(e) => setTo(e.target.value)} aria-label="إلى">
             {allCodes.map((c) => (
-              <option key={c} value={c}>{CURRENCY_META[c].name}</option>
+              <option key={c} value={c}>{meta[c].name}</option>
             ))}
           </select>
         </div>
