@@ -1,331 +1,43 @@
-// إعدادات الدول: كل دولة ليها عملتها وهويتها (ألوان + زخرفة) ومحتواها المحلي.
-// الذهب والفضة بيتحسبوا من السعر العالمي للأونصة × سعر الصرف المحلي.
-// peg = سعر الربط الرسمي بالدولار (ثابت)، والكويت بتتحسب من سوق الصرف.
-
-export const GOLD_KARATS = [24, 22, 21, 18];
-// كل العيارات اللي ليها صفحة مستقلة (/sa/gold/21) ونقاء كل عيار
-export const KARATS_ALL = [24, 22, 21, 18, 14, 12];
-export const KARAT_PURITY = { 24: 0.999, 22: 0.916, 21: 0.875, 18: 0.75, 14: 0.583, 12: 0.5 };
-export const KARAT_INFO = {
-  24: { percent: '99.9', label: 'الذهب الخالص', use: 'يُستخدم أساساً في السبائك والعملات الذهبية والادخار، ولا يناسب المجوهرات اليومية لأنه لين وسهل التشوّه.' },
-  22: { percent: '91.6', label: 'ذهب عالي النقاء', use: 'من العيارات المعروفة في المجوهرات التقليدية، يجمع بين النقاء العالي والقدرة على التشكيل.' },
-  21: { percent: '87.5', label: 'العيار الأشهر', use: 'من أكثر العيارات تداولاً في المجوهرات بالمنطقة العربية، لتوازنه بين النقاء والمتانة.' },
-  18: { percent: '75', label: 'ذهب متين', use: 'أصلب من العيارات الأعلى، لذلك يُستخدم كثيراً في الأطقم المرصّعة بالأحجار والمجوهرات العصرية.' },
-  14: { percent: '58.3', label: 'ذهب اقتصادي', use: 'أقل سعراً وأكثر صلابة، ويناسب الاستخدام اليومي والقطع التي تتعرض للاحتكاك.' },
-  12: { percent: '50', label: 'نصف ذهب', use: 'نسبة الذهب فيه النصف تقريباً، فهو الأقل سعراً بين العيارات المتداولة.' },
-};
-export const SILVER_PURITIES = [999, 925, 900, 800];
-
-// theme: ألوان الوضع الداكن (dark) والفاتح (light) — accent هو اللون الرئيسي للدولة
-export const COUNTRIES = {
-  eg: {
-    code: 'eg',
-    path: '/',
-    name: 'مصر',
-    flag: 'eg',
-    currency: 'egp',
-    currencyName: 'جنيه مصري',
-    short: 'جنيه',
-    active: true,
-    isHome: true,
-    theme: { accent: '#e3b341', bright: '#f0c040', deep: '#b8860b', bg: '#0d1117', card: '#161b22' },
+export const CURRENCY_META = {
+  egp: { name: 'جنيه مصري', flag: 'eg' },
+  usd: {
+    name: 'دولار امريكي',
+    flag: 'us',
+    title: 'سعر الدولار اليوم في مصر مقابل الجنيه | تحديث فورى بالبنوك والسوق السوداء',
+    description:
+      'تابع سعر الدولار اليوم في مصر لحظة بلحظة. أسعار الصرف الرسمية في البنك المركزي والبنوك المصرية مقابل الجنيه، بالإضافة إلى مؤشر السوق السوداء عبر موقع ذهبي.',
   },
-  sa: {
-    code: 'sa',
-    tz: 'Asia/Riyadh',
-    path: '/sa',
-    name: 'السعودية',
-    flag: 'sa',
-    currency: 'sar',
-    currencyName: 'ريال سعودي',
-    short: 'ر.س',
-    decimals: 2,
-    peg: 3.75,
-    active: true,
-    pattern: 'dunes',
-    tagline: 'الرياض وجدة والدمام',
-    theme: {
-      dark: { accent: '#34d399', bright: '#6ee7b7', deep: '#059669', bg: '#06130e', card: '#0d1f18', elev: '#12291f', rgb: '52, 211, 153' },
-      light: { accent: '#0d8a5f', bright: '#10a374', deep: '#066a49', bg: '#eff7f3', card: '#ffffff', rgb: '13, 138, 95' },
-    },
-    about:
-      'الريال السعودي مربوط بالدولار الأمريكي بسعر ثابت 3.75 ريال لكل دولار، لذلك يتحرك سعر جرام الذهب في السعودية مع حركة الأونصة العالمية بالدولار. الأسعار هنا استرشادية، محسوبة من السعر العالمي لكل عيار، ولا تشمل المصنعية ولا الضريبة اللي بتضيفها محلات الذهب.',
-    faq: [
-      ['كيف يُحسب سعر جرام الذهب بالريال؟', 'نقسم سعر الأونصة العالمية بالدولار على 31.1035 (جرامات الأونصة)، ونضرب في نقاء العيار، ثم في سعر الصرف 3.75.'],
-      ['هل السعر المعروض هو سعر المحلات؟', 'لا، هو السعر العالمي بالريال بدون مصنعية أو ضريبة. المحلات بتضيف عليه حسب تصميم القطعة.'],
-    ],
+  eur: {
+    name: 'يورو',
+    flag: 'eu',
+    title: 'سعر اليورو اليوم في مصر مقابل الجنيه | تحديث لحظي بالبنوك',
+    description:
+      'اعرف سعر اليورو اليوم في مصر بالبنوك والصرافة. تحديث فوري لأسعار بيع وشراء اليورو مقابل الجنيه المصري عبر موقع ذهبي.',
   },
-  ae: {
-    code: 'ae',
-    tz: 'Asia/Dubai',
-    path: '/ae',
-    name: 'الإمارات',
+  gbp: { name: 'جنيه استرليني', flag: 'gb' },
+  sar: { name: 'ريال سعودي', flag: 'sa' },
+  aed: {
+    name: 'درهم اماراتي',
     flag: 'ae',
-    currency: 'aed',
-    currencyName: 'درهم إماراتي',
-    short: 'د.إ',
-    decimals: 2,
-    peg: 3.6725,
-    active: true,
-    pattern: 'skyline',
-    tagline: 'دبي وأبوظبي والشارقة',
-    theme: {
-      dark: { accent: '#ff5a5f', bright: '#ff8a8e', deep: '#d62f3a', bg: '#150a0d', card: '#211015', elev: '#2a161c', rgb: '255, 90, 95' },
-      light: { accent: '#c8323c', bright: '#dc3f49', deep: '#a1232d', bg: '#fbf1f1', card: '#ffffff', rgb: '200, 50, 60' },
-    },
-    about:
-      'الدرهم الإماراتي مربوط بالدولار الأمريكي بسعر ثابت 3.6725 درهم لكل دولار، فسعر الذهب بالدرهم يتبع الأونصة العالمية مباشرة. الأسعار هنا استرشادية لكل عيار بدون مصنعية أو ضريبة، وتفيدك كمرجع قبل الشراء من أي محل في دبي أو أبوظبي أو الشارقة.',
-    faq: [
-      ['كم سعر الدرهم مقابل الدولار؟', 'الدرهم مربوط بالدولار عند 3.6725 درهم لكل دولار، وهو السعر المستخدم في حساب الذهب هنا.'],
-      ['ما العيارات المتداولة؟', 'العيارات الأكثر تداولاً هي 24 و22 و21 و18، ونعرضها كلها بسعر الجرام بالدرهم.'],
-    ],
+    title: 'سعر الدرهم الإماراتي اليوم في مصر مقابل الجنيه | تحديث مباشر',
+    description:
+      'تابع أسعار صرف الدرهم الإماراتي مقابل الجنيه المصري اليوم في كافة البنوك المصرية والسوق بتحديث فوري عبر موقع ذهبي.',
   },
-  kw: {
-    code: 'kw',
-    tz: 'Asia/Kuwait',
-    path: '/kw',
-    name: 'الكويت',
-    flag: 'kw',
-    currency: 'kwd',
-    currencyName: 'دينار كويتي',
-    short: 'د.ك',
-    decimals: 3,
-    fallbackFx: 0.307,
-    active: true,
-    pattern: 'waves',
-    tagline: 'مدينة الكويت والأحمدي وحولي',
-    theme: {
-      dark: { accent: '#22c3d3', bright: '#67e0ec', deep: '#0e8fa0', bg: '#061219', card: '#0d1d27', elev: '#122733', rgb: '34, 195, 211' },
-      light: { accent: '#0a8797', bright: '#0e9eb0', deep: '#066573', bg: '#eef7f9', card: '#ffffff', rgb: '10, 135, 151' },
-    },
-    about:
-      'الدينار الكويتي من أعلى العملات قيمة في العالم، وهو مرتبط بسلة عملات وليس بالدولار فقط، لذلك نحسب سعر الصرف من السوق لحظة بلحظة. سعر الذهب هنا استرشادي لكل عيار بالدينار بدون مصنعية، ويتغير مع الأونصة العالمية ومع سعر الدينار.',
-    faq: [
-      ['هل الدينار الكويتي مربوط بالدولار؟', 'لا، الدينار مرتبط بسلة عملات، فسعر الصرف بيتغير بشكل بسيط، ونحدّثه تلقائياً في الحساب.'],
-      ['لماذا الأسعار بثلاث خانات عشرية؟', 'الدينار الكويتي يتجزأ إلى 1000 فلس، فنعرض الأسعار بثلاث خانات لدقة أعلى.'],
-    ],
+  kwd: { name: 'دينار كويتي', flag: 'kw' },
+  qar: { name: 'ريال قطري', flag: 'qa' },
+  bhd: { name: 'دينار بحريني', flag: 'bh' },
+  omr: { name: 'ريال عماني', flag: 'om' },
+  jod: { name: 'دينار اردني', flag: 'jo' },
+  chf: {
+    name: 'فرنك سويسري',
+    flag: 'ch',
+    title: 'سعر الفرنك السويسري اليوم في مصر مقابل الجنيه',
+    description:
+      'تحديث فوري ومباشر لسعر الفرنك السويسري اليوم في مصر مقابل الجنيه المصري بالبنوك وشاشات الصرف عبر موقع ذهبي.',
   },
-  qa: {
-    code: 'qa',
-    tz: 'Asia/Qatar',
-    path: '/qa',
-    name: 'قطر',
-    flag: 'qa',
-    currency: 'qar',
-    currencyName: 'ريال قطري',
-    short: 'ر.ق',
-    decimals: 2,
-    peg: 3.64,
-    active: true,
-    pattern: 'dhow',
-    tagline: 'الدوحة والريان والوكرة',
-    theme: {
-      dark: { accent: '#d65a8e', bright: '#ec85b0', deep: '#a8346a', bg: '#14080f', card: '#210f18', elev: '#2b141f', rgb: '214, 90, 142' },
-      light: { accent: '#a8325f', bright: '#bd3f70', deep: '#862449', bg: '#faf0f4', card: '#ffffff', rgb: '168, 50, 95' },
-    },
-    about:
-      'الريال القطري مربوط بالدولار الأمريكي بسعر ثابت 3.64 ريال لكل دولار. نحسب سعر جرام الذهب بالريال القطري من الأونصة العالمية لكل عيار، وهو سعر استرشادي لا يشمل المصنعية ولا هامش المحل.',
-    faq: [
-      ['ما سعر صرف الريال القطري؟', 'الريال القطري مربوط بالدولار عند 3.64 ريال لكل دولار.'],
-      ['هل تتغير الأسعار خلال اليوم؟', 'نعم، تتحدث مع حركة الأونصة العالمية أثناء ساعات التداول.'],
-    ],
-  },
-  bh: {
-    code: 'bh',
-    tz: 'Asia/Bahrain',
-    path: '/bh',
-    name: 'البحرين',
-    flag: 'bh',
-    currency: 'bhd',
-    currencyName: 'دينار بحريني',
-    short: 'د.ب',
-    decimals: 3,
-    peg: 0.376,
-    active: true,
-    pattern: 'pearls',
-    tagline: 'المنامة والمحرق والرفاع',
-    theme: {
-      dark: { accent: '#9db4ff', bright: '#c0cfff', deep: '#5f7ae0', bg: '#090c1a', card: '#10152b', elev: '#171d38', rgb: '157, 180, 255' },
-      light: { accent: '#3f58c4', bright: '#4d68d6', deep: '#2f449c', bg: '#f0f2fb', card: '#ffffff', rgb: '63, 88, 196' },
-    },
-    about:
-      'الدينار البحريني مربوط بالدولار الأمريكي بسعر ثابت 0.376 دينار لكل دولار، ويتجزأ إلى 1000 فلس. نحسب سعر جرام الذهب بالدينار من الأونصة العالمية لكل عيار، وهو سعر استرشادي بدون مصنعية.',
-    faq: [
-      ['ما سعر الدينار البحريني مقابل الدولار؟', 'مربوط عند 0.376 دينار لكل دولار.'],
-      ['لماذا ثلاث خانات عشرية؟', 'لأن الدينار يتجزأ إلى 1000 فلس.'],
-    ],
-  },
-  om: {
-    code: 'om',
-    tz: 'Asia/Muscat',
-    path: '/om',
-    name: 'عُمان',
-    flag: 'om',
-    currency: 'omr',
-    currencyName: 'ريال عماني',
-    short: 'ر.ع',
-    decimals: 3,
-    peg: 0.3845,
-    active: true,
-    pattern: 'khanjar',
-    tagline: 'مسقط وصلالة وصحار',
-    theme: {
-      dark: { accent: '#a3c93a', bright: '#c4e063', deep: '#76951a', bg: '#0c1005', card: '#161c0b', elev: '#1d2512', rgb: '163, 201, 58' },
-      light: { accent: '#5f7d0f', bright: '#6f9112', deep: '#475f0a', bg: '#f4f7ea', card: '#ffffff', rgb: '95, 125, 15' },
-    },
-    about:
-      'الريال العماني مربوط بالدولار الأمريكي بسعر ثابت 0.3845 ريال لكل دولار، ويتجزأ إلى 1000 بيسة. نحسب سعر جرام الذهب بالريال العماني من الأونصة العالمية لكل عيار، وهو سعر استرشادي بدون مصنعية.',
-    faq: [
-      ['ما سعر الريال العماني مقابل الدولار؟', 'مربوط عند 0.3845 ريال لكل دولار.'],
-      ['هل السعر يشمل المصنعية؟', 'لا، هو السعر العالمي بالريال العماني، والمصنعية تختلف من محل لآخر.'],
-    ],
-  },
-  jo: {
-    code: 'jo',
-    tz: 'Asia/Amman',
-    path: '/jo',
-    name: 'الأردن',
-    flag: 'jo',
-    currency: 'jod',
-    currencyName: 'دينار أردني',
-    short: 'د.أ',
-    decimals: 3,
-    peg: 0.709,
-    active: true,
-    pattern: 'petra',
-    tagline: 'عمّان وإربد والزرقاء',
-    theme: {
-      dark: { accent: '#e8896b', bright: '#f2a68c', deep: '#c05f3f', bg: '#160c09', card: '#221410', elev: '#2c1b16', rgb: '232, 137, 107' },
-      light: { accent: '#b4482a', bright: '#c85a3a', deep: '#8f3720', bg: '#fbf1ee', card: '#ffffff', rgb: '180, 72, 42' },
-    },
-    about:
-      'الدينار الأردني مربوط بالدولار الأمريكي بسعر ثابت 0.709 دينار لكل دولار، ويتجزأ إلى 1000 فلس. نحسب سعر جرام الذهب بالدينار الأردني من الأونصة العالمية لكل عيار، وهو سعر استرشادي بدون مصنعية.',
-    faq: [
-      ['ما سعر الدينار الأردني مقابل الدولار؟', 'مربوط عند 0.709 دينار لكل دولار.'],
-      ['ما العيارات المعروضة؟', 'نعرض عيارات 24 و22 و21 و18 بسعر الجرام بالدينار.'],
-    ],
-  },
-  // شمال أفريقيا — عملاتها مش مربوطة بالدولار، فسعر الصرف بيتجاب من مصدر الصرف العالمي (fxSource: 'open')
-  tn: {
-    code: 'tn',
-    tz: 'Africa/Tunis',
-    path: '/tn',
-    name: 'تونس',
-    flag: 'tn',
-    currency: 'tnd',
-    currencyName: 'دينار تونسي',
-    short: 'د.ت',
-    decimals: 3,
-    fxSource: 'open',
-    active: true,
-    pattern: 'carthage',
-    tagline: 'تونس العاصمة وصفاقس وسوسة',
-    theme: {
-      dark: { accent: '#e0525a', bright: '#f0777d', deep: '#b83a42', bg: '#150b0c', card: '#211214', elev: '#2b181a', rgb: '224, 82, 90' },
-      light: { accent: '#b3202b', bright: '#cc3340', deep: '#8c161f', bg: '#fcf0f0', card: '#ffffff', rgb: '179, 32, 43' },
-    },
-    about:
-      'الدينار التونسي عملة غير مربوطة بالدولار بسعر ثابت، فسعر صرفه بيتغير يومياً، ويتجزأ إلى 1000 مليم. نحسب سعر جرام الذهب بالدينار التونسي من الأونصة العالمية لكل عيار بآخر سعر صرف، وهو سعر استرشادي بدون مصنعية ولا ضريبة.',
-    faq: [
-      ['هل سعر الدينار التونسي ثابت؟', 'لا، بيتغير مع سوق الصرف، وبنعرض آخر سعر صرف في أعلى الصفحة.'],
-      ['ما العيارات المعروضة؟', 'نعرض عيارات 24 و22 و21 و18 بسعر الجرام بالدينار التونسي.'],
-    ],
-  },
-  dz: {
-    code: 'dz',
-    tz: 'Africa/Algiers',
-    path: '/dz',
-    name: 'الجزائر',
-    flag: 'dz',
-    currency: 'dzd',
-    currencyName: 'دينار جزائري',
-    short: 'د.ج',
-    decimals: 2,
-    fxSource: 'open',
-    active: true,
-    pattern: 'casbah',
-    tagline: 'الجزائر العاصمة ووهران وقسنطينة',
-    theme: {
-      dark: { accent: '#34b57a', bright: '#58cf97', deep: '#258f5d', bg: '#08130d', card: '#0f1f16', elev: '#152a1d', rgb: '52, 181, 122' },
-      light: { accent: '#17744a', bright: '#228f5e', deep: '#105a39', bg: '#eff8f2', card: '#ffffff', rgb: '23, 116, 74' },
-    },
-    about:
-      'نحسب سعر جرام الذهب بالدينار الجزائري من الأونصة العالمية لكل عيار بسعر الصرف الرسمي. لاحظ أن سعر الدينار في السوق الموازي قد يختلف عن السعر الرسمي، فالأسعار هنا استرشادية وقد تختلف عن أسعار المحلات، وهي بدون مصنعية ولا ضريبة.',
-    faq: [
-      ['هل السعر المعروض بسعر الصرف الرسمي؟', 'نعم، بنستخدم سعر الصرف الرسمي. وسعر السوق الموازي قد يختلف عنه.'],
-      ['ما العيارات المعروضة؟', 'نعرض عيارات 24 و22 و21 و18 بسعر الجرام بالدينار الجزائري.'],
-    ],
-  },
-  ma: {
-    code: 'ma',
-    tz: 'Africa/Casablanca',
-    path: '/ma',
-    name: 'المغرب',
-    flag: 'ma',
-    currency: 'mad',
-    currencyName: 'درهم مغربي',
-    short: 'د.م',
-    decimals: 2,
-    fxSource: 'open',
-    active: true,
-    pattern: 'zellige',
-    tagline: 'الدار البيضاء ومراكش والرباط',
-    theme: {
-      dark: { accent: '#4f86e8', bright: '#76a4f5', deep: '#3568c4', bg: '#090e18', card: '#101826', elev: '#16213a', rgb: '79, 134, 232' },
-      light: { accent: '#2a5bc0', bright: '#3b72dc', deep: '#1e4596', bg: '#eff3fb', card: '#ffffff', rgb: '42, 91, 192' },
-    },
-    about:
-      'الدرهم المغربي مرتبط بسلة عملات (الأورو والدولار) وبيتحرك ضمن نطاق محدد، فسعر صرفه بيتغير. نحسب سعر جرام الذهب بالدرهم من الأونصة العالمية لكل عيار بآخر سعر صرف، وهو سعر استرشادي بدون مصنعية ولا ضريبة.',
-    faq: [
-      ['هل سعر الدرهم المغربي ثابت؟', 'لا، بيتحرك مع سلة العملات، وبنعرض آخر سعر صرف في أعلى الصفحة.'],
-      ['ما العيارات المعروضة؟', 'نعرض عيارات 24 و22 و21 و18 بسعر الجرام بالدرهم المغربي.'],
-    ],
-  },
+  jpy: { name: 'ين ياباني', flag: 'jp' },
+  cny: { name: 'يوان صيني', flag: 'cn' },
+  try: { name: 'ليرة تركية', flag: 'tr' },
 };
 
-// أسماء وأعلام عملات الدول الجديدة (مش في بيانات مصر، فمبنلمسش ملف عملات مصر)
-export const EXTRA_CURRENCY_META = {
-  tnd: { name: 'دينار تونسي', flag: 'tn' },
-  dzd: { name: 'دينار جزائري', flag: 'dz' },
-  mad: { name: 'درهم مغربي', flag: 'ma' },
-};
-
-export const COUNTRY_ORDER = ['eg', 'sa', 'ae', 'kw', 'qa', 'bh', 'om', 'jo', 'tn', 'dz', 'ma'];
-export const ACTIVE_COUNTRY_CODES = COUNTRY_ORDER.filter((c) => COUNTRIES[c].active && !COUNTRIES[c].isHome);
-
-export function getCountry(code) {
-  const c = COUNTRIES[code];
-  return c && c.active && !c.isHome ? c : null;
-}
-
-export function flagUrl(code, width = 80) {
-  return `https://flagcdn.com/w${width}/${code}.png`;
-}
-
-// بيحوّل رقم لنص بعدد الخانات العشرية الخاصة بالعملة
-export function formatMoney(value, decimals = 2) {
-  if (value == null || !Number.isFinite(Number(value))) return '—';
-  return Number(value).toLocaleString('en-US', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals,
-  });
-}
-
-// عدد خانات ذكي: الأرقام الصغيرة (زي الين) محتاجة خانات أكتر
-export function smartMoney(v) {
-  if (v == null || !Number.isFinite(Number(v))) return '—';
-  const n = Number(v);
-  const abs = Math.abs(n);
-  const d = abs >= 100 ? 2 : abs >= 1 ? 3 : abs >= 0.01 ? 4 : 5;
-  return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: d });
-}
-
-// CSS متغيرات الثيم لدولة معينة (داكن + فاتح). بيتحقن كـ <style> على الصفحة فقط.
-export function countryThemeCss(country) {
-  const d = country.theme.dark;
-  const l = country.theme.light;
-  return `
-html body{--gold-primary:${d.accent};--gold-bright:${d.bright};--gold-dark:${d.deep};--border-gold:rgba(${d.rgb},.28);--bg-color:${d.bg};--card-bg:${d.card};--card-bg-elevated:${d.elev};--dot-rgb:${d.rgb};--dot-a:.2;--glow-a:.12;background-image:radial-gradient(ellipse 80% 340px at 50% -60px,rgba(${d.rgb},.14),transparent 70%)}
-html body.light-mode{--gold-primary:${l.accent};--gold-bright:${l.bright};--gold-dark:${l.deep};--border-gold:rgba(${l.rgb},.3);--bg-color:${l.bg};--card-bg:${l.card};--card-bg-elevated:${l.card};--dot-rgb:${l.rgb};--dot-a:.24;--glow-a:.1;background-image:linear-gradient(180deg,rgba(${l.rgb},.1) 0,var(--bg-color) 320px)}
-`;
-}
+export const CURRENCY_ORDER = ['usd', 'eur', 'gbp', 'sar', 'aed', 'kwd', 'qar', 'bhd', 'omr', 'jod', 'chf', 'jpy', 'cny', 'try'];
