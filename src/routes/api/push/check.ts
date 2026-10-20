@@ -21,6 +21,7 @@ import {
   ROTATION_ORDER,
 } from "@/lib/push.server";
 import { sendTelegramMessage } from "@/lib/telegram.server";
+import { processCountryAlerts } from "@/lib/country-alerts.server";
 
 // ده الـ endpoint اللي بينده عليه cron خارجي كل دقيقة. كل مرة بيفحص معدن واحد بس
 // بالتبادل (عيار 21 ← عيار 24 ← الدولار ← تكرار)، ولو فيه تغيّر حقيقي يبعت:
@@ -76,10 +77,18 @@ export const Route = createFileRoute("/api/push/check")({
             // نكمل عادي
           }
 
+          // تنبيهات الدول: مستقلة تماماً عن تنبيهات مصر، وفشلها ما بيوقفش أي حاجة.
+          let countryAlerts = { fired: 0, failed: 0 };
+          try {
+            countryAlerts = await processCountryAlerts(subs);
+          } catch {
+            // نكمل عادي
+          }
+
           await saveSnapshot(now);
           await saveRotationIndex(idx + 1);
 
-          return jsonOk({ changed: !!message, which, message, telegramSent, alerts, ...result });
+          return jsonOk({ changed: !!message, which, message, telegramSent, alerts, countryAlerts, ...result });
         } catch (e) {
           return jsonErr(e);
         }
