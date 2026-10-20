@@ -28,9 +28,11 @@ export type StoredSubscription = {
   endpoint: string;
   keys: { p256dh: string; auth: string };
   alerts?: StoredAlerts;
+  // تنبيهات الدول (مفاتيحها بالشكل sa:gold21) — مخزّنة منفصلة عن تنبيهات مصر عشان ما يتداخلوش
+  countryAlerts?: Record<string, StoredAlert>;
 };
 
-async function sha256Hex(input: string) {
+export async function sha256Hex(input: string) {
   const enc = new TextEncoder().encode(input);
   const digest = await crypto.subtle.digest("SHA-256", enc);
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
@@ -43,16 +45,21 @@ async function sha256Hex(input: string) {
 // (HGETALL) بدل ما نعمل SMEMBERS ثم طلب GET منفصل لكل مشترك — وده كان
 // السبب الرئيسي في تخطي حد "Too many subrequests" بتاع Cloudflare مع زيادة
 // عدد المشتركين، لأن كل مشترك كان بيكلفنا طلب HTTP إضافي بس عشان نجيب بياناته.
-const SUBS_HASH_KEY = "push:subs:hash";
+export const SUBS_HASH_KEY = "push:subs:hash";
 
 export async function saveSubscription(sub: StoredSubscription) {
   const id = await sha256Hex(sub.endpoint);
   // الجهاز بيعيد الاشتراك كل ما الصفحة تتفتح — لازم نحافظ على تنبيهاته
   // المخزّنة بدل ما نمسحها بنسخة الاشتراك الجديدة (اللي مفيهاش تنبيهات).
   let alerts: StoredAlerts | undefined;
+  let countryAlerts: Record<string, StoredAlert> | undefined;
   try {
     const raw = await upstash("HGET", SUBS_HASH_KEY, id);
-    if (raw) alerts = (JSON.parse(raw) as StoredSubscription).alerts;
+    if (raw) {
+      const old = JSON.parse(raw) as StoredSubscription;
+      alerts = old.alerts;
+      countryAlerts = old.countryAlerts;
+    }
   } catch {
     // لو القراءة فشلت نكمل تسجيل الاشتراك عادي
   }
@@ -60,12 +67,13 @@ export async function saveSubscription(sub: StoredSubscription) {
     endpoint: sub.endpoint,
     keys: sub.keys,
     ...(alerts ? { alerts } : {}),
+    ...(countryAlerts ? { countryAlerts } : {}),
   };
   await upstash("HSET", SUBS_HASH_KEY, id, JSON.stringify(record));
   return id;
 }
 
-async function readSubscriptionById(id: string): Promise<StoredSubscription | null> {
+export async function readSubscriptionById(id: string): Promise<StoredSubscription | null> {
   const raw = await upstash("HGET", SUBS_HASH_KEY, id);
   if (!raw) return null;
   try {
@@ -135,7 +143,7 @@ async function patchSubscriptionAlerts(
   if (changed) await upstash("HSET", SUBS_HASH_KEY, id, JSON.stringify(sub));
 }
 
-async function removeSubscriptionById(id: string) {
+export async function removeSubscriptionById(id: string) {
   await upstash("HDEL", SUBS_HASH_KEY, id);
 }
 
@@ -164,7 +172,7 @@ export async function getAllSubscriptions(): Promise<Array<{ id: string; sub: St
 
 // -------- إرسال Push حقيقي (VAPID + تشفير aes128gcm) --------
 
-function getVapid(): VapidKeys {
+export function getVapid(): VapidKeys {
   const subject = process.env['VAPID_SUBJECT'];
   const publicKey = process.env['VAPID_PUBLIC_KEY'];
   const privateKey = process.env['VAPID_PRIVATE_KEY'];
