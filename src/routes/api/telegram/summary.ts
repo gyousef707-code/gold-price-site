@@ -1,19 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { jsonOk, jsonErr } from "@/lib/api-response";
 import { getGoldPrices, getCurrencyRates } from "@/lib/market.server";
-import { sendTelegramMessage } from "@/lib/telegram.server";
-import { sendWhatsAppMessage } from "@/lib/whatsapp.server";
+import { runTelegramAutomation, cairoNow, TG_CONFIG } from "@/lib/telegram-live.server";
 
-// ده الـ endpoint اللي بينده عليه cron خارجي كل ساعة، وبيبعت ملخص أسعار كامل
-// لقناة تيليجرام (كل الأعيرة + الجنيه الذهب + الأونصة + الدولار)
+// كان cron خارجي بينده على الـ endpoint ده كل ساعة. دلوقتي بقى للملخص اليومي بس:
+//  - الفحص اللحظي والملخص بيتبعتوا تلقائيًا من /api/push/check (كل دقيقة)،
+//    فالـ endpoint ده اختياري: لو حبيت cron يومي إضافي (23:00) هيشتغل بأمان.
+//  - آمن لو cron الساعة القديم لسه شغال: قبل الإغلاق بيرجّع "not-yet"،
+//    وبعده الملخص بيتبعت مرة واحدة في اليوم بس (already-sent بعد كده).
+//  - ?force=1 لاختبار يدوي: بيبعت ملخص اليوم فورًا بدون شرط الوقت وبدون علامة "اتبعت".
 export const Route = createFileRoute("/api/telegram/summary")({
   server: {
     handlers: {
       GET: async ({ request }) => {
         try {
-          const requiredSecret = process.env['CRON_SECRET'];
-          const provided = new URL(request.url).searchParams.get("secret");
-          if (requiredSecret && provided !== requiredSecret) {
+          const requiredSecret = process.env["CRON_SECRET"];
+          const url = new URL(request.url);
+          if (requiredSecret && url.searchParams.get("secret") !== requiredSecret) {
             return jsonErr(new Error("غير مصرح"), 401);
           }
 
@@ -21,90 +24,20 @@ export const Route = createFileRoute("/api/telegram/summary")({
             getGoldPrices().catch(() => null),
             getCurrencyRates().catch(() => null),
           ]);
+          if (!gold) return jsonErr(new Error("تعذر جلب أسعار الذهب"), 502);
 
-          if (!gold) {
-            return jsonErr(new Error("تعذر جلب أسعار الذهب"), 502);
+          const force = url.searchParams.get("force") === "1";
+          const now = cairoNow();
+          if (!force && now.hour < TG_CONFIG.CLOSE_HOUR) {
+            return jsonOk({ status: "not-yet", closeHour: TG_CONFIG.CLOSE_HOUR });
           }
 
-          // علامة فرض اتجاه لليمين (RLM) — بتتحط في أول كل سطر عشان نضمن إن
-          // الرمز/الإيموجي يفضل ظاهر على أقصى اليمين على كل الأجهزة، حتى
-          // لو السطر بدأ برقم أو رمز مش عربي
-          const RLM = "\u200F";
-          const rtl = (s: string) => `${RLM}${s}`;
-
-          const carat = (k: string) => (gold as any)?.caratPrices?.[k]?.sell;
-          const carat21 = (gold as any)?.caratPrices?.["21"];
-          const time = new Date().toLocaleTimeString("ar-EG", {
-            timeZone: "Africa/Cairo",
-            hour: "2-digit",
-            minute: "2-digit",
+          // now.hour = CLOSE_HOUR يخلّي runTelegramAutomation يدخل مسار الملخص مباشرة
+          const result = await runTelegramAutomation(gold, currency, {
+            now: { day: now.day, hour: Math.max(now.hour, TG_CONFIG.CLOSE_HOUR) },
+            force,
           });
-          const fmt = (n: number, opts?: Intl.NumberFormatOptions) =>
-            Number(n).toLocaleString("en-US", opts);
-
-          const DIVIDER = "➖➖➖➖➖➖➖➖➖➖";
-
-          const lines = [
-            rtl(`✨ <b>ذهبي | أسعار الذهب اليوم</b> ✨`),
-            rtl(DIVIDER),
-            "",
-            rtl(`<b>🥇 أسعار الذهب الان</b>`),
-            "",
-            carat("24") ? rtl(`عيار 24     <b>${fmt(carat("24"))}</b> جنيه`) : null,
-            carat("21") ? rtl(`عيار 21     <b>${fmt(carat("21"))}</b> جنيه`) : null,
-            carat("18") ? rtl(`عيار 18     <b>${fmt(carat("18"))}</b> جنيه`) : null,
-            "",
-            rtl(`<b>📊 الأسواق العالمية</b>`),
-            "",
-            (gold as any)?.pound?.sell
-              ? rtl(`💎 جنيه الذهب     <b>${fmt((gold as any).pound.sell)}</b> جنيه`)
-              : null,
-            (gold as any)?.ounce_usd
-              ? rtl(`🌍 الأونصة عالميًا     <b>$${fmt((gold as any).ounce_usd, { maximumFractionDigits: 2 })}</b>`)
-              : null,
-            "",
-            rtl(`<b>⭐ سعر التداول (عيار 21)</b>`),
-            "",
-            carat21?.buy ? rtl(`الشراء     <b>${fmt(carat21.buy)}</b> جنيه`) : null,
-            carat21?.sell ? rtl(`البيع     <b>${fmt(carat21.sell)}</b> جنيه`) : null,
-            "",
-            rtl(`<b>💵 الدولار</b>`),
-            "",
-            (currency as any)?.rates?.usd?.sell
-              ? rtl(`دولار البنك     <b>${fmt((currency as any).rates.usd.sell, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b> جنيه`)
-              : null,
-            (gold as any)?.implied_usd_rate
-              ? rtl(`دولار الصاغة     <b>${fmt((gold as any).implied_usd_rate, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b> جنيه`)
-              : null,
-            "",
-            rtl(DIVIDER),
-            rtl(`🕐 آخر تحديث: ${time}`),
-            "",
-            rtl(`🌐 موقعنا: zahaby1.com`),
-            rtl(`📢 قناتنا: t.me/zahaby1`),
-          ].filter((l) => l !== null);
-
-          const message = lines.join("\n");
-
-          await sendTelegramMessage(message);
-
-          // فور نجاح الإرسال لتليجرام، ابعت نفس الرسالة لقناة الواتساب
-          // بنعمل try/catch منفصلة عشان لو واتساب فشل، ميضيعش نجاح تيليجرام
-          // اللي حصل فعلاً، وبس نرجّع تفاصيل الخطأ في الرد
-          let whatsapp: { ok: boolean; error?: string } = { ok: true };
-          try {
-            await sendWhatsAppMessage(message);
-          } catch (whatsappError) {
-            whatsapp = {
-              ok: false,
-              error:
-                whatsappError instanceof Error
-                  ? whatsappError.message
-                  : "فشل إرسال رسالة الواتساب",
-            };
-          }
-
-          return jsonOk({ ok: true, telegram: { ok: true }, whatsapp });
+          return jsonOk(result);
         } catch (e) {
           return jsonErr(e);
         }

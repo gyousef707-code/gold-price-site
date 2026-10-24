@@ -1,0 +1,30 @@
+-- أتمتة تيليجرام اللحظية + الملخص اليومي (Cloudflare D1)
+--
+-- التصميم: صف واحد لكل (يوم، صنف) بدل تخزين كل لقطة سعر. كل فحص بيعمل
+-- UPSERT واحد بيحدّث الأعلى/الأقل/الإغلاق، فالأعلى والأقل والافتتاح والإغلاق
+-- جاهزين من غير أي تجميع (MAX/MIN) ولا مسح للجدول وقت الملخص.
+
+-- ملخص اليوم: افتتاح / أعلى / أقل / إغلاق
+CREATE TABLE IF NOT EXISTS daily_stats (
+  day        TEXT    NOT NULL,   -- YYYY-MM-DD بتوقيت القاهرة
+  item       TEXT    NOT NULL,   -- gold24, gold21, gold18, gold_pound, ounce_usd, usd_bank, usd_sagha
+  open       REAL    NOT NULL,
+  high       REAL    NOT NULL,
+  low        REAL    NOT NULL,
+  close      REAL    NOT NULL,
+  updated_at INTEGER NOT NULL,   -- epoch ms
+  PRIMARY KEY (day, item)
+) WITHOUT ROWID;
+
+-- آخر سعر اتبعتت بيه رسالة لحظية فعلاً (مرجع حد الـ 5 جنيه)
+CREATE TABLE IF NOT EXISTS last_sent (
+  item    TEXT    PRIMARY KEY,
+  price   REAL    NOT NULL,
+  sent_at INTEGER NOT NULL
+) WITHOUT ROWID;
+
+-- علامة "ملخص اليوم اتبعت" — بتمنع التكرار حتى لو الفحص اتنده أكتر من مرة
+CREATE TABLE IF NOT EXISTS daily_flags (
+  day     TEXT    PRIMARY KEY,
+  sent_at INTEGER NOT NULL
+) WITHOUT ROWID;
