@@ -46,7 +46,13 @@ export async function subscribeToPush() {
     return { ok: false, reason: `فشل طلب الإذن: ${e?.message || e}` };
   }
   if (permission !== 'granted') {
-    return { ok: false, reason: `الإذن مرفوض أو معلّق (${permission}). فعّل الإشعارات لموقعنا من إعدادات المتصفح وجرّب تاني.` };
+    return {
+      ok: false,
+      reason:
+        permission === 'denied'
+          ? 'الإشعارات متقفلة لموقعنا. دوس على أيقونة القفل جنب الرابط ← الأذونات ← الإشعارات ← سماح، وجرّب تاني.'
+          : 'مظهرش طلب الإذن. افتح الموقع من متصفح Chrome نفسه (مش من جوه تيليجرام أو واتساب) وجرّب تاني، ولو لسه ما ظهرش: القفل جنب الرابط ← الأذونات ← الإشعارات ← سماح.',
+    };
   }
 
   let reg;
