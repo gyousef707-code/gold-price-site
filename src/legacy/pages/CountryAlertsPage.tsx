@@ -49,6 +49,8 @@ function Row({
     if (!touched.current && live != null) setDraft(String(live));
   }, [live]);
 
+  const active = enabled && target != null;
+  const up = active && live != null ? (target as number) > live : null;
   const valid = draft.trim() !== "" && !Number.isNaN(Number(draft));
   const commit = (v = draft) => {
     const n = v.trim() === "" ? null : Number(v);
@@ -63,10 +65,15 @@ function Row({
   };
 
   return (
-    <div className="alert-row">
+    <div className="alert-row" style={active ? { background: "color-mix(in srgb, var(--gold-primary) 14%, transparent)", borderInlineStart: "4px solid var(--gold-primary)", borderRadius: 12, padding: "10px 12px" } : undefined}>
       <div>
         <div className="alert-row-label">{label}</div>
         <div className="alert-row-sub">{live != null ? `الآن: ${live} ${unit}` : "جاري تحميل السعر…"}</div>
+        {active && (
+          <div className="alert-row-sub" style={{ color: "var(--gold-primary)", fontWeight: 700 }}>
+            {`⏳ تنبيه مفعّل — ينتظر وصول السعر لـ ${target} ${unit} ${up === true ? "↑" : up === false ? "↓" : ""}`}
+          </div>
+        )}
       </div>
       <div className="alert-target-controls">
         <div className="alert-target-stepper">
@@ -187,7 +194,7 @@ export default function CountryAlertsPage({ code }: { code: string }) {
 
   const row = (k: CountryAlertKey) => (
     <Row
-      key={k}
+      key={`${code}-${k}-${loaded}`}
       label={LABELS[k]}
       target={prefs[k].target}
       enabled={prefs[k].enabled}
@@ -210,7 +217,7 @@ export default function CountryAlertsPage({ code }: { code: string }) {
         </p>
 
         {status && (
-          <p className={`alert-status alert-status-${status.kind}`} role="status">
+          <p className={`alert-status alert-status-${status.kind}`} role="status" style={{ position: "fixed", left: 12, right: 12, bottom: 70, zIndex: 60, margin: 0, background: "var(--card-bg)", boxShadow: "0 8px 24px rgba(0,0,0,.45)" }} onClick={() => setStatus(null)}>
             {status.text}
           </p>
         )}

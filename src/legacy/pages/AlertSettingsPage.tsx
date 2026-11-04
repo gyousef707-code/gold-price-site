@@ -64,11 +64,20 @@ function AlertTargetRow({
     commit(nextStr);
   };
 
+  const active = enabled && target != null;
+  const up = active && livePrice != null ? (target as number) > livePrice : null;
+  const arrow = up === true ? "↑" : up === false ? "↓" : "";
+
   return (
-    <div className="alert-row">
+    <div className="alert-row" style={active ? { background: "color-mix(in srgb, var(--gold-primary) 14%, transparent)", borderInlineStart: "4px solid var(--gold-primary)", borderRadius: 12, padding: "10px 12px" } : undefined}>
       <div>
         <div className="alert-row-label">{label}</div>
         {sublabel && <div className="alert-row-sub">{sublabel}</div>}
+        {active && (
+          <div className="alert-row-sub" style={{ color: "var(--gold-primary)", fontWeight: 700 }}>
+            {en ? `⏳ Alert active — waiting for ${target} ${arrow}` : `⏳ تنبيه مفعّل — ينتظر وصول السعر لـ ${target} ${arrow}`}
+          </div>
+        )}
       </div>
       <div className="alert-target-controls">
         <div className="alert-target-stepper">
@@ -244,7 +253,7 @@ export default function AlertSettingsPage() {
     opts?: { unit?: string; step?: number },
   ) => (
     <AlertTargetRow
-      key={key}
+      key={`${key}-${loaded}`}
       akey={key}
       label={en ? labelEn : label}
       sublabel={sublabel ? (en ? sublabelEn : sublabel) : undefined}
@@ -276,7 +285,7 @@ export default function AlertSettingsPage() {
       </p>
 
       {status && (
-        <p className={`alert-status alert-status-${status.kind}`} role="status">
+        <p className={`alert-status alert-status-${status.kind}`} role="status" style={{ position: "fixed", left: 12, right: 12, bottom: 70, zIndex: 60, margin: 0, background: "var(--card-bg)", boxShadow: "0 8px 24px rgba(0,0,0,.45)" }} onClick={() => setStatus(null)}>
           {status.text}
         </p>
       )}
