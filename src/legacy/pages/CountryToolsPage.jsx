@@ -59,6 +59,7 @@ export default function CountryToolsPage({ code }) {
     {
       title: 'المزيد',
       cards: [
+        { to: `${base}/alerts`, icon: 'fa-regular fa-bell', title: 'تنبيهات الأسعار', desc: `اضبط تنبيهك بـ${c.currencyName}`, tone: 'blue' },
         { to: '/blog', icon: 'fa-regular fa-newspaper', title: 'المدونة والمقالات', desc: 'كل المقالات', tone: 'blue' },
         { to: '/contact', icon: 'fa-regular fa-envelope', title: 'اتصل بنا', desc: 'اقتراح أو استفسار', tone: 'silver' },
       ],
