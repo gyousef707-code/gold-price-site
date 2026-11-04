@@ -63,7 +63,16 @@ export async function subscribeToPush() {
     return { ok: false, reason: `فشل تسجيل Service Worker: ${e?.message || e}` };
   }
 
-  const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+  let vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+  if (!vapidKey) {
+    // لو المتغير مش موجود في الـ build نجيب المفتاح العام من السيرفر
+    try {
+      const r = await fetch('/api/push/vapid-key');
+      if (r.ok) vapidKey = (await r.json())?.key || '';
+    } catch {
+      /* نكمل لرسالة الخطأ تحت */
+    }
+  }
   if (!vapidKey) {
     return { ok: false, reason: 'السيرفر مش مظبوط لسه (متغير VITE_VAPID_PUBLIC_KEY مش موجود في الـ build).' };
   }
