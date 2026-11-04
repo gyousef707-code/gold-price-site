@@ -3,6 +3,7 @@ import { Outlet } from '@/lib/router-compat.jsx';
 import Header from './Header.jsx';
 import Drawer from './Drawer.jsx';
 import BottomNav from './BottomNav.jsx';
+import QuickMenu from './QuickMenu.jsx';
 import Footer from './Footer.jsx';
 import ScrollToTop from './ScrollToTop.jsx';
 import JsonLd from './JsonLd.jsx';
@@ -39,6 +40,7 @@ export default function Layout() {
       </main>
       <Footer />
       <BottomNav />
+      <QuickMenu hidden={drawerOpen} />
     </>
   );
 }
