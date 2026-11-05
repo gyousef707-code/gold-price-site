@@ -92,7 +92,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { name: "theme-color", content: "#0d1117" },
+      { name: "theme-color", content: "#0b0b0c" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -121,15 +121,15 @@ function RootShell({ children }: { children: ReactNode }) {
         <style
           dangerouslySetInnerHTML={{
             __html: `
-              #splash-screen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,#1b1810 0%,#0d1117 68%);transition:opacity .6s ease,visibility .6s ease}
+              #splash-screen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 42%,#1c1810 0%,#0b0b0c 70%);transition:opacity .6s ease,visibility .6s ease}
               #splash-screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
-              .splash-bg{position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 50% 50%,rgba(227,179,65,0.08) 0%,transparent 50%);animation:splashPulse 3s ease-in-out infinite}
+              .splash-bg{position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 50% 50%,rgba(227,179,65,0.1) 0%,transparent 50%);animation:splashPulse 3s ease-in-out infinite}
               @keyframes splashPulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.1);opacity:1}}
               .splash-content{position:relative;z-index:1;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
               .splash-icon{animation:splashIconIn .8s cubic-bezier(.34,1.56,.64,1) forwards;opacity:0;transform:scale(.5)}
               @keyframes splashIconIn{to{opacity:1;transform:scale(1)}}
               .splash-title{font-size:36px;font-weight:800;color:#e3b341;margin:0;letter-spacing:2px;animation:splashFadeUp .6s .3s ease forwards;opacity:0;transform:translateY(20px)}
-              .splash-subtitle{font-size:13px;color:#8b949e;margin:0;animation:splashFadeUp .6s .5s ease forwards;opacity:0;transform:translateY(20px)}
+              .splash-subtitle{font-size:14px;color:#b9ad94;margin:6px 0 0;animation:splashFadeUp .6s .5s ease forwards;opacity:0;transform:translateY(20px)}
               @keyframes splashFadeUp{to{opacity:1;transform:translateY(0)}}
               .splash-loader{width:120px;height:3px;background:rgba(240,246,252,.1);border-radius:3px;overflow:hidden;margin-top:16px;animation:splashFadeUp .6s .7s ease forwards;opacity:0}
               .splash-loader-bar{width:0%;height:100%;background:linear-gradient(90deg,#e3b341,#f0c040);border-radius:3px;animation:splashLoad 1s .3s ease-in-out forwards}
@@ -183,9 +183,8 @@ function RootShell({ children }: { children: ReactNode }) {
           <div className="splash-bg"></div>
           <div className="splash-content">
             <div className="splash-icon">
-              <img src="/icons/coin-256.png" width="104" height="104" alt="ذهبي" style={{ display: "block", filter: "drop-shadow(0 10px 24px rgba(227,179,65,.35))" }} />
+              <img src="/icons/coin-256.png" width="132" height="132" alt="ذهبي" style={{ display: "block", filter: "drop-shadow(0 12px 30px rgba(227,179,65,.4))" }} />
             </div>
-            <h1 className="splash-title">ذهبي</h1>
             <p className="splash-subtitle">أسعار الذهب والفضة والعملات</p>
             <div className="splash-loader">
               <div className="splash-loader-bar"></div>
