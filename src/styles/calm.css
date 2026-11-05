@@ -193,11 +193,20 @@ body.light-mode::before {
 }
 
 /* الهيدر شفاف على نفس لون أعلى الصفحة، فمفيش حد فاصل بينه وبين الخلفية */
-body .app-header {
-  background: color-mix(in srgb, var(--page-top) 70%, transparent);
-}
+body .app-header,
 body.light-mode .app-header {
-  background: color-mix(in srgb, var(--page-top) 70%, transparent);
+  background: color-mix(in srgb, var(--page-top) 26%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+/* الشريط السفلي زجاجي برضه، فالموجة تبان من وراه */
+body .bottom-nav,
+body.light-mode .bottom-nav {
+  background: color-mix(in srgb, var(--page-top) 30%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border-top: 0;
+  box-shadow: none;
 }
 
 /* كروت زجاجية: السطح شبه شفاف عشان الخلفية الدافية تبان من تحتها */
