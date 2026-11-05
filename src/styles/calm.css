@@ -152,18 +152,17 @@ body :is(.gold-card, .silver-card, .currency-card-new, .tool-card, .tool-card-pr
 body :is(.ounce-card, .cp-hero) { border-radius: 34px; }
 
 /* =====================================================================
-   ألوان التصميم الجديد (دهبي دافي في النهاري / أسود دافي في الليلي)
-   ألوان الدول (الأخضر وغيره) بتفضل بتاعتها لأنها بتتحط بأولوية أعلى.
+   ألوان التصميم الجديد — نفس المعاينة: خلفية متدرجة + أمواج دهبية + كروت زجاجية
+   ألوان الدول بتفضل بتاعتها (الخلفية والأمواج بياخدوا لون الدولة تلقائياً).
    ===================================================================== */
 body {
   --bg-color: #0b0b0c;
   --card-bg: #171510;
   --card-bg-elevated: #201d17;
   --border-subtle: rgba(var(--dot-rgb), 0.16);
-  background-image: linear-gradient(170deg,
-    color-mix(in srgb, var(--bg-color) 90%, #e8bd52) 0%,
-    var(--bg-color) 55%,
-    color-mix(in srgb, var(--bg-color) 95%, #e8bd52) 100%);
+  --page-top: color-mix(in srgb, var(--bg-color) 90%, rgb(var(--dot-rgb)));
+  --page-bot: color-mix(in srgb, var(--bg-color) 94%, rgb(var(--dot-rgb)));
+  background-image: linear-gradient(170deg, var(--page-top) 0%, var(--bg-color) 55%, var(--page-bot) 100%);
   background-attachment: fixed;
   background-repeat: no-repeat;
 }
@@ -173,22 +172,42 @@ body.light-mode {
   --card-bg-elevated: #fbf3df;
   --border-subtle: rgba(var(--dot-rgb), 0.26);
   --border-gold: rgba(196, 146, 36, 0.45);
-  background-image: linear-gradient(170deg, #fffaf0 0%, var(--bg-color) 55%, #efd9a4 100%);
+  --page-top: color-mix(in srgb, var(--bg-color) 55%, #fff);
+  --page-bot: color-mix(in srgb, var(--bg-color) 80%, rgb(var(--dot-rgb)));
+  background-image: linear-gradient(170deg, var(--page-top) 0%, var(--bg-color) 55%, var(--page-bot) 100%);
 }
 
-/* أمواج دهبية ناعمة في الخلفية (بلون الدولة تلقائياً) */
+/* أمواج دهبية (نفس شكل المعاينة) بلون الدولة */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background:
-    radial-gradient(ellipse 130% 22% at 8% 6%, rgba(var(--dot-rgb), 0.16), transparent 70%),
-    radial-gradient(ellipse 120% 26% at 92% 96%, rgba(var(--dot-rgb), 0.18), transparent 70%);
+  background: linear-gradient(90deg, transparent 0%, rgba(var(--dot-rgb), 0.55) 50%, transparent 100%);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844' preserveAspectRatio='none'%3E%3Cpath d='M-20 120C80 40 200 130 420 30' fill='none' stroke='black' stroke-width='22' vector-effect='non-scaling-stroke'/%3E%3Cpath d='M-20 790C120 700 240 840 420 730' fill='none' stroke='black' stroke-width='26' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844' preserveAspectRatio='none'%3E%3Cpath d='M-20 120C80 40 200 130 420 30' fill='none' stroke='black' stroke-width='22' vector-effect='non-scaling-stroke'/%3E%3Cpath d='M-20 790C120 700 240 840 420 730' fill='none' stroke='black' stroke-width='26' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
 }
 body.light-mode::before {
-  background:
-    radial-gradient(ellipse 130% 22% at 8% 6%, rgba(var(--dot-rgb), 0.2), transparent 70%),
-    radial-gradient(ellipse 120% 26% at 92% 96%, rgba(var(--dot-rgb), 0.24), transparent 70%);
+  background: linear-gradient(90deg, transparent 0%, rgba(var(--dot-rgb), 0.5) 50%, transparent 100%);
+}
+
+/* الهيدر شفاف على نفس لون أعلى الصفحة، فمفيش حد فاصل بينه وبين الخلفية */
+body .app-header {
+  background: color-mix(in srgb, var(--page-top) 70%, transparent);
+}
+body.light-mode .app-header {
+  background: color-mix(in srgb, var(--page-top) 70%, transparent);
+}
+
+/* كروت زجاجية: السطح شبه شفاف عشان الخلفية الدافية تبان من تحتها */
+body :is(.gold-card, .silver-card, .ounce-card, .carats-box-main, .currency-card-new,
+         .tool-card, .tool-card-pro, .alert-section, .chart-card, .price-chart-card,
+         .calc-card, .converter-box) {
+  --surf: color-mix(in srgb, var(--card-bg) 88%, transparent);
+}
+body.light-mode :is(.gold-card, .silver-card, .ounce-card, .carats-box-main, .currency-card-new,
+         .tool-card, .tool-card-pro, .alert-section, .chart-card, .price-chart-card,
+         .calc-card, .converter-box) {
+  --surf: color-mix(in srgb, var(--card-bg) 78%, transparent);
 }
