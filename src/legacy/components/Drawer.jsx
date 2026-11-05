@@ -74,6 +74,10 @@ export default function Drawer({ open, onClose, panel, setPanel }) {
             </div>
           )}
 
+          <button className="drawer-item" onClick={() => window.location.reload()}>
+            <FaIcon icon="fa-solid fa-rotate" /> {t('header.refresh')}
+          </button>
+
           <button className="drawer-item" onClick={() => setPanel(panel === 'settings' ? null : 'settings')}>
             <FaIcon icon="fa-solid fa-gear" /> {t('drawer.settings')}
           </button>

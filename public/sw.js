@@ -124,7 +124,23 @@ self.addEventListener("push", (event) => {
     lang: "ar",
     data: { url: payload.url || "/" },
   };
-  event.waitUntil(self.registration.showNotification(title, options));
+  // تنبيه الهدف (tag بيبدأ بـ alert): اهتزاز مميز، ونغمة جوه الصفحة لو مفتوحة.
+  // صوت الإشعار نفسه (والموقع مقفول) بيجي من نظام الموبايل.
+  const isAlert = String(options.tag).startsWith("alert");
+  options.silent = false;
+  if (isAlert) {
+    options.vibrate = [300, 120, 300, 120, 500];
+    options.requireInteraction = true;
+  }
+  event.waitUntil(
+    (async () => {
+      if (isAlert) {
+        const wins = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+        wins.forEach((c) => c.postMessage({ type: "alert-chime" }));
+      }
+      await self.registration.showNotification(title, options);
+    })(),
+  );
 });
 
 self.addEventListener("notificationclick", (event) => {

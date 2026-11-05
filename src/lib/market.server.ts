@@ -114,6 +114,24 @@ async function fetchCurrencyRates() {
     }
   }
 
+  // 3) نربط الدولار بنفس "دولار البنك" اللي في صفحة الذهب (المصدر المصري)،
+  //    وباقي العملات بتتظبط بنفس النسبة عشان الأسعار تفضل متسقة مع بعض.
+  //    (قائمة العملات العالمية في banklive كانت بتدّي دولار أعلى من سعر السوق.)
+  try {
+    const market = await fetchEgyptGoldMarket();
+    const anchor = market.bank_usd_rate;
+    const current = rates["usd"]?.mid;
+    if (anchor && current && anchor > 0 && Math.abs(anchor / current - 1) > 0.002 && Math.abs(anchor / current - 1) < 0.1) {
+      const k = anchor / current;
+      for (const code of Object.keys(rates)) {
+        if (code !== "egp") put(code, rates[code]!.mid * k);
+      }
+      sources.push("egypt.gold-price-today.com (USD)");
+    }
+  } catch {
+    // لو المصدر مش متاح بنكمل بالأرقام اللي معانا زي ما هي
+  }
+
   if (Object.keys(rates).length < 6) throw new Error("لم يتم العثور على أسعار كافية للعملات");
   return {
     source: sources.join(" + ") || "banklive.net",

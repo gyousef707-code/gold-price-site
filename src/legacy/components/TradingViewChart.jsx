@@ -4,7 +4,7 @@ import FaIcon from './FaIcon.jsx';
 // ملاحظة: سكربت TradingView تقيل (حوالي 800 كيلوبايت). بنحمّله بس لما
 // (1) المستخدم يعمل أي حركة في الصفحة (سكرول/لمس/ضغط) و
 // (2) قسم الرسم يقرّب من الشاشة.
-export default function TradingViewChart({ symbol, id }) {
+export default function TradingViewChart({ symbol, id, timezone = 'Africa/Cairo' }) {
   const containerRef = useRef(null);
 
   useEffect(() => {
@@ -37,7 +37,7 @@ export default function TradingViewChart({ symbol, id }) {
         height: '350',
         symbol,
         interval: '60',
-        timezone: 'Africa/Cairo',
+        timezone,
         theme: 'dark',
         style: '1',
         locale: 'ar',
@@ -72,7 +72,7 @@ export default function TradingViewChart({ symbol, id }) {
     }
 
     return cleanup;
-  }, [symbol]);
+  }, [symbol, timezone]);
 
   return (
     <section className="tradingview-section">

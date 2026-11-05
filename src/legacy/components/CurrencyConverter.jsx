@@ -4,24 +4,25 @@ import LivePrice from './LivePrice.jsx';
 import NumberInput from './NumberInput.jsx';
 import FaIcon from './FaIcon.jsx';
 
-export default function CurrencyConverter({ rates, selected }) {
+export default function CurrencyConverter({ rates, selected, base = 'egp', meta = CURRENCY_META }) {
   const [amount, setAmount] = useState(100);
   const [from, setFrom] = useState('usd');
-  const [to, setTo] = useState('egp');
-  const allCodes = ['egp', ...CURRENCY_ORDER];
+  const [to, setTo] = useState(base);
+  // عملة الأساس (الجنيه في مصر، وعملة الدولة في صفحات الدول) أول القايمة، وقيمتها 1
+  const allCodes = [base, ...(base === 'egp' ? [] : ['egp']), ...CURRENCY_ORDER.filter((x) => x !== base)];
 
   // لما المستخدم يدوس على أى عملة فى القائمة، تتبدل مكان الدولار أوتوماتيك
   useEffect(() => {
-    if (!selected || !CURRENCY_META[selected]) return;
+    if (!selected || !meta[selected]) return;
     setFrom(selected);
-    setTo((prev) => (prev === selected ? 'egp' : prev));
+    setTo((prev) => (prev === selected ? base : prev));
   }, [selected]);
 
 
   const result = useMemo(() => {
     if (!rates) return null;
-    const fromMid = from === 'egp' ? 1 : rates[from]?.mid;
-    const toMid = to === 'egp' ? 1 : rates[to]?.mid;
+    const fromMid = from === base ? 1 : rates[from]?.mid;
+    const toMid = to === base ? 1 : rates[to]?.mid;
     if (!fromMid || !toMid) return null;
     return (amount * fromMid) / toMid;
   }, [amount, from, to, rates]);
@@ -34,7 +35,7 @@ export default function CurrencyConverter({ rates, selected }) {
   const flag = (code) => (
     <img
       className="converter-flag-img"
-      src={`https://flagcdn.com/24x18/${CURRENCY_META[code].flag}.png`}
+      src={`https://flagcdn.com/24x18/${meta[code].flag}.png`}
       width="24"
       height="18"
       alt={code}
@@ -52,7 +53,7 @@ export default function CurrencyConverter({ rates, selected }) {
           <FaIcon icon="fa-solid fa-chevron-down" className="converter-select-arrow" />
           <select value={from} onChange={(e) => setFrom(e.target.value)} aria-label="من">
             {allCodes.map((c) => (
-              <option key={c} value={c}>{CURRENCY_META[c].name}</option>
+              <option key={c} value={c}>{meta[c].name}</option>
             ))}
           </select>
         </div>
@@ -79,7 +80,7 @@ export default function CurrencyConverter({ rates, selected }) {
           <FaIcon icon="fa-solid fa-chevron-down" className="converter-select-arrow" />
           <select value={to} onChange={(e) => setTo(e.target.value)} aria-label="إلى">
             {allCodes.map((c) => (
-              <option key={c} value={c}>{CURRENCY_META[c].name}</option>
+              <option key={c} value={c}>{meta[c].name}</option>
             ))}
           </select>
         </div>
@@ -91,7 +92,7 @@ export default function CurrencyConverter({ rates, selected }) {
       <div className="converter-note">
         1 {from.toUpperCase()} ={' '}
         {rates
-          ? (((from === 'egp' ? 1 : rates[from]?.mid) || 0) / ((to === 'egp' ? 1 : rates[to]?.mid) || 1)).toLocaleString('en-US', { maximumFractionDigits: 4 })
+          ? (((from === base ? 1 : rates[from]?.mid) || 0) / ((to === base ? 1 : rates[to]?.mid) || 1)).toLocaleString('en-US', { maximumFractionDigits: 4 })
           : '—'}{' '}
         {to.toUpperCase()}
       </div>

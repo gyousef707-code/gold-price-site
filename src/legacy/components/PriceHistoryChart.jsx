@@ -45,9 +45,11 @@ export default function PriceHistoryChart({
   titleEn,
   dataKey,
   tone = 'gold',
+  unitAr = 'ج.م', // اسم العملة (مصر افتراضياً)
+  unitEn = 'EGP',
   livePrice = null, // اختياري: سعر اللحظة، بيتحط كآخر نقطة عشان الرسم يطابق الكارت اللي فوقه
 }) {
-  const { data, loading } = useApiData(`${endpoint}?days=365`, { intervalMs: 60 * 60 * 1000 });
+  const { data, loading } = useApiData(`${endpoint}${endpoint.includes('?') ? '&' : '?'}days=365`, { intervalMs: 60 * 60 * 1000 });
   const { lang } = useLang();
   const en = lang === 'en';
   const rows = data?.history ?? [];
@@ -125,7 +127,7 @@ export default function PriceHistoryChart({
   const min = values.length ? Math.min(...values) : 0;
   const max = values.length ? Math.max(...values) : 0;
   const axis = useMemo(() => buildAxis(min, max), [min, max]);
-  const currency = en ? 'EGP' : 'ج.م';
+  const currency = en ? unitEn : unitAr;
 
   return (
     <section className="page-tools">

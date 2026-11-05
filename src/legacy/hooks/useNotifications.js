@@ -31,6 +31,13 @@ function urlBase64ToUint8Array(base64String) {
   return outputArray;
 }
 
+function withTimeout(promise, ms, message) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error(message)), ms)),
+  ]);
+}
+
 export async function subscribeToPush() {
   if (typeof window === 'undefined') {
     return { ok: false, reason: 'الصفحة لسه بتحمّل، جرّب تاني.' };
@@ -39,25 +46,47 @@ export async function subscribeToPush() {
     return { ok: false, reason: 'المتصفح ده مش بيدعم الإشعارات الحقيقية (Push). جرّب Chrome محدّث.' };
   }
 
+  if (Notification.permission === 'denied') {
+    return {
+      ok: false,
+      reason: 'لازم تفتح الإشعارات الأول: دوس على القفل جنب الرابط ← الأذونات ← الإشعارات ← سماح، وبعدين دوس تفعيل التنبيه تاني.',
+    };
+  }
+
   let permission;
   try {
-    permission = await Notification.requestPermission();
+    permission = await withTimeout(Notification.requestPermission(), 30000, 'طلب الإذن ما اتجاوبش في 30 ثانية');
   } catch (e) {
     return { ok: false, reason: `فشل طلب الإذن: ${e?.message || e}` };
   }
   if (permission !== 'granted') {
-    return { ok: false, reason: `الإذن مرفوض أو معلّق (${permission}). فعّل الإشعارات لموقعنا من إعدادات المتصفح وجرّب تاني.` };
+    return {
+      ok: false,
+      reason:
+        permission === 'denied'
+          ? 'لازم تفتح الإشعارات الأول: دوس على القفل جنب الرابط ← الأذونات ← الإشعارات ← سماح، وبعدين دوس تفعيل التنبيه تاني.'
+          : 'لازم تفعّل الإشعارات الأول: اضغط سماح لما يظهر الطلب. ولو ما ظهرش، افتح الموقع من Chrome نفسه (مش من تطبيق تاني) ومن القفل جنب الرابط ← الأذونات ← الإشعارات ← سماح.',
+    };
   }
 
   let reg;
   try {
     reg = await navigator.serviceWorker.register('/sw.js');
-    await navigator.serviceWorker.ready;
+    await withTimeout(navigator.serviceWorker.ready, 10000, 'الـ Service Worker ما جهزش في 10 ثواني. اقفل التبويب وافتحه تاني وجرّب');
   } catch (e) {
     return { ok: false, reason: `فشل تسجيل Service Worker: ${e?.message || e}` };
   }
 
-  const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+  let vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+  if (!vapidKey) {
+    // لو المتغير مش موجود في الـ build نجيب المفتاح العام من السيرفر
+    try {
+      const r = await fetch('/api/push/vapid-key');
+      if (r.ok) vapidKey = (await r.json())?.key || '';
+    } catch {
+      /* نكمل لرسالة الخطأ تحت */
+    }
+  }
   if (!vapidKey) {
     return { ok: false, reason: 'السيرفر مش مظبوط لسه (متغير VITE_VAPID_PUBLIC_KEY مش موجود في الـ build).' };
   }
@@ -66,10 +95,14 @@ export async function subscribeToPush() {
   try {
     sub = await reg.pushManager.getSubscription();
     if (!sub) {
-      sub = await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(vapidKey),
-      });
+      sub = await withTimeout(
+        reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(vapidKey),
+        }),
+        15000,
+        'خدمة الإشعارات (Google) ما ردّتش في 15 ثانية. اتأكد من النت أو جرّب شبكة تانية',
+      );
     }
   } catch (e) {
     return { ok: false, reason: `فشل الاشتراك في الـ Push: ${e?.message || e}` };
@@ -97,6 +130,32 @@ function pct(a, b) {
   return ((b - a) / a) * 100;
 }
 
+// نغمة قصيرة (نوتتين) بتتشغل جوه الصفحة لما تنبيه سعر يوصل والموقع مفتوح
+function playChime() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    [880, 1318.5].forEach((freq, i) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      const t = ctx.currentTime + i * 0.2;
+      o.type = 'sine';
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.35, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
+      o.connect(g);
+      g.connect(ctx.destination);
+      o.start(t);
+      o.stop(t + 0.55);
+    });
+    setTimeout(() => ctx.close && ctx.close(), 1500);
+  } catch {
+    /* تجاهل */
+  }
+}
+
 // بيقارن الأسعار الحالية بآخر نسخة محفوظة وبيولّد إشعارات حقيقية بوقتها
 export default function useNotifications() {
   const [items, setItems] = useState([]);
@@ -120,6 +179,11 @@ export default function useNotifications() {
     };
     window.addEventListener('pointerdown', trySubscribe, { once: true });
     window.addEventListener('keydown', trySubscribe, { once: true });
+
+    const onSwMessage = (e) => {
+      if (e.data && e.data.type === 'alert-chime') playChime();
+    };
+    if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', onSwMessage);
 
     async function tick() {
       try {
@@ -201,6 +265,7 @@ export default function useNotifications() {
       clearInterval(id);
       window.removeEventListener('pointerdown', trySubscribe);
       window.removeEventListener('keydown', trySubscribe);
+      if ('serviceWorker' in navigator) navigator.serviceWorker.removeEventListener('message', onSwMessage);
     };
   }, []);
 

@@ -1,6 +1,7 @@
 import { NavLink } from '@/lib/router-compat.jsx';
 import { useLang } from '../context/LangContext.jsx';
 import FaIcon from './FaIcon.jsx';
+import useCountryCode, { cpath } from '../hooks/useCountry.js';
 
 const TABS = [
   { to: '/', icon: 'fa-solid fa-chart-line', key: 'nav.prices', end: true },
@@ -12,13 +13,18 @@ const TABS = [
 
 export default function BottomNav() {
   const { t } = useLang();
+  const country = useCountryCode();
   return (
     <nav className="bottom-nav">
       {TABS.map((tab) => (
         <NavLink
           key={tab.to}
-          to={tab.to}
+          to={cpath(country, tab.to)}
           end={tab.end}
+          // الراوتر بيحط كلاس active تلقائي على الرابط /sa لأي صفحة تحته (/sa/silver...)،
+          // فبنقفله هنا، والتفعيل بيتحدد من NavLink بس.
+          activeProps={{}}
+          activeOptions={{ exact: true }}
           className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
         >
           <FaIcon icon={tab.icon} />
