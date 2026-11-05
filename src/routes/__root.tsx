@@ -121,7 +121,7 @@ function RootShell({ children }: { children: ReactNode }) {
         <style
           dangerouslySetInnerHTML={{
             __html: `
-              #splash-screen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d1117 0%,#161b22 50%,#0d1117 100%);transition:opacity .6s ease,visibility .6s ease}
+              #splash-screen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,#1b1810 0%,#0d1117 68%);transition:opacity .6s ease,visibility .6s ease}
               #splash-screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
               .splash-bg{position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 50% 50%,rgba(227,179,65,0.08) 0%,transparent 50%);animation:splashPulse 3s ease-in-out infinite}
               @keyframes splashPulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.1);opacity:1}}
@@ -183,35 +183,7 @@ function RootShell({ children }: { children: ReactNode }) {
           <div className="splash-bg"></div>
           <div className="splash-content">
             <div className="splash-icon">
-              <svg viewBox="0 0 100 100" width="80" height="80">
-                <defs>
-                  <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#e3b341" />
-                    <stop offset="50%" stopColor="#f0c040" />
-                    <stop offset="100%" stopColor="#b8860b" />
-                  </linearGradient>
-                  <filter id="sglow">
-                    <feGaussianBlur stdDeviation="2" result="blur" />
-                    <feMerge>
-                      <feMergeNode in="blur" />
-                      <feMergeNode in="SourceGraphic" />
-                    </feMerge>
-                  </filter>
-                </defs>
-                <circle cx="50" cy="50" r="46" fill="url(#sg)" filter="url(#sglow)" />
-                <circle cx="50" cy="50" r="42" fill="none" stroke="#0d1117" strokeWidth="2" />
-                <text
-                  x="50"
-                  y="60"
-                  fontSize="26"
-                  textAnchor="middle"
-                  fill="#0d1117"
-                  fontFamily="Cairo, serif"
-                  fontWeight="800"
-                >
-                  ذهبي
-                </text>
-              </svg>
+              <img src="/icons/coin-256.png" width="104" height="104" alt="ذهبي" style={{ display: "block", filter: "drop-shadow(0 10px 24px rgba(227,179,65,.35))" }} />
             </div>
             <h1 className="splash-title">ذهبي</h1>
             <p className="splash-subtitle">أسعار الذهب والفضة والعملات</p>

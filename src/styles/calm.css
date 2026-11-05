@@ -131,3 +131,22 @@ body.light-mode :is(
 .qs-item:active, .qs-item:hover { background: rgba(var(--dot-rgb, 227, 179, 65), 0.12); }
 .qs-item small { display: block; margin-top: 2px; color: var(--text-muted); font-size: 12px; }
 .qs-empty { padding: 18px 14px; color: var(--text-muted); text-align: center; font-size: 14px; }
+
+/* ---- هيدر من غير خط تحت (بيدوب في الخلفية زي الصورة) ---- */
+body .app-header,
+body.light-mode .app-header {
+  border-bottom: 0 !important;
+  box-shadow: none;
+  background: color-mix(in srgb, var(--bg-color) 82%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+body .app-header::after,
+body.light-mode .app-header::after { display: none; }
+
+/* ---- استدارة الكروت (نفس الاستايل الجديد، بيمشي على كل الدول) ---- */
+body :is(.gold-card, .silver-card, .currency-card-new, .tool-card, .tool-card-pro,
+         .alert-section, .chart-card, .price-chart-card, .calc-card, .converter-box, .carats-box-main) {
+  border-radius: 20px;
+}
+body :is(.ounce-card, .cp-hero) { border-radius: 34px; }
