@@ -150,3 +150,45 @@ body :is(.gold-card, .silver-card, .currency-card-new, .tool-card, .tool-card-pr
   border-radius: 20px;
 }
 body :is(.ounce-card, .cp-hero) { border-radius: 34px; }
+
+/* =====================================================================
+   ألوان التصميم الجديد (دهبي دافي في النهاري / أسود دافي في الليلي)
+   ألوان الدول (الأخضر وغيره) بتفضل بتاعتها لأنها بتتحط بأولوية أعلى.
+   ===================================================================== */
+body {
+  --bg-color: #0b0b0c;
+  --card-bg: #171510;
+  --card-bg-elevated: #201d17;
+  --border-subtle: rgba(var(--dot-rgb), 0.16);
+  background-image: linear-gradient(170deg,
+    color-mix(in srgb, var(--bg-color) 90%, #e8bd52) 0%,
+    var(--bg-color) 55%,
+    color-mix(in srgb, var(--bg-color) 95%, #e8bd52) 100%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+body.light-mode {
+  --bg-color: #f6e8c6;
+  --card-bg: #fffdf8;
+  --card-bg-elevated: #fbf3df;
+  --border-subtle: rgba(var(--dot-rgb), 0.26);
+  --border-gold: rgba(196, 146, 36, 0.45);
+  background-image: linear-gradient(170deg, #fffaf0 0%, var(--bg-color) 55%, #efd9a4 100%);
+}
+
+/* أمواج دهبية ناعمة في الخلفية (بلون الدولة تلقائياً) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 130% 22% at 8% 6%, rgba(var(--dot-rgb), 0.16), transparent 70%),
+    radial-gradient(ellipse 120% 26% at 92% 96%, rgba(var(--dot-rgb), 0.18), transparent 70%);
+}
+body.light-mode::before {
+  background:
+    radial-gradient(ellipse 130% 22% at 8% 6%, rgba(var(--dot-rgb), 0.2), transparent 70%),
+    radial-gradient(ellipse 120% 26% at 92% 96%, rgba(var(--dot-rgb), 0.24), transparent 70%);
+}
