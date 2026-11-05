@@ -144,6 +144,10 @@ body.light-mode .app-header {
   backdrop-filter: none;
 }
 
+/* الخط الدهبي اللي كان بيترسم تحت الهيدر: مخفي */
+body .app-header::after,
+body.light-mode .app-header::after { display: none; }
+
 /* ---- الشريط السفلي: كبسولة عايمة، والتبويب النشط زرار دهبي ---- */
 body { padding-bottom: 96px; }
 body .bottom-nav,
