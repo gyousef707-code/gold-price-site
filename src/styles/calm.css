@@ -193,20 +193,37 @@ body.light-mode::before {
 }
 
 /* الهيدر شفاف على نفس لون أعلى الصفحة، فمفيش حد فاصل بينه وبين الخلفية */
+/* الهيدر والشريط السفلي: لونهم بيكمّل الخلفية بالظبط، وفيهم موجة دهبية واضحة (من غير تغبيش) */
 body .app-header,
 body.light-mode .app-header {
-  background: color-mix(in srgb, var(--page-top) 26%, transparent);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  background: color-mix(in srgb, var(--page-top) 93%, transparent);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
-/* الشريط السفلي زجاجي برضه، فالموجة تبان من وراه */
+body .app-header::before,
+body.light-mode .app-header::before {
+  background: linear-gradient(90deg, transparent 0%, rgba(var(--dot-rgb), 0.6) 50%, transparent 100%);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 96' preserveAspectRatio='none'%3E%3Cpath d='M-20 80C90 22 220 92 420 20' fill='none' stroke='black' stroke-width='16' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 96' preserveAspectRatio='none'%3E%3Cpath d='M-20 80C90 22 220 92 420 20' fill='none' stroke='black' stroke-width='16' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+}
 body .bottom-nav,
 body.light-mode .bottom-nav {
-  background: color-mix(in srgb, var(--page-top) 30%, transparent);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--page-bot) 93%, transparent);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   border-top: 0;
   box-shadow: none;
+}
+.bottom-nav > * { position: relative; z-index: 1; }
+.bottom-nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent 0%, rgba(var(--dot-rgb), 0.6) 50%, transparent 100%);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 64' preserveAspectRatio='none'%3E%3Cpath d='M-20 50C110 6 250 80 420 14' fill='none' stroke='black' stroke-width='16' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 64' preserveAspectRatio='none'%3E%3Cpath d='M-20 50C110 6 250 80 420 14' fill='none' stroke='black' stroke-width='16' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
 }
 
 /* كروت زجاجية: السطح شبه شفاف عشان الخلفية الدافية تبان من تحتها */
