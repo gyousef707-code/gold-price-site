@@ -341,6 +341,13 @@ async function fetchSilverPrices() {
 type CacheEntry = { at: number; data: any };
 const memCache = new Map<string, CacheEntry>();
 
+// حد الكتابة اليومي في KV (النسخة المجانية) = 1000 عملية على الحساب كله.
+// الكتابة في كل جلب (كل 30 ثانية للذهب مثلاً) كانت بتخلّصه بسرعة، فبنكتب كل مفتاح
+// مرة كل نص ساعة بس. الـ KV بيفضل مرجع احتياطي لو المصدر وقع، مش كاش لحظي.
+const KV_WRITE_EVERY_MS = 30 * 60_000;
+const KV_TTL_SECONDS = 3600;
+const kvWrittenAt = new Map<string, number>();
+
 async function getPriceCacheKv(): Promise<any | null> {
   try {
     // بنستورد cloudflare:workers جوه الفانكشن نفسها (مش فوق فى الملف) عشان
@@ -379,10 +386,11 @@ async function cached<T>(key: string, freshMs: number, fn: () => Promise<T>): Pr
     const data = await fn();
     const entry: CacheEntry = { at: Date.now(), data };
     memCache.set(key, entry);
-    if (kv) {
-      // بنخزّنها فى الـ KV المشترك (تنتهي صلاحيتها تلقائيًا بعد 10 دقايق)
+    if (kv && Date.now() - (kvWrittenAt.get(key) ?? 0) > KV_WRITE_EVERY_MS) {
+      // بنخزّنها فى الـ KV المشترك مرة كل نص ساعة بس (توفيراً لحد الكتابة اليومي)
       // من غير ما ننتظر الكتابة تخلص عشان متبطّئش الرد للزائر.
-      void kv.put(kvKey, JSON.stringify(entry), { expirationTtl: 600 }).catch(() => {});
+      kvWrittenAt.set(key, Date.now());
+      void kv.put(kvKey, JSON.stringify(entry), { expirationTtl: KV_TTL_SECONDS }).catch(() => {});
     }
     void reportSuccess(key); // مش هننتظرها، مبتأثرش على سرعة الرد
     return data;
