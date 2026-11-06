@@ -415,22 +415,48 @@ async function cached<T>(key: string, freshMs: number, fn: () => Promise<T>): Pr
 }
 
 export async function getCryptoPrices() {
-  // زودنا مدة الصلاحية لدقيقتين (كانت 45 ثانية) عشان نقلل عدد الطلبات
-  // الفعلية لمصدر الكريبتو (حده 60 طلب/ساعة بس)، والكاش المشترك فوق هيقلل
+  // مدة الصلاحية 5 دقايق عشان نقلل عدد الطلبات الفعلية لمصدر الكريبتو
+  // (حده المجاني 20 ألف طلب فى الشهر بس)، والكاش المشترك فوق هيقلل
   // العدد أكتر لأنه بيمنع كل نسخ Cloudflare تطلب لوحدها فى نفس الوقت.
-  return cached("crypto", 120_000, fetchCryptoPrices);
+  return cached("crypto", 300_000, fetchCryptoPrices);
 }
 
 async function fetchCryptoPrices() {
-  // ملاحظة: CoinGecko بيرفض (403) طلبات جايه من Cloudflare Workers، فبنستخدم
-  // CoinPaprika بدالها — مجاني وبدون مفتاح API وشغال كويس مع Cloudflare.
-  const [marketsRes, usdRate] = await Promise.all([
-    fetch("https://api.coinpaprika.com/v1/tickers", {
-      headers: UA,
-      signal: AbortSignal.timeout(8000),
-    }),
-    safeUsdRate(51.4),
-  ]);
+  const usdRate = (await safeUsdRate(51.4)) ?? 51.4;
+  // المصدر الأساسي CoinPaprika (حده المجاني 20 ألف طلب فى الشهر، وبيرد 429 لما بيخلص)،
+  // ولو فشل بنجرّب CoinLore (مجاني وخفيف) عشان الصفحة ما تقعش.
+  try {
+    return await fetchCryptoFromPaprika(usdRate);
+  } catch (primaryError) {
+    try {
+      return await fetchCryptoFromCoinLore(usdRate);
+    } catch {
+      throw primaryError;
+    }
+  }
+}
+
+function shapeCoin(id: string, symbol: string, name: string, price: unknown, change: unknown, usdRate: number) {
+  const p = typeof price === "number" ? price : Number(price);
+  const ch = typeof change === "number" ? change : Number(change);
+  const okPrice = Number.isFinite(p) && p > 0;
+  return {
+    id,
+    symbol: (symbol || "").toUpperCase(),
+    name,
+    image: null,
+    price_usd: okPrice ? p : null,
+    price_egp: okPrice ? Number((p * usdRate).toFixed(4)) : null,
+    change_24h: Number.isFinite(ch) ? Number(ch.toFixed(2)) : null,
+  };
+}
+
+async function fetchCryptoFromPaprika(bank_usd_rate: number) {
+  // ملاحظة: CoinGecko بيرفض (403) طلبات جايه من Cloudflare Workers، فبنستخدم CoinPaprika.
+  const marketsRes = await fetch("https://api.coinpaprika.com/v1/tickers", {
+    headers: UA,
+    signal: AbortSignal.timeout(8000),
+  });
   if (!marketsRes.ok) {
     const bodyText = await marketsRes.text().catch(() => "");
     throw new Error(
@@ -444,25 +470,32 @@ async function fetchCryptoPrices() {
   const markets = all
     .filter((c: any) => c.rank && c.rank <= 20)
     .sort((a: any, b: any) => a.rank - b.rank);
-  const bank_usd_rate = usdRate ?? 51.4;
-
-  const coins = markets.map((c: any) => {
-    const price = c.quotes?.USD?.price ?? null;
-    const change = c.quotes?.USD?.percent_change_24h ?? null;
-    return {
-      id: c.id,
-      symbol: (c.symbol || "").toUpperCase(),
-      name: c.name,
-      image: null,
-      price_usd: price,
-      price_egp:
-        typeof price === "number" ? Number((price * bank_usd_rate).toFixed(4)) : null,
-      change_24h:
-        typeof change === "number" ? Number(change.toFixed(2)) : null,
-    };
-  });
-
+  const coins = markets.map((c: any) =>
+    shapeCoin(c.id, c.symbol, c.name, c.quotes?.USD?.price, c.quotes?.USD?.percent_change_24h, bank_usd_rate),
+  );
   return { source: "coinpaprika.com", bank_usd_rate, coins, updated_at: new Date().toISOString() };
+}
+
+async function fetchCryptoFromCoinLore(bank_usd_rate: number) {
+  const res = await fetch("https://api.coinlore.net/api/tickers/?start=0&limit=20", {
+    headers: UA,
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!res.ok) throw new Error(`CoinLore status ${res.status}`);
+  const json: any = await res.json();
+  const rows: any[] = Array.isArray(json?.data) ? json.data : [];
+  if (rows.length === 0) throw new Error("CoinLore: مفيش بيانات");
+  const coins = rows.map((c: any) =>
+    shapeCoin(
+      `${String(c.symbol || "").toLowerCase()}-${c.nameid}`,
+      c.symbol,
+      c.name,
+      c.price_usd,
+      c.percent_change_24h,
+      bank_usd_rate,
+    ),
+  );
+  return { source: "coinlore.net", bank_usd_rate, coins, updated_at: new Date().toISOString() };
 }
 
 function escapeRegex(str: string) {
