@@ -369,11 +369,13 @@ async function cached<T>(key: string, freshMs: number, fn: () => Promise<T>): Pr
 
   // مفيش حاجة حديثة فى الذاكرة المحلية؟ نشوف لو نسخة تانية من الـ Worker
   // (فى مكان تاني فى العالم) أصلاً جابت سعر حديث وخزّنته فى الـ KV المشترك.
+  let kvAt = 0; // وقت آخر كتابة فى الـ KV (من أي نسخة)، بنستخدمه نقلل الكتابة على مستوى الحساب كله
   if (kv) {
     try {
       const raw: string | null = await kv.get(kvKey);
       if (raw) {
         const parsed = JSON.parse(raw) as CacheEntry;
+        kvAt = parsed.at ?? 0;
         memCache.set(key, parsed); // نسخّنها محلي كمان عشان السرعة فى المرات الجاية
         if (Date.now() - parsed.at < freshMs) return parsed.data as T;
       }
@@ -386,7 +388,7 @@ async function cached<T>(key: string, freshMs: number, fn: () => Promise<T>): Pr
     const data = await fn();
     const entry: CacheEntry = { at: Date.now(), data };
     memCache.set(key, entry);
-    if (kv && Date.now() - (kvWrittenAt.get(key) ?? 0) > KV_WRITE_EVERY_MS) {
+    if (kv && Date.now() - Math.max(kvAt, kvWrittenAt.get(key) ?? 0) > KV_WRITE_EVERY_MS) {
       // بنخزّنها فى الـ KV المشترك مرة كل نص ساعة بس (توفيراً لحد الكتابة اليومي)
       // من غير ما ننتظر الكتابة تخلص عشان متبطّئش الرد للزائر.
       kvWrittenAt.set(key, Date.now());
