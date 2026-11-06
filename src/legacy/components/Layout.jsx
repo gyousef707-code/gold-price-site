@@ -4,6 +4,7 @@ import Header from './Header.jsx';
 import Drawer from './Drawer.jsx';
 import BottomNav from './BottomNav.jsx';
 import QuickMenu from './QuickMenu.jsx';
+import CountryMemory from './CountryMemory.jsx';
 import Footer from './Footer.jsx';
 import ScrollToTop from './ScrollToTop.jsx';
 import JsonLd from './JsonLd.jsx';
@@ -33,6 +34,7 @@ export default function Layout() {
       {/* بيانات المنظمة والموقع — مرة واحدة بس، بتظهر في كل الصفحات */}
       <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
       <ScrollToTop />
+      <CountryMemory />
       <Header onMenuClick={() => setDrawerOpen(true)} />
       <Drawer open={drawerOpen} onClose={closeDrawer} panel={panel} setPanel={setPanel} />
       <main>
