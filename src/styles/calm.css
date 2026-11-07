@@ -218,3 +218,7 @@ body.light-mode :is(.gold-card, .silver-card, .ounce-card, .carats-box-main, .cu
          .calc-card, .converter-box) {
   --surf: color-mix(in srgb, var(--card-bg) 78%, transparent);
 }
+
+/* زرار القايمة العايم: نص شفاف، ويبقى واضح لما تفتحه */
+.qm { opacity: 0.5; transition: opacity 0.2s ease; }
+.qm.open, .qm:active { opacity: 1; }
