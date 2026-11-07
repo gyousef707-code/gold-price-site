@@ -9,6 +9,10 @@ import { breadcrumbJsonLd } from '@/lib/jsonld.js';
 
 const PriceHistoryChart = lazy(() => import('../components/PriceHistoryChart.jsx'));
 
+const WEIGHTS = [1, 5, 10, 20, 50, 100];
+const GRAMS_PER_OUNCE = 31.1034768;
+const fmt = (n) => Math.round(n).toLocaleString('en-US');
+
 const RELATED_BY_KARAT = {
   '24': ['gold-karat-types-explained', 'difference-21-24-karat'],
   '22': ['gold-karat-types-explained', 'gold-price-today-egypt'],
@@ -56,6 +60,32 @@ export default function GoldKaratPage() {
         </div>
         <Link to="/#tool-gold-calc" className="btn">احسب قيمة ذهبك</Link>
       </div>
+
+      {price && (
+        <section aria-labelledby="kw-h" style={{ margin: '18px 0' }}>
+          <h2 id="kw-h">سعر الذهب عيار {karat} بالوزن</h2>
+          <table className="spec-table">
+            <thead>
+              <tr><th>الوزن</th><th>البيع</th><th>الشراء</th></tr>
+            </thead>
+            <tbody>
+              {WEIGHTS.map((w) => (
+                <tr key={w}>
+                  <th>{w} جرام</th>
+                  <td>{fmt(price.sell * w)} ج.م</td>
+                  <td>{fmt(price.buy * w)} ج.م</td>
+                </tr>
+              ))}
+              <tr>
+                <th>أونصة ({GRAMS_PER_OUNCE.toFixed(2)} جرام)</th>
+                <td>{fmt(price.sell * GRAMS_PER_OUNCE)} ج.م</td>
+                <td>{fmt(price.buy * GRAMS_PER_OUNCE)} ج.م</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style={{ fontSize: 13, opacity: 0.75 }}>الأسعار استرشادية ولا تشمل المصنعية ولا الضريبة.</p>
+        </section>
+      )}
 
       <Suspense fallback={null}>
         <PriceHistoryChart
