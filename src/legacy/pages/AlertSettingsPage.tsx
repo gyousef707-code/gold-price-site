@@ -6,6 +6,7 @@ import useApiData from "../hooks/useApiData.js";
 import useAlertPreferences, { type AlertKey } from "../hooks/useAlertPreferences";
 import { subscribeToPush } from "../hooks/useNotifications.js";
 import { fetchServerAlerts, pushAlertsToServer } from "../lib/alertSync";
+import NotificationEnableCard from "../components/NotificationEnableCard.jsx";
 
 // صف واحد: تسمية العيار + حقل السعر المستهدف (متعبّى بالسعر الحي أول
 // مرة) + زرار زيادة/نقصان + زرار التفعيل/الإلغاء.
@@ -235,13 +236,16 @@ export default function AlertSettingsPage() {
       return;
     }
     // طلب إذن الإشعارات + تسجيل الجهاز (لازم يحصل من ضغطة المستخدم نفسها)
+    setStatus({ kind: "ok", text: en ? "⏳ Activating the alert…" : "⏳ بنفعّل التنبيه… لو ظهر طلب إذن اضغط سماح" });
     const res = await subscribeToPush();
     if (!res.ok) {
       setStatus({ kind: "err", text: res.reason });
       return;
     }
-    setStatus(null);
     setEnabled(key, true);
+    const done = en ? "✅ Alert activated" : "✅ التنبيه اتفعّل";
+    setStatus({ kind: "ok", text: done });
+    setTimeout(() => setStatus((cur) => (cur?.text === done ? null : cur)), 2500);
   };
 
   const row = (
@@ -283,6 +287,8 @@ export default function AlertSettingsPage() {
           ? "Each field starts at today's live price — adjust it with + / − or type your own target, then activate the alert. Each alert is sent once, when the price reaches your target — even if the site is closed."
           : "كل حقل بيبدأ بالسعر الحي لحظة بلحظة — عدّله بزرار +/- أو اكتب سعرك المستهدف بنفسك، وبعدين فعّل التنبيه. والتنبيه بيوصلك مرة واحدة لما السعر يوصل هدفك، حتى لو الموقع مقفول."}
       </p>
+
+        <NotificationEnableCard />
 
       {status && (
         <p className={`alert-status alert-status-${status.kind}`} role="status" style={{ position: "fixed", left: 12, right: 12, bottom: 70, zIndex: 60, margin: 0, background: "var(--card-bg)", boxShadow: "0 8px 24px rgba(0,0,0,.45)" }} onClick={() => setStatus(null)}>
