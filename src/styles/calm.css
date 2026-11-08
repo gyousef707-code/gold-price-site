@@ -236,3 +236,47 @@ body .tools-list-desc { font-size: 12.5px; line-height: 1.4; }
 body .tools-list-arrow { font-size: 13px; }
 body .tools-sub .tools-list-row { padding-right: 20px; min-height: 54px; }
 body .tools-sub .tools-list-icon { width: 36px; height: 36px; font-size: 15px; }
+
+/* ---- كارت تفعيل الإشعارات (صفحات التنبيهات) ---- */
+.ne-ok {
+  display: flex; align-items: center; gap: 8px; margin: 0 0 12px; padding: 10px 14px;
+  border-radius: 14px; font-size: 13.5px; font-weight: 700;
+  color: var(--success, #3fb950); background: color-mix(in srgb, var(--success, #3fb950) 12%, transparent);
+}
+.ne-card {
+  display: flex; flex-direction: column; gap: 12px; margin: 0 0 16px; padding: 16px;
+  border-radius: 22px; background: var(--card-bg);
+  border: 1px solid rgba(var(--dot-rgb), 0.4);
+  box-shadow: 0 12px 26px -16px rgba(0, 0, 0, 0.55);
+}
+.ne-top { display: flex; align-items: center; gap: 12px; }
+.ne-ico {
+  flex: none; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center;
+  font-size: 21px; color: var(--gold-primary); background: rgba(var(--dot-rgb), 0.16);
+}
+.ne-body { flex: 1; min-width: 0; }
+.ne-title { font-size: 16px; font-weight: 800; line-height: 1.4; }
+.ne-sub { margin-top: 3px; font-size: 13px; line-height: 1.55; color: var(--text-muted); }
+.ne-btn {
+  border: 0; border-radius: 16px; padding: 14px 18px; font: inherit; font-size: 15.5px; font-weight: 800;
+  color: #1f1600; cursor: pointer; width: 100%;
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold-dark));
+  box-shadow: 0 10px 20px -10px rgba(0, 0, 0, 0.55);
+}
+.ne-btn[disabled] { opacity: 0.6; }
+.ne-btn-block { margin-top: 6px; }
+.ne-msg { font-size: 13px; line-height: 1.5; color: var(--danger, #f85149); }
+.ne-backdrop {
+  position: fixed; inset: 0; z-index: 400; background: rgba(0, 0, 0, 0.6);
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.ne-sheet {
+  width: 100%; max-width: 560px; background: var(--card-bg); color: var(--text-color);
+  border-radius: 26px 26px 0 0; padding: 14px 20px calc(22px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -20px 50px -20px rgba(0, 0, 0, 0.7);
+}
+.ne-grab { width: 44px; height: 5px; border-radius: 99px; margin: 0 auto 14px; background: rgba(128, 128, 128, 0.4); }
+.ne-sheet-title { font-size: 18px; font-weight: 800; margin-bottom: 10px; }
+.ne-steps { margin: 0 0 8px; padding-inline-start: 20px; font-size: 14.5px; line-height: 1.9; }
+.ne-hint { margin: 6px 0 8px; font-size: 12.5px; line-height: 1.6; color: var(--text-muted); }
+.ne-link { display: block; margin: 8px auto 0; border: 0; background: none; font: inherit; font-size: 14px; color: var(--text-muted); cursor: pointer; }
