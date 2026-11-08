@@ -11,6 +11,7 @@ import {
   type CountryAlertKey,
 } from "../lib/countryAlertSync";
 import { COUNTRIES } from "../data/countries.js";
+import NotificationEnableCard from "../components/NotificationEnableCard.jsx";
 
 const LABELS: Record<CountryAlertKey, string> = {
   gold24: "ذهب عيار 24",
@@ -186,10 +187,12 @@ export default function CountryAlertsPage({ code }: { code: string }) {
       setStatus({ kind: "err", text: "السعر المستهدف نفس السعر الحالي. عدّله بزرار + أو − عشان نبلّغك لما السعر يوصله." });
       return;
     }
+    setStatus({ kind: "ok", text: "⏳ بنفعّل التنبيه… لو ظهر طلب إذن اضغط سماح" });
     const res = await subscribeToPush();
     if (!res.ok) return setStatus({ kind: "err", text: res.reason });
-    setStatus(null);
     setEnabled(key, true);
+    setStatus({ kind: "ok", text: "✅ التنبيه اتفعّل" });
+    setTimeout(() => setStatus((cur) => (cur?.text === "✅ التنبيه اتفعّل" ? null : cur)), 2500);
   };
 
   const row = (k: CountryAlertKey) => (
@@ -215,6 +218,8 @@ export default function CountryAlertsPage({ code }: { code: string }) {
         <p className="alert-settings-intro">
           كل حقل بيبدأ بالسعر الحالي — عدّله بزرار +/- أو اكتب سعرك المستهدف، وبعدين فعّل التنبيه. التنبيه بيوصلك مرة واحدة لما السعر يوصل هدفك، حتى لو الموقع مقفول.
         </p>
+
+        <NotificationEnableCard />
 
         {status && (
           <p className={`alert-status alert-status-${status.kind}`} role="status" style={{ position: "fixed", left: 12, right: 12, bottom: 70, zIndex: 60, margin: 0, background: "var(--card-bg)", boxShadow: "0 8px 24px rgba(0,0,0,.45)" }} onClick={() => setStatus(null)}>
