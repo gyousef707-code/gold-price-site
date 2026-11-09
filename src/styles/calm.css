@@ -280,3 +280,66 @@ body .tools-sub .tools-list-icon { width: 36px; height: 36px; font-size: 15px; }
 .ne-steps { margin: 0 0 8px; padding-inline-start: 20px; font-size: 14.5px; line-height: 1.9; }
 .ne-hint { margin: 6px 0 8px; font-size: 12.5px; line-height: 1.6; color: var(--text-muted); }
 .ne-link { display: block; margin: 8px auto 0; border: 0; background: none; font: inherit; font-size: 14px; color: var(--text-muted); cursor: pointer; }
+.ne-one { margin: 6px 0 4px; font-size: 16px; line-height: 1.9; }
+
+/* ---- كارت الإشعارات بتصميم الإعدادات + شاشة "اهتماماتي" ---- */
+.ns { margin: 0 0 18px; }
+.ns-head { display: flex; align-items: center; gap: 10px; margin: 4px 2px 10px; }
+.ns-head h2 { margin: 0; font-size: 18px; font-weight: 800; }
+.ns-head-ico { color: var(--gold-primary); display: grid; }
+.ns-card {
+  background: var(--card-bg); border: 1px solid rgba(var(--dot-rgb), 0.3); border-radius: 24px;
+  box-shadow: 0 12px 28px -18px rgba(0, 0, 0, 0.6); overflow: hidden;
+}
+.ns-row {
+  display: flex; align-items: center; gap: 14px; width: 100%; padding: 18px 18px; text-align: right;
+  background: none; border: 0; color: inherit; font: inherit;
+}
+.ns-row-btn { cursor: pointer; }
+.ns-div { height: 1px; margin: 0 18px; background: var(--border-subtle); }
+.ns-ico { flex: none; display: grid; place-items: center; color: var(--gold-primary); }
+.ns-ico.on { filter: drop-shadow(0 0 6px rgba(var(--dot-rgb), 0.5)); }
+.ns-text { flex: 1; min-width: 0; }
+.ns-title { font-size: 17px; font-weight: 800; line-height: 1.4; }
+.ns-sub { margin-top: 2px; font-size: 13.5px; line-height: 1.5; color: var(--text-muted); }
+.ns-chev { flex: none; color: var(--text-muted); display: grid; }
+.ns-switch {
+  direction: ltr; flex: none; width: 60px; height: 36px; padding: 2px; border-radius: 99px; cursor: pointer;
+  background: transparent; border: 2px solid var(--text-muted); display: flex; align-items: center;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.ns-switch span {
+  width: 26px; height: 26px; border-radius: 50%; background: var(--text-muted);
+  transform: translateX(24px); transition: transform 0.2s ease, background 0.2s ease;
+}
+.ns-switch.on { background: rgba(var(--dot-rgb), 0.4); border-color: var(--gold-primary); }
+.ns-switch.on span { transform: translateX(0); background: var(--gold-bright); }
+.ns-switch[disabled] { opacity: 0.5; cursor: default; }
+.ns-msg { margin: 10px 4px 0; font-size: 13.5px; line-height: 1.6; color: var(--danger, #f85149); }
+.ns-backdrop { position: fixed; inset: 0; z-index: 400; background: rgba(0, 0, 0, 0.6); display: flex; align-items: flex-end; justify-content: center; }
+.ns-sheet {
+  width: 100%; max-width: 560px; background: var(--card-bg-elevated, var(--card-bg)); color: var(--text-color);
+  border-radius: 30px 30px 0 0; padding: 12px 18px calc(22px + env(safe-area-inset-bottom, 0px)); text-align: center;
+  box-shadow: 0 -24px 60px -20px rgba(0, 0, 0, 0.75);
+}
+.ns-grab { width: 44px; height: 5px; border-radius: 99px; margin: 0 auto 18px; background: rgba(128, 128, 128, 0.45); }
+.ns-bubble {
+  width: 68px; height: 68px; border-radius: 50%; margin: 0 auto 10px; display: grid; place-items: center;
+  color: var(--gold-primary); background: rgba(var(--dot-rgb), 0.18);
+}
+.ns-sheet-title { margin: 6px 0 4px; font-size: 21px; font-weight: 800; }
+.ns-sheet-sub { margin: 0 0 18px; font-size: 14px; color: var(--text-muted); }
+.ns-label { text-align: right; font-size: 14.5px; font-weight: 700; margin: 14px 4px 8px; }
+.ns-pills { display: flex; gap: 10px; }
+.ns-pill {
+  flex: 1; padding: 15px 0; border-radius: 18px; font: inherit; font-size: 16px; cursor: pointer; color: var(--text-muted);
+  background: transparent; border: 1.5px solid var(--border-subtle);
+}
+.ns-pill.on { color: var(--gold-primary); border-color: var(--gold-primary); background: rgba(var(--dot-rgb), 0.16); font-weight: 800; }
+.ns-box { border: 1.5px solid var(--border-subtle); border-radius: 20px; padding: 14px 16px; }
+.ns-save {
+  width: 100%; margin-top: 20px; padding: 17px; border: 0; border-radius: 99px; font: inherit; font-size: 17px; font-weight: 800;
+  color: #1f1600; cursor: pointer; background: linear-gradient(180deg, var(--gold-bright), var(--gold-dark));
+}
+.ns-save[disabled] { opacity: 0.6; }
+.ns-cancel { display: block; margin: 12px auto 0; padding: 8px 20px; border: 0; background: none; font: inherit; font-size: 15px; color: var(--text-muted); cursor: pointer; }
