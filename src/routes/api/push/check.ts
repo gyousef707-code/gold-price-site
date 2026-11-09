@@ -19,6 +19,7 @@ import {
   getRotationIndex,
   saveRotationIndex,
   ROTATION_ORDER,
+  wantsKey,
 } from "@/lib/push.server";
 import { runTelegramAutomation } from "@/lib/telegram-live.server";
 import { processCountryAlerts } from "@/lib/country-alerts.server";
@@ -70,7 +71,8 @@ export const Route = createFileRoute("/api/push/check")({
 
             let result = { sent: 0, removed: 0, total: 0 };
             if (message) {
-              result = await sendPushToAll({ ...message, url: "/", tag: "price-update" }, subs);
+              const interested = subs.filter(({ sub }) => wantsKey(sub, which));
+              result = await sendPushToAll({ ...message, url: "/", tag: "price-update" }, interested);
             }
 
             // تنبيهات السعر المستهدف: مستقلة، وفشلها ما بيوقفش باقي الفحص.
