@@ -122,6 +122,11 @@ export async function subscribeToPush() {
     return { ok: false, reason: `تعذّر الاتصال بالسيرفر لحفظ الاشتراك: ${e?.message || e}` };
   }
 
+  try {
+    localStorage.removeItem('push-opt-out');
+  } catch {
+    /* تجاهل */
+  }
   return { ok: true };
 }
 
@@ -175,6 +180,12 @@ export default function useNotifications() {
       done = true;
       window.removeEventListener('pointerdown', trySubscribe);
       window.removeEventListener('keydown', trySubscribe);
+      try {
+        // المستخدم قفل التنبيهات بنفسه من كارت الإشعارات: ما نشتركوش تاني من غير ما يفعّلها
+        if (localStorage.getItem('push-opt-out') === '1') return;
+      } catch {
+        /* تجاهل */
+      }
       subscribeToPush();
     };
     window.addEventListener('pointerdown', trySubscribe, { once: true });
