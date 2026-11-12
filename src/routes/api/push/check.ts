@@ -19,8 +19,8 @@ import {
   getRotationIndex,
   saveRotationIndex,
   ROTATION_ORDER,
-  wantsKey,
 } from "@/lib/push.server";
+import { upstash } from "@/lib/upstash.server";
 import { runTelegramAutomation } from "@/lib/telegram-live.server";
 import { processCountryAlerts } from "@/lib/country-alerts.server";
 
@@ -29,6 +29,36 @@ import { processCountryAlerts } from "@/lib/country-alerts.server";
 // 1) Push حقيقي لكل الأجهزة المشتركة (حتى لو التطبيق مقفول)
 // وبعدها (بشكل مستقل) أتمتة تيليجرام: رسالة لحظية لو عيار 21 اتغير 5 جنيه عن آخر رسالة،
 // وإيقاف ليلي، وملخص إغلاق يومي (شوف telegram-live.server.ts)
+// ---- اهتمامات الأجهزة في الإشعارات العامة (أي عيار/الأونصة يوصل لكل جهاز) ----
+// بتتخزن في Hash لوحدها (push:prefs:hash) عشان ما تتمسحش لما الجهاز يعيد الاشتراك.
+async function sha256Hex(input: string) {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function loadPrefsMap(): Promise<Record<string, Record<string, boolean>>> {
+  try {
+    const flat: string[] = (await upstash("HGETALL", "push:prefs:hash")) || [];
+    const out: Record<string, Record<string, boolean>> = {};
+    for (let i = 0; i < flat.length; i += 2) {
+      try {
+        out[flat[i]!] = JSON.parse(flat[i + 1]!);
+      } catch {
+        // تجاهل أي قيمة تالفة
+      }
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+function wants(prefs: Record<string, boolean> | undefined, which: string) {
+  if (!prefs) return true; // جهاز ما اختارش اهتمامات: بيستقبل كل حاجة زي الأول
+  if (which === "usd") return false;
+  return !!prefs[which];
+}
+
 export const Route = createFileRoute("/api/push/check")({
   server: {
     handlers: {
@@ -71,7 +101,11 @@ export const Route = createFileRoute("/api/push/check")({
 
             let result = { sent: 0, removed: 0, total: 0 };
             if (message) {
-              const interested = subs.filter(({ sub }) => wantsKey(sub, which));
+              const prefsMap = await loadPrefsMap();
+              const interested: typeof subs = [];
+              for (const entry of subs) {
+                if (wants(prefsMap[await sha256Hex(entry.sub.endpoint)], which)) interested.push(entry);
+              }
               result = await sendPushToAll({ ...message, url: "/", tag: "price-update" }, interested);
             }
 
