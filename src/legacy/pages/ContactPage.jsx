@@ -7,7 +7,7 @@ import { staticPages } from '../data/staticPages.js';
 import { useLang } from '../context/LangContext.jsx';
 
 const p = staticPages.contact;
-const EMAIL = 'gyousef707@gmail.com';
+const EMAIL = 'zahaby.app@gmail.com';
 
 const FAQ = [
   {
