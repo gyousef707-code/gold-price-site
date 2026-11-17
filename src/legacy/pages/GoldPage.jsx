@@ -17,6 +17,7 @@ import { shareCard } from '../lib/shareCard.js';
 // لحد ما المستخدم يقرب منها فعلاً، بدل ما تتحمّل كلها من أول لحظة.
 // الشكل والمحتوى النهائي بيفضلوا زي ما هم بالظبط.
 import CalcTabs from '../components/CalcTabs.jsx';
+import SeoH1 from '../components/SeoH1.jsx';
 const RelatedArticles = lazy(() => import('../components/RelatedArticles.jsx'));
 const GoldCalculator = lazy(() => import('../components/calculators/GoldCalculator.jsx'));
 const ZakatCalculator = lazy(() => import('../components/calculators/ZakatCalculator.jsx'));
@@ -70,6 +71,7 @@ export default function GoldPage({ initialGoldData = null } = {}) {
 
   return (
     <div className="page-wrap">
+      <SeoH1>{lang === 'en' ? 'Gold price today in Egypt' : 'سعر الذهب اليوم في مصر'}</SeoH1>
       <section className="global-ounce-section">
         <div className="ounce-card">
           <div className="ounce-header">
