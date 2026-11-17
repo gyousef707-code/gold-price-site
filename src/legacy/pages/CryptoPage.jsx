@@ -9,6 +9,7 @@ import useApiData from '../hooks/useApiData.js';
 import { useLang } from '../context/LangContext.jsx';
 import { cryptoDetails } from '../data/crypto.js';
 import { SYMBOL_TO_ID } from '../data/cryptoSymbols.js';
+import SeoH1 from '../components/SeoH1.jsx';
 
 const FALLBACK_ICON = (id) => `https://assets.coincap.io/assets/icons/${id}@2x.png`;
 
@@ -35,6 +36,7 @@ export default function CryptoPage() {
 
   return (
     <div className="page-wrap">
+      <SeoH1>{lang === 'en' ? 'Cryptocurrency prices today' : 'أسعار العملات الرقمية اليوم'}</SeoH1>
       {top && (
         <section className="global-ounce-section">
           <div className="ounce-card">
