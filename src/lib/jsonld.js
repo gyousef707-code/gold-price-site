@@ -3,7 +3,8 @@
 // (زي اللي شغال بالفعل في ContactPage.jsx). الهدف: جوجل يقدر يفهم الصفحة
 // كويس ويظهرها كـ rich result (breadcrumbs في نتيجة البحث، مقال بتاريخ نشر، إلخ).
 
-const SITE_URL = "https://www.zahaby1.com";
+import { SITE_URL } from "./site";
+
 const SITE_NAME = "ذهبي";
 const LOGO_URL = `${SITE_URL}/logo.png`;
 
