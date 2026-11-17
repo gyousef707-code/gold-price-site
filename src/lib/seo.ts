@@ -1,4 +1,4 @@
-const SITE_URL = "https://www.zahaby1.com";
+import { SITE_URL } from "./site";
 
 export function seoMeta({
   title,
