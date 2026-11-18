@@ -35,8 +35,8 @@ export default function CountryKaratPage({ code, karat, initialData = null }) {
   });
   const [time, setTime] = useState('');
   useEffect(() => {
-    setTime(formatTime(data?.updated_at));
-  }, [data?.updated_at]);
+    setTime(formatTime(data?.updated_at, c?.tz));
+  }, [data?.updated_at, c?.tz]);
 
   if (!c || !info) return null;
   const dec = c.decimals ?? 2;
