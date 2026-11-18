@@ -13,6 +13,7 @@ import {
   GOLD_KARATS,
   flagUrl,
   formatMoney,
+  buyFromSell,
 } from '../data/countries.js';
 
 const PriceHistoryChart = lazy(() => import('../components/PriceHistoryChart.jsx'));
@@ -81,13 +82,19 @@ export default function CountryPage({ code, initialData = null }) {
           <div className="cp-karat-grid">
             {GOLD_KARATS.map((k) => {
               const v = karatPrice(k);
+              const buy = v == null ? null : buyFromSell(code, v, dec);
               return (
                 <Link key={k} to={`${c.path}/gold/${k}`} className="cp-karat" aria-label={`سعر الذهب عيار ${k} في ${c.name}`}>
                   <p className="cp-karat-name">
                     <b>{k}</b> عيار
                   </p>
+                  <p className="cp-karat-lbl sell">البيع لك</p>
                   <p className="cp-karat-price">
                     {data ? money(v) : <span className="cp-skel" aria-hidden="true" />}
+                  </p>
+                  <p className="cp-karat-buy">
+                    <span>الشراء منك</span>
+                    <b>{data ? money(buy) : '—'}</b>
                   </p>
                   <p className="cp-karat-unit">{c.short} / جرام</p>
                 </Link>
@@ -141,7 +148,7 @@ export default function CountryPage({ code, initialData = null }) {
 
       <p className="cp-note">
         الأسعار استرشادية، محسوبة من السعر العالمي بسعر الصرف المعروض، ولا تشمل المصنعية ولا
-        الضريبة.
+        الضريبة. وسعر الشراء منك محسوب بفرق السوق المعتاد بين البيع والشراء، وبيختلف من محل لمحل.
       </p>
 
       <section className="cp-section cp-about" aria-labelledby="cp-about-h">
