@@ -31,8 +31,8 @@ export default function CountryCryptoPage({ code, initialData = null }) {
   const [sort, setSort] = useState('rank');
 
   useEffect(() => {
-    setTime(formatTime(data?.updated_at));
-  }, [data?.updated_at]);
+    setTime(formatTime(data?.updated_at, c?.tz));
+  }, [data?.updated_at, c?.tz]);
 
   const coins = useMemo(() => {
     let list = (data?.coins || []).map((k, i) => ({ ...k, rank: i + 1 }));
