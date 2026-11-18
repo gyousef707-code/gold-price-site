@@ -41,6 +41,7 @@ body.light-mode :is(
    قايمة الوصول السريع (زرار عايم على الشمال)
    ===================================================================== */
 .qm {
+  pointer-events: none; /* الحاوية نفسها متاخدش لمس، الأزرار بس */
   position: absolute;
   left: 12px;
   top: 140px;
@@ -64,6 +65,7 @@ body.light-mode :is(
   box-shadow: 0 8px 18px -6px rgba(0, 0, 0, 0.55);
   -webkit-tap-highlight-color: transparent;
 }
+.qm-toggle { pointer-events: auto; }
 .qm-btn:active { transform: scale(0.94); }
 .qm-toggle svg { transition: transform 0.25s ease; }
 .qm.open .qm-toggle svg { transform: rotate(180deg); }
@@ -73,8 +75,11 @@ body.light-mode :is(
   gap: 10px;
   align-items: center;
   pointer-events: none;
+  /* المقفول مخفي تمامًا فمايسرقش اللمس من زرار المشاركة اللي تحته (عيار 18 والجنيه) */
+  visibility: hidden;
+  transition: visibility 0s linear 0.25s;
 }
-.qm.open .qm-items { pointer-events: auto; }
+.qm.open .qm-items { pointer-events: auto; visibility: visible; transition-delay: 0s; }
 .qm-items .qm-btn {
   opacity: 0;
   transform: translateY(-10px) scale(0.7);
