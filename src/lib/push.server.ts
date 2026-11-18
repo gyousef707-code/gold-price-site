@@ -261,6 +261,24 @@ export async function saveSnapshot(snap: Snapshot) {
   await upstash("SET", "push:last-snapshot", JSON.stringify(snap));
 }
 
+// آخر سعر اتبعت فعلاً في إشعار لكل نوع (عيار 21 / عيار 24 / الدولار) — الإشعار الجاي بيقارن بيه
+export type Notified = Partial<Record<"k21" | "k24" | "usd" | "at", number>>;
+
+export async function getNotified(): Promise<Notified> {
+  const raw = await upstash("GET", "push:last-notified");
+  if (!raw) return {};
+  try {
+    return JSON.parse(raw) ?? {};
+  } catch {
+    return {};
+  }
+}
+
+export async function saveNotified(patch: Notified) {
+  const cur = await getNotified();
+  await upstash("SET", "push:last-notified", JSON.stringify({ ...cur, ...patch }));
+}
+
 // -------- دورة الإشعارات: عيار 21 ← عيار 24 ← الدولار ← تكرار --------
 
 export const ROTATION_ORDER = ["k21", "k24", "usd"] as const;
@@ -304,6 +322,57 @@ export function buildChangeMessage(prev: Snapshot, now: Snapshot, which: Rotatio
     title: "سعر الدولار",
     body: `الدولار: ${prev.usd.toFixed(2)} ← ${now.usd.toFixed(2)} ج.م للبيع (${d > 0 ? "+" : ""}${d.toFixed(2)})`,
   };
+}
+
+// -------- إشعار واحد مجمّع (عيار 21 + عيار 24 + الدولار) بعتبة حقيقية --------
+// العتبة: تغيّر 50 جنيه أو 1% في الذهب، أو 0.5% في الدولار، عن آخر سعر اتبعت فعلاً.
+// وفي فاصل أدنى 30 دقيقة بين إشعارين، إلا لو الحركة كبيرة (100 جنيه / 2% ذهب، أو 1% دولار).
+const MIN_GAP_MS = 30 * 60 * 1000;
+
+export type ChangeItem = { key: "k21" | "k24" | "usd"; line: string };
+
+export function buildCombinedChange(
+  base: Notified,
+  fallback: Snapshot,
+  now: Snapshot,
+  nowMs: number,
+): ChangeItem[] | null {
+  const items: ChangeItem[] = [];
+  let trigger = false;
+  let big = false;
+
+  const defs = [
+    { key: "k21", label: "عيار 21", gold: true },
+    { key: "k24", label: "عيار 24", gold: true },
+    { key: "usd", label: "الدولار", gold: false },
+  ] as const;
+
+  for (const { key, label, gold } of defs) {
+    const a = base[key] ?? fallback[key];
+    const b = now[key];
+    if (!a || !b || a === b) continue;
+    const d = b - a;
+    const p = pct(a, b);
+    const sign = d > 0 ? "+" : "";
+    const dTxt = gold ? d.toFixed(0) : d.toFixed(2);
+    const fmtN = (n: number) => (gold ? n.toLocaleString("en-US") : n.toFixed(2));
+    items.push({
+      key,
+      line: `${label}: ${fmtN(a)} ← ${fmtN(b)} ج.م (${sign}${dTxt} | ${sign}${p.toFixed(gold ? 1 : 2)}%)`,
+    });
+    if (gold) {
+      if (Math.abs(d) >= 50 || Math.abs(p) >= 1) trigger = true;
+      if (Math.abs(d) >= 100 || Math.abs(p) >= 2) big = true;
+    } else {
+      if (Math.abs(p) >= 0.5) trigger = true;
+      if (Math.abs(p) >= 1) big = true;
+    }
+  }
+
+  if (!trigger || items.length === 0) return null;
+  const last = base.at ?? 0;
+  if (!big && last && nowMs - last < MIN_GAP_MS) return null;
+  return items;
 }
 
 export function computeSnapshot(gold: any, currency: any, crypto: any): Snapshot {
