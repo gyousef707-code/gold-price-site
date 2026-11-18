@@ -88,14 +88,16 @@ export default function CountryPage({ code, initialData = null }) {
                   <p className="cp-karat-name">
                     <b>{k}</b> عيار
                   </p>
-                  <p className="cp-karat-lbl sell">البيع لك</p>
-                  <p className="cp-karat-price">
-                    {data ? money(v) : <span className="cp-skel" aria-hidden="true" />}
-                  </p>
-                  <p className="cp-karat-buy">
-                    <span>الشراء منك</span>
-                    <b>{data ? money(buy) : '—'}</b>
-                  </p>
+                  <div className="cp-sb">
+                    <div className="cp-sb-col sell">
+                      <span>البيع لك</span>
+                      <b>{data ? money(v) : <span className="cp-skel" aria-hidden="true" />}</b>
+                    </div>
+                    <div className="cp-sb-col buy">
+                      <span>الشراء منك</span>
+                      <b>{data ? money(buy) : '—'}</b>
+                    </div>
+                  </div>
                   <p className="cp-karat-unit">{c.short} / جرام</p>
                 </Link>
               );
