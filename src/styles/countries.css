@@ -122,12 +122,17 @@
 .cp-karat-name b { font-size: 34px; line-height: 1; color: var(--gold-bright); font-weight: 800; margin-inline-start: 2px; }
 .cp-karat-price { font-size: 25px; font-weight: 800; color: var(--text-color); margin: 8px 0 2px; min-height: 36px; font-variant-numeric: tabular-nums; }
 .cp-karat-unit { font-size: 12px; color: var(--text-muted); margin: 0; }
-.cp-karat-lbl { font-size: 11px; font-weight: 700; margin: 8px 0 0; color: var(--success); }
-.cp-karat-lbl + .cp-karat-price { margin-top: 2px; }
-.cp-karat-buy { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin: 6px 0 6px; padding-top: 6px; border-top: 1px dashed var(--border-gold); font-size: 12px; color: var(--text-muted); }
-.cp-karat-buy b { color: var(--danger); font-size: 14px; font-weight: 800; font-variant-numeric: tabular-nums; }
-.cp-karat-hero .cp-karat-buy { font-size: 13px; }
-.cp-karat-hero .cp-karat-buy b { font-size: 18px; }
+/* البيع لك / الشراء منك: عمودين متساويين تماماً بينهم خط فاصل */
+.cp-sb { display: grid; grid-template-columns: 1fr 1fr; margin: 12px 0 8px; border-top: 1px dashed var(--border-gold); padding-top: 10px; }
+.cp-sb-col { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+.cp-sb-col + .cp-sb-col { border-inline-end: 1px solid var(--border-gold); }
+.cp-sb-col > span { font-size: 11px; font-weight: 700; color: var(--text-muted); }
+.cp-sb-col > b { font-size: 17px; font-weight: 800; line-height: 1.2; font-variant-numeric: tabular-nums; white-space: nowrap; min-height: 22px; }
+.cp-sb-col.sell > b { color: var(--success); }
+.cp-sb-col.buy > b { color: var(--danger); }
+.cp-karat-hero .cp-sb { margin-top: 16px; padding-top: 14px; }
+.cp-karat-hero .cp-sb-col > span { font-size: 13px; }
+.cp-karat-hero .cp-sb-col > b { font-size: 28px; }
 .cp-skel { display: inline-block; width: 70%; height: 24px; border-radius: 8px; background: var(--border-subtle); vertical-align: middle; }
 
 /* الأونصة والفضة */
