@@ -1,8 +1,8 @@
 // أسعار كل دولة: بتتحسب من الأسعار العالمية (بالدولار) × سعر الصرف المحلي.
 // سعر استرشادي — مفيهوش مصنعية ولا ضريبة.
 import { getGoldPrices, getSilverPrices, getCurrencyRates, getCryptoPrices } from "./market.server";
-import { COUNTRIES, GOLD_KARATS, SILVER_PURITIES, KARATS_ALL, KARAT_PURITY } from "@/legacy/data/countries.js";
-import { recordGlobalSnapshotIfMissing, getGlobalHistory } from "./country-history.server";
+import { COUNTRIES, GOLD_KARATS, SILVER_PURITIES, KARATS_ALL, KARAT_PURITY, buyFromSell } from "@/legacy/data/countries.js";
+import { recordGlobalSnapshotIfMissing, shouldRecordSnapshotToday, getGlobalHistory } from "./country-history.server";
 
 const GRAMS_PER_OUNCE = 31.1034768;
 const GOLD_PURITY: Record<number, number> = { 24: 0.999, 22: 0.916, 21: 0.875, 18: 0.75 };
@@ -71,6 +71,34 @@ async function floatingFxMap(rates: any): Promise<Record<string, number>> {
   return out;
 }
 
+
+// بيسجّل لقطة اليوم (مرة واحدة في اليوم لكل isolate) — بيتنادى من طلب الأسعار ومن cron
+async function saveDailySnapshot(ounceUsd: number, silver: any, rates: any) {
+  if (!shouldRecordSnapshotToday()) return;
+  try {
+    const floatFx = await floatingFxMap(rates);
+    await recordGlobalSnapshotIfMissing({
+      gold_usd: ounceUsd,
+      silver_usd: silver?.ounce_usd ? Number(silver.ounce_usd) : null,
+      fx: floatFx,
+    });
+  } catch {
+    // نظام ثانوي، ميأثرش على الأسعار
+  }
+}
+
+// بيستخدمه cron (/api/push/check) عشان الأرشيف يتسجل حتى لو مفيش زوار على صفحات الدول
+export async function recordCountrySnapshotNow() {
+  if (!shouldRecordSnapshotToday()) return { skipped: true };
+  const [gold, silver, rates] = await Promise.all([
+    getGoldPrices(),
+    getSilverPrices().catch(() => null),
+    getCurrencyRates().catch(() => null),
+  ]);
+  await saveDailySnapshot(Number((gold as any).ounce_usd), silver, rates);
+  return { skipped: false };
+}
+
 export async function getCountryPrices(code: string) {
   const c = activeCountry(code);
   if (!c) return null;
@@ -83,14 +111,8 @@ export async function getCountryPrices(code: string) {
   if (!Number.isFinite(ounceUsd) || ounceUsd <= 0) throw new Error("تعذر جلب سعر الأونصة");
   const { fx, source } = await resolveFx(c, rates);
   const gramOf = (ounce: number, purity: number) => (ounce / GRAMS_PER_OUNCE) * purity * fx;
-  // لقطة يومية للأسعار العالمية (مرة واحدة في اليوم) — بتخدم شارت "تطور السعر" لكل الدول
-  void floatingFxMap(rates).then((floatFx) =>
-    recordGlobalSnapshotIfMissing({
-      gold_usd: ounceUsd,
-      silver_usd: (silver as any)?.ounce_usd ? Number((silver as any).ounce_usd) : null,
-      fx: floatFx,
-    }),
-  );
+  // لقطة يومية للأسعار العالمية — بنستنى تخلص (await) لأن الشغل بعد الرد ممكن يتقطع على Cloudflare
+  await saveDailySnapshot(ounceUsd, silver, rates);
   return {
     country: c.code,
     currency: c.currency,
@@ -99,7 +121,11 @@ export async function getCountryPrices(code: string) {
     ounce_usd: ounceUsd,
     ounce_local: Number((ounceUsd * fx).toFixed(4)),
     ounce_change_percent: (gold as any).ounce_change_percent ?? null,
-    karats: (GOLD_KARATS as number[]).map((k) => ({ karat: k, gram: Number(gramOf(ounceUsd, GOLD_PURITY[k]).toFixed(4)) })),
+    karats: (GOLD_KARATS as number[]).map((k) => {
+      const gram = Number(gramOf(ounceUsd, GOLD_PURITY[k]).toFixed(4));
+      // gram = سعر البيع لك، buy = سعر الشراء منك (بفرق السوق المحدد لكل دولة)
+      return { karat: k, gram, sell: gram, buy: buyFromSell(c.code, gram, c.decimals ?? 2) };
+    }),
     silver: (silver as any)?.ounce_usd
       ? {
           ounce_usd: Number((silver as any).ounce_usd),
