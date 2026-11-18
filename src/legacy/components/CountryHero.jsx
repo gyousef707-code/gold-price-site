@@ -50,7 +50,7 @@ export default function CountryHero({ code, title, subtitle, fx, time, live = tr
 }
 
 // تحويل وقت التحديث لنص (بتوقيت الزائر) — بيتحسب في المتصفح بس
-export function formatTime(iso) {
+export function formatTime(iso, timeZone) {
   if (!iso) return '';
-  return new Date(iso).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+  return new Date(iso).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', ...(timeZone ? { timeZone } : {}) });
 }
