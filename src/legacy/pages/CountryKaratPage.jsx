@@ -13,6 +13,7 @@ import {
   KARAT_INFO,
   flagUrl,
   formatMoney,
+  buyFromSell,
 } from '../data/countries.js';
 
 const CountryGoldCalc = lazy(() =>
@@ -43,6 +44,7 @@ export default function CountryKaratPage({ code, karat, initialData = null }) {
 
   // سعر جرام العيار بعملة الدولة: الأونصة المحلية ÷ جرامات الأونصة × نقاء العيار
   const gram = data?.ounce_local ? (data.ounce_local / GRAMS_PER_OUNCE) * KARAT_PURITY[karat] : null;
+  const buyGram = gram != null ? buyFromSell(code, gram, dec) : null;
   const gramUsd = gram != null && data?.fx ? gram / data.fx : null;
   const otherCountries = ACTIVE_COUNTRY_CODES.filter((x) => x !== code);
 
@@ -67,7 +69,12 @@ export default function CountryKaratPage({ code, karat, initialData = null }) {
             <p className="cp-karat-name">
               <b>{karat}</b> عيار
             </p>
+            <p className="cp-karat-lbl sell">البيع لك</p>
             <p className="cp-karat-price">{data ? money(gram) : <span className="cp-skel" aria-hidden="true" />}</p>
+            <p className="cp-karat-buy">
+              <span>الشراء منك</span>
+              <b>{data ? money(buyGram) : '—'}</b>
+            </p>
             <p className="cp-karat-unit">{c.short} / جرام</p>
             {gramUsd != null ? (
               <p className="cp-karat-usd">≈ ${formatMoney(gramUsd, 2)} للجرام الواحد</p>
