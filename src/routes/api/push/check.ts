@@ -23,6 +23,7 @@ import {
 import { upstash } from "@/lib/upstash.server";
 import { runTelegramAutomation } from "@/lib/telegram-live.server";
 import { processCountryAlerts } from "@/lib/country-alerts.server";
+import { recordCountrySnapshotNow } from "@/lib/country-prices.server";
 
 // ده الـ endpoint اللي بينده عليه cron خارجي كل دقيقة. كل مرة بيفحص معدن واحد بس
 // بالتبادل (عيار 21 ← عيار 24 ← الدولار ← تكرار)، ولو فيه تغيّر حقيقي يبعت:
@@ -85,6 +86,14 @@ export const Route = createFileRoute("/api/push/check")({
             telegram = { status: "error", error: e instanceof Error ? e.message : String(e) };
           }
 
+          // أرشيف أسعار الدول: لقطة يومية بتتسجل من هنا كل يوم حتى لو مفيش زوار (مستقل عن الباقي)
+          let countryArchive: unknown = null;
+          try {
+            countryArchive = await recordCountrySnapshotNow();
+          } catch (e) {
+            countryArchive = { error: e instanceof Error ? e.message : String(e) };
+          }
+
           // باقي الفحص (إشعارات الأجهزة وتنبيهات الأسعار) بيعتمد على Upstash، فاتحط في كتلة لوحده
           let core: Record<string, unknown> = {};
           try {
@@ -133,7 +142,7 @@ export const Route = createFileRoute("/api/push/check")({
             core = { upstashError: e instanceof Error ? e.message : String(e) };
           }
 
-          return jsonOk({ telegram, ...core });
+          return jsonOk({ telegram, countryArchive, ...core });
         } catch (e) {
           return jsonErr(e);
         }
