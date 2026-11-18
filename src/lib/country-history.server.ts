@@ -21,22 +21,33 @@ function dateOf(offsetDays = 0): string {
   return new Date(Date.now() + 2 * 60 * 60 * 1000 - offsetDays * DAY_MS).toISOString().slice(0, 10);
 }
 
-// حارس داخل نفس الـ isolate: نحاول نكتب مرة واحدة بس في اليوم، فمنستهلكش أوامر Upstash
-// مع كل طلب (الحصة المجانية محدودة ومشتركة مع الإشعارات).
-const attempted = new Set<string>();
+// حارس داخل نفس الـ isolate: لو اللقطة اتسجلت فعلاً النهارده منحاولش تاني (بنوفّر أوامر Upstash).
+// لو المحاولة فشلت أو اتقطعت منعيدش قبل دقيقة، فنتجنب الطلبات الزايدة وبرضه منقفش على أول فشل.
+const done = new Set<string>();
+const lastTry = new Map<string, number>();
 
-export async function recordGlobalSnapshotIfMissing(input: Omit<GlobalSnapshot, "date">) {
+export function shouldRecordSnapshotToday(): boolean {
+  const date = dateOf();
+  if (done.has(date)) return false;
+  return Date.now() - (lastTry.get(date) ?? 0) > 60_000;
+}
+
+// لازم يتعمله await عند المنادي: على Cloudflare Workers أي شغل بعد ما الرد يتبعت ممكن يتقطع.
+export async function recordGlobalSnapshotIfMissing(input: Omit<GlobalSnapshot, "date">): Promise<boolean> {
   try {
     const date = dateOf();
-    if (attempted.has(date)) return;
-    attempted.add(date);
-    if (!Number.isFinite(input.gold_usd) || input.gold_usd <= 0) return;
+    if (done.has(date)) return true;
+    lastTry.set(date, Date.now());
+    if (!Number.isFinite(input.gold_usd) || input.gold_usd <= 0) return false;
     const snapshot: GlobalSnapshot = { date, ...input };
     // NX: بيتكتب بس لو مفيش لقطة لليوم ده
     await upstash("SET", `country:history:${date}`, JSON.stringify(snapshot), "EX", TTL_SECONDS, "NX");
     await upstash("SET", "country:history:start", date, "NX");
+    done.add(date);
+    return true;
   } catch {
     // Upstash مش مضبوط أو فشل الاتصال — نظام ثانوي
+    return false;
   }
 }
 
