@@ -69,12 +69,16 @@ export default function CountryKaratPage({ code, karat, initialData = null }) {
             <p className="cp-karat-name">
               <b>{karat}</b> عيار
             </p>
-            <p className="cp-karat-lbl sell">البيع لك</p>
-            <p className="cp-karat-price">{data ? money(gram) : <span className="cp-skel" aria-hidden="true" />}</p>
-            <p className="cp-karat-buy">
-              <span>الشراء منك</span>
-              <b>{data ? money(buyGram) : '—'}</b>
-            </p>
+            <div className="cp-sb">
+              <div className="cp-sb-col sell">
+                <span>البيع لك</span>
+                <b>{data ? money(gram) : <span className="cp-skel" aria-hidden="true" />}</b>
+              </div>
+              <div className="cp-sb-col buy">
+                <span>الشراء منك</span>
+                <b>{data ? money(buyGram) : '—'}</b>
+              </div>
+            </div>
             <p className="cp-karat-unit">{c.short} / جرام</p>
             {gramUsd != null ? (
               <p className="cp-karat-usd">≈ ${formatMoney(gramUsd, 2)} للجرام الواحد</p>
