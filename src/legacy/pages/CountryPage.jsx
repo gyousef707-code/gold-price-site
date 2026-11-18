@@ -45,8 +45,8 @@ export default function CountryPage({ code, initialData = null }) {
 
   // الوقت بيتحسب في المتصفح بس (بتوقيت الزائر) عشان ميحصلش اختلاف بين السيرفر والمتصفح
   useEffect(() => {
-    setTime(formatTime(data?.updated_at));
-  }, [data?.updated_at]);
+    setTime(formatTime(data?.updated_at, c?.tz));
+  }, [data?.updated_at, c?.tz]);
 
   if (!c) return null;
   const dec = c.decimals ?? 2;
