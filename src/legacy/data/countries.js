@@ -293,6 +293,31 @@ export const EXTRA_CURRENCY_META = {
 export const COUNTRY_ORDER = ['eg', 'sa', 'ae', 'kw', 'qa', 'bh', 'om', 'jo', 'tn', 'dz', 'ma'];
 export const ACTIVE_COUNTRY_CODES = COUNTRY_ORDER.filter((c) => COUNTRIES[c].active && !COUNTRIES[c].isHome);
 
+
+// الفرق بين سعر البيع لك وسعر الشراء منك (نسبة مئوية من سعر البيع) لكل دولة.
+// السعودية متحققة من تقرير سوق (فرق حوالي 1% في عيارات 22 و21 و18). باقي الدول مبدئياً 1%
+// لحد ما تتأكد من فرق السوق الفعلي عندها، وتقدر تعدّل أي رقم هنا من غير ما تلمس أي ملف تاني.
+export const BUY_SPREAD_PCT = {
+  sa: 1,
+  ae: 1,
+  kw: 1,
+  qa: 1,
+  bh: 1,
+  om: 1,
+  jo: 1,
+  tn: 1,
+  dz: 1,
+  ma: 1,
+};
+
+// سعر الشراء منك = سعر البيع ناقص نسبة الفرق
+export function buyFromSell(code, sell, decimals = 2) {
+  const n = Number(sell);
+  if (!Number.isFinite(n)) return null;
+  const pct = BUY_SPREAD_PCT[code] ?? 1;
+  return Number((n * (1 - pct / 100)).toFixed(decimals + 2));
+}
+
 export function getCountry(code) {
   const c = COUNTRIES[code];
   return c && c.active && !c.isHome ? c : null;
