@@ -9,6 +9,7 @@ import UpdatedStamp from '../components/UpdatedStamp.jsx';
 import useApiData from '../hooks/useApiData.js';
 import { useLang } from '../context/LangContext.jsx';
 import { CURRENCY_META, CURRENCY_ORDER } from '../data/currencies.js';
+import SeoH1 from '../components/SeoH1.jsx';
 
 export default function CurrenciesPage() {
   const { data, loading, error } = useApiData('/api/public/currency-price', { intervalMs: 2 * 60000 });
@@ -23,6 +24,7 @@ export default function CurrenciesPage() {
 
   return (
     <div className="page-wrap">
+      <SeoH1>{lang === 'en' ? 'Currency prices today in Egypt' : 'أسعار العملات اليوم في مصر'}</SeoH1>
       <Seo
         title="اسعار العملات اليوم في مصر | ذهبي"
         description="تابع اسعار العملات اليوم بالجنيه المصري لحظة بلحظة، ومحول عملات مجاني بين أكتر من 14 عملة."

@@ -9,6 +9,7 @@ import { useLang } from '../context/LangContext.jsx';
 import { CURRENCY_META } from '../data/currencies.js';
 import { shareCard } from '../lib/shareCard.js';
 import { breadcrumbJsonLd } from '@/lib/jsonld.js';
+import SeoH1 from '../components/SeoH1.jsx';
 
 export default function CurrencyPage() {
   const params = useParams();
@@ -42,6 +43,7 @@ export default function CurrencyPage() {
 
   return (
     <div className="page-wrap">
+      <SeoH1>{lang === 'en' ? `${meta.name} price today in Egypt` : `سعر ${meta.name} اليوم في مصر`}</SeoH1>
       <JsonLd
         data={breadcrumbJsonLd([
           { name: 'الرئيسية', path: '/' },

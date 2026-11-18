@@ -76,10 +76,10 @@ export default function Header({ onMenuClick }) {
       </div>
       <div className="header-right">
         <Link to={inCountry ? `/${current}` : '/'} className="logo-link">
-          <h1 className="logo-text">
+          <div className="logo-text">
             {t('app.name')} <span className="logo-dot">●</span>
             {inCountry ? <span className="logo-country">{COUNTRY_NAMES[current]}</span> : null}
-          </h1>
+          </div>
         </Link>
         <button className="icon-btn" onClick={onMenuClick} aria-label={t('header.menu')}>
           <FaIcon icon="fa-solid fa-bars" />

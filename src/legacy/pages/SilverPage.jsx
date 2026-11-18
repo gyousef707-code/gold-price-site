@@ -13,6 +13,7 @@ const SavingsCalculator = lazy(() => import('../components/calculators/SavingsCa
 import useApiData from '../hooks/useApiData.js';
 import { useLang } from '../context/LangContext.jsx';
 import { shareCard } from '../lib/shareCard.js';
+import SeoH1 from '../components/SeoH1.jsx';
 
 const CARAT_ORDER = ['999', '925', '900', '800', '720', '500'];
 
@@ -43,6 +44,7 @@ export default function SilverPage() {
 
   return (
     <div className="page-wrap">
+      <SeoH1>{lang === 'en' ? 'Silver price today in Egypt' : 'سعر الفضة اليوم في مصر'}</SeoH1>
       <section className="global-ounce-section">
         <div className="ounce-card">
           <div className="ounce-header">
