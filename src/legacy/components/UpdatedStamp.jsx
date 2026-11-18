@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import FaIcon from './FaIcon.jsx';
 
-const TZ = 'Africa/Cairo';
+const DEFAULT_TZ = 'Africa/Cairo';
 
-export function formatStamp(date, lang = 'ar') {
+export function formatStamp(date, lang = 'ar', TZ = DEFAULT_TZ) {
   const locale = lang === 'en' ? 'en-GB' : 'ar-EG';
   const time = new Intl.DateTimeFormat(locale, {
     timeZone: TZ,
@@ -25,7 +25,7 @@ export function formatStamp(date, lang = 'ar') {
 // ختم الوقت والتاريخ — لو اتبعت `date` (وقت آخر تحديث حقيقي للبيانات من
 // السيرفر)، بيعرضه ثابت زي ما هو عشان يبين فعلاً إمتى آخر مرة اتغيرت فيها
 // البيانات. من غيره، بيرجع للسلوك القديم (ساعة حية بتتحدث كل ثانية) كاحتياطي.
-export default function UpdatedStamp({ lang = 'ar', label, date }) {
+export default function UpdatedStamp({ lang = 'ar', label, date, timeZone = DEFAULT_TZ }) {
   const [now, setNow] = useState(null);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function UpdatedStamp({ lang = 'ar', label, date }) {
   const stampDate = date ? new Date(date) : now;
   if (!stampDate) return <div className="updated-stamp" />;
 
-  const { time, day } = formatStamp(stampDate, lang);
+  const { time, day } = formatStamp(stampDate, lang, timeZone);
   const text = label ?? (lang === 'en' ? 'Last update' : 'آخر تحديث');
 
   return (
