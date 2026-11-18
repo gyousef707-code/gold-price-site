@@ -53,7 +53,7 @@ export default function CountryCurrenciesPage({ code, initialData = null }) {
           </h2>
         </div>
         <CurrencyConverter rates={rates} selected={selected} base={local} meta={META} />
-        <UpdatedStamp lang={lang} date={data?.updated_at} />
+        <UpdatedStamp lang={lang} date={data?.updated_at} timeZone={c.tz} />
       </section>
 
       <section>
