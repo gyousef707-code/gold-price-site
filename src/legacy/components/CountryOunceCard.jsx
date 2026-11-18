@@ -27,7 +27,7 @@ export default function CountryOunceCard({ code, title, ounceUsd, ounceLocal, ch
         <p className="cp-ounce-local" style={{ margin: '4px 0 2px' }}>
           {ounceLocal != null ? `≈ ${formatMoney(ounceLocal, c.decimals ?? 2)} ${c.short} للأونصة` : '—'}
         </p>
-        <UpdatedStamp lang={lang} date={updatedAt} />
+        <UpdatedStamp lang={lang} date={updatedAt} timeZone={c.tz} />
         <div className="ounce-footer">
           <span className="live-pulse">
             <span className="update-dot" /> {t('live')}
