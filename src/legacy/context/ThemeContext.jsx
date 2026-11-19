@@ -17,7 +17,9 @@ function resolveIsLight(mode) {
 export function ThemeProvider({ children }) {
   const [mode, setModeState] = useState(() => {
     if (typeof window === 'undefined') return DEFAULT_MODE;
-    return localStorage.getItem('theme-mode') || DEFAULT_MODE;
+    // الوضع التلقائي اتشال: أي قيمة قديمة غير فاتح/داكن ترجع للداكن
+    const saved = localStorage.getItem('theme-mode');
+    return saved === 'light' || saved === 'dark' ? saved : DEFAULT_MODE;
   });
 
   const applyMode = useCallback((m) => {
