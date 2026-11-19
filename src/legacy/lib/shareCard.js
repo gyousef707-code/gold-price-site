@@ -176,7 +176,8 @@ export async function shareCard(card, text) {
   // الصورة المتشارَكة = لوجو الموقع، والسعر + الرابط في النص.
   // لو فشل تحميل اللوجو أو الجهاز مش بيدعم مشاركة الملفات، بنكمّل على كارت الأسعار تحت.
   try {
-    const res = await fetch('/logo.png');
+    // أيقونة التطبيق (العملة المكتوب عليها "ذهبي")
+    const res = await fetch('/icons/icon-512.png');
     if (res.ok) {
       const logoBlob = await res.blob();
       const logoFile = new File([logoBlob], 'zahaby.png', { type: 'image/png' });
