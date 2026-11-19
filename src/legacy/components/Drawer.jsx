@@ -57,10 +57,6 @@ export default function Drawer({ open, onClose, panel, setPanel }) {
           </button>
           {panel === 'notifications' && (
             <div className="drawer-panel">
-              <Link to={cpath(country, '/alerts')} className="drawer-panel-link" onClick={onClose}>
-                <FaIcon icon="fa-solid fa-bell" /> {lang === 'en' ? 'Price alerts' : 'تنبيهات الأسعار'}
-                <FaIcon icon="fa-solid fa-chevron-left" />
-              </Link>
               {items.slice(0, 3).map((n) => (
                 <div key={n.id} className="drawer-notif">
                   <h3>{n.title}</h3>
@@ -78,6 +74,10 @@ export default function Drawer({ open, onClose, panel, setPanel }) {
               </Link>
             </div>
           )}
+
+          <Link to={cpath(country, '/alerts')} className="drawer-item" onClick={onClose}>
+            <FaIcon icon="fa-solid fa-bell-ring" /> {lang === 'en' ? 'Price alerts' : 'تنبيهات الأسعار'}
+          </Link>
 
           <button className="drawer-item" onClick={() => window.location.reload()}>
             <FaIcon icon="fa-solid fa-rotate" /> {t('header.refresh')}
