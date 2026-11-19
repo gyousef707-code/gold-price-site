@@ -1,21 +1,22 @@
 import { Link } from '@/lib/router-compat.jsx';
+import useCountryCode, { cpath } from '../hooks/useCountry.js';
 import FaIcon from './FaIcon.jsx';
 import { useTheme } from '../context/ThemeContext.jsx';
 import { useLang } from '../context/LangContext.jsx';
-import { SunIcon, MoonIcon, AutoIcon } from './icons.jsx';
+import { SunIcon, MoonIcon } from './icons.jsx';
 import RatingStars from './RatingStars.jsx';
-import useNotifications, { relativeTime } from '../hooks/useNotifications.js';
+import useNotifications from '../hooks/useNotifications.js';
 import { shareCard } from '../lib/shareCard.js';
 
 export default function Drawer({ open, onClose, panel, setPanel }) {
   const { mode, setMode } = useTheme();
   const { t, lang, setLang } = useLang();
   const { items } = useNotifications();
+  const country = useCountryCode();
 
   const THEME_OPTIONS = [
     { id: 'light', label: t('theme.light'), Icon: SunIcon },
     { id: 'dark', label: t('theme.dark'), Icon: MoonIcon },
-    { id: 'auto', label: t('theme.auto'), Icon: AutoIcon },
   ];
 
   const shareApp = () =>
@@ -47,32 +48,10 @@ export default function Drawer({ open, onClose, panel, setPanel }) {
           </button>
         </div>
         <div className="drawer-body">
-          <button
-            className="drawer-item"
-            onClick={() => setPanel(panel === 'notifications' ? null : 'notifications')}
-          >
+          <Link to={cpath(country, '/alerts')} className="drawer-item" onClick={onClose}>
             <FaIcon icon="fa-regular fa-bell" /> {t('drawer.notifications')}
             {items.length > 0 && <span className="drawer-badge">{items.length}</span>}
-          </button>
-          {panel === 'notifications' && (
-            <div className="drawer-panel">
-              {items.slice(0, 3).map((n) => (
-                <div key={n.id} className="drawer-notif">
-                  <h3>{n.title}</h3>
-                  <p>{n.body}</p>
-                  <span className="news-source">{relativeTime(n.at, lang)}</span>
-                </div>
-              ))}
-              {!items.length && (
-                <p className="drawer-panel-empty">
-                  {lang === 'en' ? 'No notifications yet' : 'مفيش إشعارات لسه'}
-                </p>
-              )}
-              <Link to="/notifications" className="drawer-panel-link" onClick={onClose}>
-                {t('drawer.allNotifications')} <FaIcon icon="fa-solid fa-chevron-left" />
-              </Link>
-            </div>
-          )}
+          </Link>
 
           <button className="drawer-item" onClick={() => window.location.reload()}>
             <FaIcon icon="fa-solid fa-rotate" /> {t('header.refresh')}
