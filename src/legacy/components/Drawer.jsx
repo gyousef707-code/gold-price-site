@@ -5,7 +5,7 @@ import { useTheme } from '../context/ThemeContext.jsx';
 import { useLang } from '../context/LangContext.jsx';
 import { SunIcon, MoonIcon } from './icons.jsx';
 import RatingStars from './RatingStars.jsx';
-import useNotifications from '../hooks/useNotifications.js';
+import useNotifications, { relativeTime } from '../hooks/useNotifications.js';
 import { shareCard } from '../lib/shareCard.js';
 
 export default function Drawer({ open, onClose, panel, setPanel }) {
@@ -48,10 +48,36 @@ export default function Drawer({ open, onClose, panel, setPanel }) {
           </button>
         </div>
         <div className="drawer-body">
-          <Link to={cpath(country, '/alerts')} className="drawer-item" onClick={onClose}>
+          <button
+            className="drawer-item"
+            onClick={() => setPanel(panel === 'notifications' ? null : 'notifications')}
+          >
             <FaIcon icon="fa-regular fa-bell" /> {t('drawer.notifications')}
             {items.length > 0 && <span className="drawer-badge">{items.length}</span>}
-          </Link>
+          </button>
+          {panel === 'notifications' && (
+            <div className="drawer-panel">
+              <Link to={cpath(country, '/alerts')} className="drawer-panel-link" onClick={onClose}>
+                <FaIcon icon="fa-solid fa-bell" /> {lang === 'en' ? 'Price alerts' : 'تنبيهات الأسعار'}
+                <FaIcon icon="fa-solid fa-chevron-left" />
+              </Link>
+              {items.slice(0, 3).map((n) => (
+                <div key={n.id} className="drawer-notif">
+                  <h3>{n.title}</h3>
+                  <p>{n.body}</p>
+                  <span className="news-source">{relativeTime(n.at, lang)}</span>
+                </div>
+              ))}
+              {!items.length && (
+                <p className="drawer-panel-empty">
+                  {lang === 'en' ? 'No notifications yet' : 'مفيش إشعارات لسه'}
+                </p>
+              )}
+              <Link to="/notifications" className="drawer-panel-link" onClick={onClose}>
+                {t('drawer.allNotifications')} <FaIcon icon="fa-solid fa-chevron-left" />
+              </Link>
+            </div>
+          )}
 
           <button className="drawer-item" onClick={() => window.location.reload()}>
             <FaIcon icon="fa-solid fa-rotate" /> {t('header.refresh')}
