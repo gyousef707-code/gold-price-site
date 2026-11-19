@@ -4,6 +4,7 @@ import Header from './Header.jsx';
 import Drawer from './Drawer.jsx';
 import BottomNav from './BottomNav.jsx';
 import QuickMenu from './QuickMenu.jsx';
+import InstallPrompt from './InstallPrompt.jsx';
 import CountryMemory from './CountryMemory.jsx';
 import Footer from './Footer.jsx';
 import ScrollToTop from './ScrollToTop.jsx';
@@ -43,6 +44,7 @@ export default function Layout() {
       <Footer />
       <BottomNav />
       <QuickMenu hidden={drawerOpen} />
+      <InstallPrompt />
     </>
   );
 }
