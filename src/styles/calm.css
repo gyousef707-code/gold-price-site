@@ -348,11 +348,3 @@ body .tools-sub .tools-list-icon { width: 36px; height: 36px; font-size: 15px; }
 }
 .ns-save[disabled] { opacity: 0.6; }
 .ns-cancel { display: block; margin: 12px auto 0; padding: 8px 20px; border: 0; background: none; font: inherit; font-size: 15px; color: var(--text-muted); cursor: pointer; }
-
-/* مساحة لمس أكبر لزرار مشاركة الكارت (خصوصًا كروت أقصى الشمال زي عيار 18 والجنيه
-   القريبة من حافة الشاشة) — بتتمد ناحية جوه الكارت وتحت */
-.card-share-btn::after {
-  content: "";
-  position: absolute;
-  inset: -6px -14px -14px -6px;
-}
