@@ -27,12 +27,6 @@ function loadLogo() {
   return logoPromise;
 }
 
-// نحمّل اللوجو بدري (بعد ما الصفحة تهدا) عشان أول ضغطة على المشاركة مأخدش وقت
-// ويضيع "إذن اللمس" فتفشل المشاركة (كان بيحصل في أول مرة على النت البطيء).
-if (typeof window !== 'undefined') {
-  setTimeout(() => { loadLogo(); }, 1200);
-}
-
 function stamp() {
 
   const now = new Date();
@@ -175,7 +169,7 @@ export async function shareCard(card, text) {
   try {
     const blob = await buildShareImage(card);
     if (blob) {
-      const file = new File([blob], 'zahaby-price.jpg', { type: 'image/jpeg', lastModified: Date.now() });
+      const file = new File([blob], 'zahaby-price.jpg', { type: 'image/jpeg' });
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], title: 'ذهبي', text: `${text}\n${url}` });
         return;
