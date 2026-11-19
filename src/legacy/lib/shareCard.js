@@ -154,7 +154,7 @@ export async function buildShareImage(card) {
   ctx.font = '700 38px Cairo, system-ui, sans-serif';
   ctx.fillText(location.host, W / 2, H - 80);
 
-  return new Promise((resolve) => canvas.toBlob(resolve, 'image/png', 0.95));
+  return new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.92));
 }
 
 export function showToast(message) {
@@ -173,27 +173,10 @@ export function showToast(message) {
 export async function shareCard(card, text) {
   const url = typeof window !== 'undefined' ? window.location.origin : '';
 
-  // الصورة المتشارَكة = لوجو الموقع، والسعر + الرابط في النص.
-  // لو فشل تحميل اللوجو أو الجهاز مش بيدعم مشاركة الملفات، بنكمّل على كارت الأسعار تحت.
-  try {
-    // أيقونة التطبيق (العملة المكتوب عليها "ذهبي")
-    const res = await fetch('/icons/icon-512.png');
-    if (res.ok) {
-      const logoBlob = await res.blob();
-      const logoFile = new File([logoBlob], 'zahaby.png', { type: 'image/png' });
-      if (navigator.canShare?.({ files: [logoFile] })) {
-        await navigator.share({ files: [logoFile], title: 'ذهبي', text: `${text}\n${url}` });
-        return;
-      }
-    }
-  } catch (e) {
-    if (e?.name === 'AbortError') return;
-  }
-
   try {
     const blob = await buildShareImage(card);
     if (blob) {
-      const file = new File([blob], 'zahaby-price.png', { type: 'image/png' });
+      const file = new File([blob], 'zahaby-price.jpg', { type: 'image/jpeg' });
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], title: 'ذهبي', text: `${text}\n${url}` });
         return;
@@ -201,7 +184,7 @@ export async function shareCard(card, text) {
       // مفيش دعم لمشاركة الملفات → ننزّل الصورة
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'zahaby-price.png';
+      a.download = 'zahaby-price.jpg';
       a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 4000);
       showToast('تم حفظ صورة السعر');
