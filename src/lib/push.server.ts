@@ -375,6 +375,36 @@ export function buildCombinedChange(
   return items;
 }
 
+// -------- طابور الإرسال: الفحص بيسجّل إشعار معلّق، وعملية تانية بتبعته على دفعات --------
+// ليه: Cloudflare المجانية بتسمح بـ 50 طلب فرعي بس لكل تشغيل، وكل جهاز = طلب. فبنبعت على دفعات صغيرة.
+export type PendingPush = {
+  id: string;
+  items: ChangeItem[];
+  lastId: string | null; // آخر اشتراك اتبعتله (الترتيب بالـ id) — الدفعة الجاية بتكمل بعده
+  createdAt: number;
+};
+
+const PENDING_KEY = "push:pending";
+
+export async function getPending(): Promise<PendingPush | null> {
+  const raw = await upstash("GET", PENDING_KEY);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as PendingPush;
+  } catch {
+    return null;
+  }
+}
+
+export async function savePending(p: PendingPush) {
+  // ينتهي لوحده بعد ساعة لو حصل أي عطل، عشان إشعار قديم ما يتبعتش متأخر جداً
+  await upstash("SET", PENDING_KEY, JSON.stringify(p), "EX", 3600);
+}
+
+export async function clearPending() {
+  await upstash("DEL", PENDING_KEY);
+}
+
 export function computeSnapshot(gold: any, currency: any, crypto: any): Snapshot {
   return {
     k21: gold?.caratPrices?.["21"]?.sell ?? null,
