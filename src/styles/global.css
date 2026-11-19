@@ -1492,14 +1492,6 @@ a.news-item { display: block; text-decoration: none; cursor: pointer; }
     background: rgba(227,179,65,0.08);
 }
 .theme-option.active i { color: var(--gold-primary); }
-.theme-option.active::after {
-    content: '\f00c';
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900;
-    margin-inline-start: auto;
-    color: var(--gold-primary);
-    font-size: 13px;
-}
 .star-rating {
     display: flex;
     justify-content: center;
