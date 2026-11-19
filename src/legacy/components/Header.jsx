@@ -4,9 +4,9 @@ import FaIcon from './FaIcon.jsx';
 import { COUNTRY_CODES, COUNTRY_NAMES } from '../data/countryCodes.js';
 import { useTheme } from '../context/ThemeContext.jsx';
 import { useLang } from '../context/LangContext.jsx';
-import { SunIcon, MoonIcon, AutoIcon } from './icons.jsx';
+import { SunIcon, MoonIcon } from './icons.jsx';
 
-const NEXT_MODE = { dark: 'light', light: 'auto', auto: 'dark' };
+const NEXT_MODE = { dark: 'light', light: 'dark' };
 
 // شاشة اختيار الدولة بتتحمّل بس لما المستخدم يضغط على العلم
 const CountryPicker = lazy(() => import('./CountryPicker.jsx'));
@@ -32,7 +32,6 @@ function EgyptFlag() {
 
 function ModeIcon({ mode }) {
   if (mode === 'light') return <SunIcon size={19} />;
-  if (mode === 'auto') return <AutoIcon size={18} />;
   return <MoonIcon size={18} />;
 }
 
