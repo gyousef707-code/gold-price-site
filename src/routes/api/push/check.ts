@@ -9,16 +9,18 @@ import {
 import {
   getSnapshot,
   saveSnapshot,
-  buildChangeMessage,
+  getNotified,
+  saveNotified,
+  getPending,
+  savePending,
+  clearPending,
+  buildCombinedChange,
   computeSnapshot,
   sendPushToAll,
   getAllSubscriptions,
   anySilverAlerts,
   computeAlertPrices,
   processPriceAlerts,
-  getRotationIndex,
-  saveRotationIndex,
-  ROTATION_ORDER,
 } from "@/lib/push.server";
 import { upstash } from "@/lib/upstash.server";
 import { runTelegramAutomation } from "@/lib/telegram-live.server";
@@ -60,6 +62,64 @@ function wants(prefs: Record<string, boolean> | undefined, which: string) {
   return !!prefs[which];
 }
 
+// عدد الأجهزة في الدفعة الواحدة. كل جهاز = طلب فرعي، وحد Cloudflare المجانية 50 لكل تشغيل،
+// فبنسيب هامش لباقي أوامر Upstash وللاشتراكات الميتة اللي بتتمسح.
+const BATCH_SIZE = 20;
+
+// بيبعت الدفعة الجاية من الإشعار المعلّق (بيتنده عليه من cron منفصل كل دقيقة بـ ?mode=drain)
+async function drainPending() {
+  const pending = await getPending();
+  if (!pending) return { pending: false };
+
+  const all = (await getAllSubscriptions()).sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  const rest = pending.lastId ? all.filter((e) => e.id > pending.lastId!) : all;
+  const batch = rest.slice(0, BATCH_SIZE);
+  if (batch.length === 0) {
+    await clearPending();
+    return { pending: false, done: true };
+  }
+
+  const prefsMap = await loadPrefsMap();
+  // كل جهاز ياخد بس الأسطر اللي مهتم بيها
+  const groups = new Map<string, { keys: string[]; entries: typeof batch }>();
+  for (const entry of batch) {
+    const prefs = prefsMap[await sha256Hex(entry.sub.endpoint)];
+    const keys = pending.items.filter((i) => wants(prefs, i.key)).map((i) => i.key);
+    if (keys.length === 0) continue;
+    const gid = keys.join(",");
+    const g = groups.get(gid) ?? { keys, entries: [] };
+    g.entries.push(entry);
+    groups.set(gid, g);
+  }
+
+  let sent = 0;
+  let removed = 0;
+  for (const g of groups.values()) {
+    const lines = pending.items.filter((i) => g.keys.includes(i.key)).map((i) => i.line);
+    const r = await sendPushToAll(
+      {
+        title:
+          g.keys.length === 1
+            ? g.keys[0] === "usd"
+              ? "سعر الدولار"
+              : `سعر ${g.keys[0] === "k21" ? "عيار 21" : "عيار 24"}`
+            : "تحديث الأسعار",
+        body: lines.join("\n"),
+        url: "/",
+        tag: "price-update",
+      },
+      g.entries,
+    );
+    sent += r.sent;
+    removed += r.removed;
+  }
+
+  const remaining = rest.length - batch.length;
+  if (remaining <= 0) await clearPending();
+  else await savePending({ ...pending, lastId: batch[batch.length - 1]!.id });
+  return { pending: remaining > 0, batch: batch.length, sent, removed, remaining };
+}
+
 export const Route = createFileRoute("/api/push/check")({
   server: {
     handlers: {
@@ -69,6 +129,11 @@ export const Route = createFileRoute("/api/push/check")({
           const provided = new URL(request.url).searchParams.get("secret");
           if (requiredSecret && provided !== requiredSecret) {
             return jsonErr(new Error("غير مصرح"), 401);
+          }
+
+          // وضع الإرسال: بيبعت دفعة من الإشعار المعلّق بس (من غير ما يجيب أسعار)
+          if (new URL(request.url).searchParams.get("mode") === "drain") {
+            return jsonOk({ drain: await drainPending() });
           }
 
           const [gold, currency, crypto] = await Promise.all([
@@ -86,36 +151,34 @@ export const Route = createFileRoute("/api/push/check")({
             telegram = { status: "error", error: e instanceof Error ? e.message : String(e) };
           }
 
-          // أرشيف أسعار الدول: لقطة يومية بتتسجل من هنا كل يوم حتى لو مفيش زوار (مستقل عن الباقي)
-          let countryArchive: unknown = null;
-          try {
-            countryArchive = await recordCountrySnapshotNow();
-          } catch (e) {
-            countryArchive = { error: e instanceof Error ? e.message : String(e) };
-          }
-
           // باقي الفحص (إشعارات الأجهزة وتنبيهات الأسعار) بيعتمد على Upstash، فاتحط في كتلة لوحده
           let core: Record<string, unknown> = {};
           try {
             const now = computeSnapshot(gold, currency, crypto);
             const prev = await getSnapshot();
 
-            const idx = await getRotationIndex();
-            const which = ROTATION_ORDER[idx % ROTATION_ORDER.length]!;
-            const message = buildChangeMessage(prev, now, which);
+            // إشعار واحد مجمّع: بنقارن بآخر سعر اتبعت فعلاً (لو مفيش، بآخر فحص)، وبعتبة وفاصل أدنى
+            const notified = await getNotified();
+            const items = buildCombinedChange(notified, prev, now, Date.now());
 
             // الاشتراكات بتتجاب مرة واحدة بس (أمر Upstash واحد) وتتستخدم للإشعار العام
             // ولتنبيهات الأسعار المستهدفة الخاصة بكل جهاز.
             const subs = await getAllSubscriptions();
 
-            let result = { sent: 0, removed: 0, total: 0 };
-            if (message) {
-              const prefsMap = await loadPrefsMap();
-              const interested: typeof subs = [];
-              for (const entry of subs) {
-                if (wants(prefsMap[await sha256Hex(entry.sub.endpoint)], which)) interested.push(entry);
-              }
-              result = await sendPushToAll({ ...message, url: "/", tag: "price-update" }, interested);
+            // بنحفظ الأسعار هنا قبل أي إرسال: لو حصل خطأ بعد كده (حد الطلبات الفرعية في Cloudflare مثلاً)
+            // متفضلش الأسعار المحفوظة قديمة ولا الإشعار يتكرر كل دقيقتين لنفس الناس.
+            if (items) {
+              const baseline: Record<string, number> = { at: Date.now() };
+              for (const k of ["k21", "k24", "usd"] as const) if (now[k] != null) baseline[k] = now[k] as number;
+              await saveNotified(baseline);
+            }
+            await saveSnapshot(now);
+
+            // الإرسال نفسه بيحصل على دفعات من تشغيل منفصل (?mode=drain)، هنا بس بنسجّل الإشعار المعلّق
+            let result: Record<string, unknown> = {};
+            if (items) {
+              await savePending({ id: String(Date.now()), items, lastId: null, createdAt: Date.now() });
+              result = { queued: true };
             }
 
             // تنبيهات السعر المستهدف: مستقلة، وفشلها ما بيوقفش باقي الفحص.
@@ -135,11 +198,17 @@ export const Route = createFileRoute("/api/push/check")({
               // نكمل عادي
             }
 
-            await saveSnapshot(now);
-            await saveRotationIndex(idx + 1);
-            core = { changed: !!message, which, message, alerts, countryAlerts, ...result };
+            core = { changed: !!items, items, alerts, countryAlerts, ...result };
           } catch (e) {
             core = { upstashError: e instanceof Error ? e.message : String(e) };
+          }
+
+          // أرشيف أسعار الدول: بنسجلها بعد الفحص الأساسي عشان متاكلش من حد الطلبات الفرعية بتاعه
+          let countryArchive: unknown = null;
+          try {
+            countryArchive = await recordCountrySnapshotNow();
+          } catch (e) {
+            countryArchive = { error: e instanceof Error ? e.message : String(e) };
           }
 
           return jsonOk({ telegram, countryArchive, ...core });
