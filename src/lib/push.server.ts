@@ -325,11 +325,29 @@ export function buildChangeMessage(prev: Snapshot, now: Snapshot, which: Rotatio
 }
 
 // -------- إشعار واحد مجمّع (عيار 21 + عيار 24 + الدولار) بعتبة حقيقية --------
-// العتبة: تغيّر 50 جنيه أو 1% في الذهب، أو 0.5% في الدولار، عن آخر سعر اتبعت فعلاً.
-// وفي فاصل أدنى 30 دقيقة بين إشعارين، إلا لو الحركة كبيرة (100 جنيه / 2% ذهب، أو 1% دولار).
+// العتبة: تغيّر 25 جنيه في الذهب، أو 0.5% في الدولار، عن آخر سعر اتبعت فعلاً.
+// وفي فاصل أدنى 30 دقيقة بين إشعارين، إلا لو الحركة كبيرة (50 جنيه / 1% ذهب، أو 1% دولار).
 const MIN_GAP_MS = 30 * 60 * 1000;
 
-export type ChangeItem = { key: "k21" | "k24" | "usd"; line: string };
+export type ChangeItem = {
+  key: "k21" | "k24" | "usd";
+  title: string; // عنوان الإشعار لو ده النوع الأساسي
+  body: string; // نص الإشعار لو ده النوع الأساسي
+  short: string; // سطر مختصر بيتضاف لو الجهاز بيستقبل أكتر من نوع في نفس الإشعار
+};
+
+function fmtEgp(n: number) {
+  return Math.round(n).toLocaleString("en-US");
+}
+
+// الجنيهات بالعربي: 1 جنيه، جنيهان، 3 إلى 10 جنيهات، وبعدها جنيهًا
+export function egpPhrase(n: number): string {
+  const v = Math.round(Math.abs(n));
+  if (v === 1) return "جنيه";
+  if (v === 2) return "جنيهان";
+  if (v >= 3 && v <= 10) return `${v} جنيهات`;
+  return `${v} جنيهًا`;
+}
 
 export function buildCombinedChange(
   base: Notified,
@@ -337,7 +355,8 @@ export function buildCombinedChange(
   now: Snapshot,
   nowMs: number,
 ): ChangeItem[] | null {
-  const items: ChangeItem[] = [];
+  const hits: ChangeItem[] = [];
+  const rest: ChangeItem[] = [];
   let trigger = false;
   let big = false;
 
@@ -353,26 +372,98 @@ export function buildCombinedChange(
     if (!a || !b || a === b) continue;
     const d = b - a;
     const p = pct(a, b);
+    const dir = d > 0 ? "ارتفاع" : "انخفاض";
     const sign = d > 0 ? "+" : "";
-    const dTxt = gold ? d.toFixed(0) : d.toFixed(2);
-    const fmtN = (n: number) => (gold ? n.toLocaleString("en-US") : n.toFixed(2));
-    items.push({
-      key,
-      line: `${label}: ${fmtN(a)} ← ${fmtN(b)} ج.م (${sign}${dTxt} | ${sign}${p.toFixed(gold ? 1 : 2)}%)`,
-    });
+
+    let item: ChangeItem;
+    let hit: boolean;
     if (gold) {
-      if (Math.abs(d) >= 50 || Math.abs(p) >= 1) trigger = true;
-      if (Math.abs(d) >= 100 || Math.abs(p) >= 2) big = true;
+      item = {
+        key,
+        title: `${dir} ${egpPhrase(d)} في ${label}`,
+        body: `منذ إشعارنا السابق، أي ${Math.abs(p).toFixed(1)}%. السعر الآن ${fmtEgp(b)} جنيهًا للجرام.`,
+        short: `${label}: ${fmtEgp(b)} جنيهًا (${sign}${Math.round(d)})`,
+      };
+      hit = Math.abs(d) >= 25;
+      if (hit) trigger = true;
+      if (Math.abs(d) >= 50 || Math.abs(p) >= 1) big = true;
     } else {
-      if (Math.abs(p) >= 0.5) trigger = true;
+      item = {
+        key,
+        title: `${dir} الدولار ${Math.abs(d).toFixed(2)} جنيه`,
+        body: `منذ إشعارنا السابق، أي ${Math.abs(p).toFixed(2)}%. السعر الآن ${b.toFixed(2)} جنيهًا.`,
+        short: `الدولار: ${b.toFixed(2)} جنيهًا`,
+      };
+      hit = Math.abs(p) >= 0.5;
+      if (hit) trigger = true;
       if (Math.abs(p) >= 1) big = true;
     }
+    (hit ? hits : rest).push(item);
   }
 
-  if (!trigger || items.length === 0) return null;
+  if (!trigger) return null;
   const last = base.at ?? 0;
   if (!big && last && nowMs - last < MIN_GAP_MS) return null;
-  return items;
+  // اللي عدّى العتبة الأول، عشان يبقى هو عنوان الإشعار
+  return [...hits, ...rest];
+}
+
+// -------- إشعار "صباح الخير" اليومي: مقارنة بآخر سعر أمس --------
+export type DayPrices = { k21: number | null; k24: number | null; oz: number | null };
+export type DayState = { date: string; last: DayPrices; prev: DayPrices | null; morning: string | null };
+
+// التاريخ والساعة بتوقيت القاهرة
+export function cairoParts(ms = Date.now()): { date: string; hour: number } {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Africa/Cairo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(new Date(ms));
+  const get = (t: string) => parts.find((x) => x.type === t)?.value ?? "";
+  return { date: `${get("year")}-${get("month")}-${get("day")}`, hour: Number(get("hour")) };
+}
+
+export async function getDayState(): Promise<DayState | null> {
+  const raw = await upstash("GET", "push:day");
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as DayState;
+  } catch {
+    return null;
+  }
+}
+
+export async function saveDayState(state: DayState) {
+  await upstash("SET", "push:day", JSON.stringify(state), "EX", 3 * 24 * 3600);
+}
+
+// بيحدّث "آخر سعر النهارده"، ولو اليوم اتغيّر بيحفظ آخر سعر امبارح كـ prev
+export function rollDayState(state: DayState | null, now: Snapshot, date: string): DayState {
+  const cur: DayPrices = { k21: now.k21 ?? null, k24: now.k24 ?? null, oz: now.ounce ?? null };
+  if (!state) return { date, last: cur, prev: null, morning: null };
+  if (state.date !== date) return { date, last: cur, prev: state.last, morning: state.morning };
+  return { ...state, last: cur };
+}
+
+export function buildMorningItems(state: DayState, now: Snapshot): ChangeItem[] | null {
+  const prev = state.prev;
+  if (!prev?.k21 || !now.k21) return null;
+  const d = now.k21 - prev.k21;
+  const p = pct(prev.k21, now.k21);
+  let body =
+    Math.round(d) === 0
+      ? "تقريبًا نفس آخر سعر أمس."
+      : `${d > 0 ? "أعلى" : "أقل"} بـ${egpPhrase(d)} من آخر سعر أمس، أي ${Math.abs(p).toFixed(1)}%.`;
+  if (prev.oz && now.ounce) {
+    const od = now.ounce - prev.oz;
+    if (Math.abs(od) >= 1) {
+      body += ` سعر الأونصة ${od > 0 ? "ارتفع" : "تراجع"} ${Math.round(Math.abs(od))} دولارًا (${Math.abs(pct(prev.oz, now.ounce)).toFixed(1)}%) مقارنة بإغلاق أمس.`;
+    }
+  }
+  return [{ key: "k21", title: `صباح الخير ☀️ عيار 21 بـ${fmtEgp(now.k21)} جنيهًا`, body, short: "" }];
 }
 
 // -------- طابور الإرسال: الفحص بيسجّل إشعار معلّق، وعملية تانية بتبعته على دفعات --------
@@ -382,6 +473,7 @@ export type PendingPush = {
   items: ChangeItem[];
   lastId: string | null; // آخر اشتراك اتبعتله (الترتيب بالـ id) — الدفعة الجاية بتكمل بعده
   createdAt: number;
+  tag?: string;
 };
 
 const PENDING_KEY = "push:pending";
@@ -399,6 +491,12 @@ export async function getPending(): Promise<PendingPush | null> {
 export async function savePending(p: PendingPush) {
   // ينتهي لوحده بعد ساعة لو حصل أي عطل، عشان إشعار قديم ما يتبعتش متأخر جداً
   await upstash("SET", PENDING_KEY, JSON.stringify(p), "EX", 3600);
+}
+
+// بيسجّل الإشعار بس لو مفيش إشعار تاني معلّق (عشان إشعار الصباح ميقطعش إرسال شغال)
+export async function savePendingIfEmpty(p: PendingPush): Promise<boolean> {
+  const res = await upstash("SET", PENDING_KEY, JSON.stringify(p), "EX", 3600, "NX");
+  return res === "OK";
 }
 
 export async function clearPending() {
