@@ -13,7 +13,13 @@ import {
   saveNotified,
   getPending,
   savePending,
+  savePendingIfEmpty,
   clearPending,
+  cairoParts,
+  getDayState,
+  saveDayState,
+  rollDayState,
+  buildMorningItems,
   buildCombinedChange,
   computeSnapshot,
   sendPushToAll,
@@ -95,19 +101,13 @@ async function drainPending() {
   let sent = 0;
   let removed = 0;
   for (const g of groups.values()) {
-    const lines = pending.items.filter((i) => g.keys.includes(i.key)).map((i) => i.line);
+    const chosen = pending.items.filter((i) => g.keys.includes(i.key));
+    const [primary, ...others] = chosen;
+    if (!primary) continue;
+    // العنوان والنص من النوع الأساسي، وأي نوع تاني بيتضاف كسطر مختصر
+    const body = [primary.body, ...others.map((i) => i.short).filter(Boolean)].join("\n");
     const r = await sendPushToAll(
-      {
-        title:
-          g.keys.length === 1
-            ? g.keys[0] === "usd"
-              ? "سعر الدولار"
-              : `سعر ${g.keys[0] === "k21" ? "عيار 21" : "عيار 24"}`
-            : "تحديث الأسعار",
-        body: lines.join("\n"),
-        url: "/",
-        tag: "price-update",
-      },
+      { title: primary.title, body, url: "/", tag: pending.tag ?? "price-update" },
       g.entries,
     );
     sent += r.sent;
@@ -174,6 +174,30 @@ export const Route = createFileRoute("/api/push/check")({
             }
             await saveSnapshot(now);
 
+            // إشعار "صباح الخير" (مرة في اليوم بعد 9 الصبح بتوقيت القاهرة): مقارنة بآخر سعر أمس
+            let morning: string | null = null;
+            try {
+              const { date, hour } = cairoParts();
+              const state = rollDayState(await getDayState(), now, date);
+              if (hour >= 9 && hour < 13 && state.morning !== date) {
+                const mItems = buildMorningItems(state, now);
+                if (mItems) {
+                  const ok = await savePendingIfEmpty({
+                    id: String(Date.now()),
+                    items: mItems,
+                    lastId: null,
+                    createdAt: Date.now(),
+                    tag: "morning-update",
+                  });
+                  morning = ok ? "queued" : "waiting";
+                  if (ok) state.morning = date;
+                }
+              }
+              await saveDayState(state);
+            } catch (e) {
+              morning = `error: ${e instanceof Error ? e.message : String(e)}`;
+            }
+
             // الإرسال نفسه بيحصل على دفعات من تشغيل منفصل (?mode=drain)، هنا بس بنسجّل الإشعار المعلّق
             let result: Record<string, unknown> = {};
             if (items) {
@@ -198,7 +222,7 @@ export const Route = createFileRoute("/api/push/check")({
               // نكمل عادي
             }
 
-            core = { changed: !!items, items, alerts, countryAlerts, ...result };
+            core = { changed: !!items, items, morning, alerts, countryAlerts, ...result };
           } catch (e) {
             core = { upstashError: e instanceof Error ? e.message : String(e) };
           }
