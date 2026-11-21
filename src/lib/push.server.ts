@@ -453,14 +453,22 @@ export function buildMorningItems(state: DayState, now: Snapshot): ChangeItem[] 
   if (!prev?.k21 || !now.k21) return null;
   const d = now.k21 - prev.k21;
   const p = pct(prev.k21, now.k21);
-  let body =
-    Math.round(d) === 0
-      ? "تقريبًا نفس آخر سعر أمس."
-      : `${d > 0 ? "أعلى" : "أقل"} بـ${egpPhrase(d)} من آخر سعر أمس، أي ${Math.abs(p).toFixed(1)}%.`;
+  // وصف هادي لحجم الحركة (زي ذهبك): ثبات، ثبات نسبي، ملحوظ، قوي، كبير
+  const ap = Math.abs(p);
+  const up = d > 0;
+  const word = up ? "ارتفاع" : "انخفاض";
+  const egp = egpPhrase(d);
+  let body: string;
+  if (ap < 0.15) body = "ثبات تام مقارنة بآخر سعر أمس.";
+  else if (ap < 0.5) body = `ثبات نسبي مقارنة بآخر سعر أمس، مع ${word} طفيف.`;
+  else if (ap < 1.5) body = `${word} ملحوظ بـ${egp} عن آخر سعر أمس، أي ${ap.toFixed(1)}%.`;
+  else if (ap < 3) body = `${word} قوي بـ${egp} عن آخر سعر أمس، أي ${ap.toFixed(1)}%.`;
+  else body = `${up ? "ارتفاع" : "تراجع"} كبير بـ${egp} عن آخر سعر أمس، أي ${ap.toFixed(1)}%.`;
   if (prev.oz && now.ounce) {
     const od = now.ounce - prev.oz;
-    if (Math.abs(od) >= 1) {
-      body += ` سعر الأونصة ${od > 0 ? "ارتفع" : "تراجع"} ${Math.round(Math.abs(od))} دولارًا (${Math.abs(pct(prev.oz, now.ounce)).toFixed(1)}%) مقارنة بإغلاق أمس.`;
+    const opc = Math.abs(pct(prev.oz, now.ounce));
+    if (opc >= 0.7) {
+      body += ` سعر الأونصة ${od > 0 ? "ارتفع" : "تراجع"} ${Math.round(Math.abs(od))} دولارًا (${opc.toFixed(1)}%) مقارنة بإغلاق أمس.`;
     }
   }
   return [{ key: "k21", title: `صباح الخير ☀️ عيار 21 بـ${fmtEgp(now.k21)} جنيهًا`, body, short: "" }];
