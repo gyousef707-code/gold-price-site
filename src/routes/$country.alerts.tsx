@@ -18,7 +18,7 @@ export const Route = createFileRoute("/$country/alerts")({
     if (!c) return {};
     return seoMeta({
       title: `تنبيهات أسعار الذهب والفضة في ${c.name} | ذهبي`,
-      description: `اضبط تنبيهك لسعر الذهب والفضة في ${c.name} بـ${c.currencyName} وهيوصلك إشعار لما السعر يوصل هدفك.`,
+      description: `اضبط تنبيهك لسعر الذهب والفضة في ${c.name} ${c.inCur} وهيوصلك إشعار لما السعر يوصل هدفك.`,
       keywords: `تنبيه سعر الذهب ${c.name}, اشعارات اسعار الذهب ${c.name}`,
       path: `/${c.code}/alerts`,
     });
