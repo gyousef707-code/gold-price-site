@@ -15,8 +15,8 @@ export const Route = createFileRoute("/$country/")({
     const c = countryMeta(params.country);
     if (!c) return {};
     return seoMeta({
-      title: `سعر الذهب اليوم في ${c.name} بـ${c.cur} | ذهبي`,
-      description: `سعر جرام الذهب اليوم في ${c.name}: عيار 24 و22 و21 و18 بـ${c.currencyName} لحظة بلحظة، محسوب من السعر العالمي، مع سعر الأونصة وسعر الفضة.`,
+      title: `سعر الذهب اليوم في ${c.name} ${c.inCur} | ذهبي`,
+      description: `سعر جرام الذهب اليوم في ${c.name}: عيار 24 و22 و21 و18 ${c.inCur} لحظة بلحظة، محسوب من السعر العالمي، مع سعر الأونصة وسعر الفضة.`,
       keywords: `سعر الذهب في ${c.name}, سعر الذهب اليوم ${c.name}, سعر جرام الذهب عيار 21 ${c.name}`,
       path: `/${c.code}`,
       type: "article",
