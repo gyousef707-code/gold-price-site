@@ -14,6 +14,9 @@ export function countryMeta(code: string) {
     name: (COUNTRY_NAMES as Record<string, string>)[code],
     currencyName,
     cur: currencyName.split(" ")[0],
+    // "ريال سعودي" -> "الريال السعودي" / "بالريال السعودي" (للعناوين والأوصاف)
+    curName: "ال" + currencyName.split(" ").join(" ال"),
+    inCur: "بال" + currencyName.split(" ").join(" ال"),
   };
 }
 
