@@ -21,8 +21,8 @@ export const Route = createFileRoute("/$country/gold/$karat")({
     if (!c || !KARATS.includes(params.karat)) return {};
     const k = params.karat;
     return seoMeta({
-      title: `سعر الذهب عيار ${k} اليوم في ${c.name} بـ${c.cur} | ذهبي`,
-      description: `سعر جرام الذهب عيار ${k} اليوم في ${c.name} بـ${c.currencyName} لحظة بلحظة، مع سعر 5 و10 و20 جرام والأونصة وحاسبة مجانية.`,
+      title: `سعر الذهب عيار ${k} اليوم في ${c.name} ${c.inCur} | ذهبي`,
+      description: `سعر جرام الذهب عيار ${k} اليوم في ${c.name} ${c.inCur} لحظة بلحظة، مع سعر 5 و10 و20 جرام والأونصة وحاسبة مجانية.`,
       keywords: `سعر الذهب عيار ${k} ${c.name}, سعر جرام الذهب عيار ${k} اليوم ${c.name}, سعر الذهب ${c.name} ${c.currencyName}`,
       path: `/${c.code}/gold/${k}`,
       type: "article",

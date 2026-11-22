@@ -15,8 +15,8 @@ export const Route = createFileRoute("/$country/currencies")({
     const c = countryMeta(params.country);
     if (!c) return {};
     return seoMeta({
-      title: `أسعار العملات اليوم في ${c.name} مقابل ${c.cur} | ذهبي`,
-      description: `أسعار الدولار واليورو والعملات العربية مقابل ${c.currencyName} في ${c.name} لحظة بلحظة، مع محوّل عملات سريع.`,
+      title: `أسعار العملات اليوم في ${c.name} مقابل ${c.curName} | ذهبي`,
+      description: `أسعار الدولار واليورو والعملات العربية مقابل ${c.curName} في ${c.name} لحظة بلحظة، مع محوّل عملات سريع.`,
       keywords: `سعر الدولار في ${c.name}, أسعار العملات ${c.name}, تحويل العملات ${c.currencyName}`,
       path: `/${c.code}/currencies`,
       type: "article",

@@ -15,9 +15,9 @@ export const Route = createFileRoute("/$country/crypto")({
     const c = countryMeta(params.country);
     if (!c) return {};
     return seoMeta({
-      title: `أسعار العملات الرقمية اليوم في ${c.name} بـ${c.cur} | ذهبي`,
-      description: `سعر البيتكوين والإيثيريوم وأعلى 20 عملة رقمية بـ${c.currencyName} في ${c.name}، محسوبة من السعر العالمي بالدولار.`,
-      keywords: `سعر البيتكوين في ${c.name}, العملات الرقمية ${c.name}, سعر الإيثيريوم بـ${c.currencyName}`,
+      title: `أسعار العملات الرقمية اليوم في ${c.name} ${c.inCur} | ذهبي`,
+      description: `سعر البيتكوين والإيثيريوم وأعلى 20 عملة رقمية ${c.inCur} في ${c.name}، محسوبة من السعر العالمي بالدولار.`,
+      keywords: `سعر البيتكوين في ${c.name}, العملات الرقمية ${c.name}, سعر الإيثيريوم ${c.inCur}`,
       path: `/${c.code}/crypto`,
       type: "article",
     });

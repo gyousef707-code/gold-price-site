@@ -14,7 +14,7 @@ export const Route = createFileRoute("/$country/tools")({
     if (!c) return {};
     return seoMeta({
       title: `الأدوات والحاسبات في ${c.name}: ذهب وفضة وزكاة | ذهبي`,
-      description: `حاسبات مجانية في ${c.name}: قيمة الذهب والفضة بالوزن والعيار، وزكاة الذهب، كلها بـ${c.currencyName}.`,
+      description: `حاسبات مجانية في ${c.name}: قيمة الذهب والفضة بالوزن والعيار، وزكاة الذهب، كلها ${c.inCur}.`,
       keywords: `حاسبة الذهب ${c.name}, حاسبة الزكاة ${c.name}, حاسبة الفضة ${c.currencyName}`,
       path: `/${c.code}/tools`,
       type: "article",

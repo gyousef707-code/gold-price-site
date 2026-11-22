@@ -15,8 +15,8 @@ export const Route = createFileRoute("/$country/silver")({
     const c = countryMeta(params.country);
     if (!c) return {};
     return seoMeta({
-      title: `سعر الفضة اليوم في ${c.name} بـ${c.cur} | ذهبي`,
-      description: `سعر جرام الفضة اليوم في ${c.name} بـ${c.currencyName}: فضة 999 و925 و900 و800 لحظة بلحظة، محسوب من السعر العالمي للأونصة.`,
+      title: `سعر الفضة اليوم في ${c.name} ${c.inCur} | ذهبي`,
+      description: `سعر جرام الفضة اليوم في ${c.name} ${c.inCur}: فضة 999 و925 و900 و800 لحظة بلحظة، محسوب من السعر العالمي للأونصة.`,
       keywords: `سعر الفضة في ${c.name}, سعر جرام الفضة اليوم ${c.name}, فضة 925 ${c.name}`,
       path: `/${c.code}/silver`,
       type: "article",
