@@ -345,6 +345,11 @@ export function smartMoney(v) {
   return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: d });
 }
 
+// "ريال سعودي" -> "بالريال السعودي" (للعناوين والنصوص، بدل "بـريال سعودي")
+for (const k of Object.keys(COUNTRIES)) {
+  COUNTRIES[k].inCur = 'بال' + COUNTRIES[k].currencyName.split(' ').join(' ال');
+}
+
 // CSS متغيرات الثيم لدولة معينة (داكن + فاتح). بيتحقن كـ <style> على الصفحة فقط.
 export function countryThemeCss(country) {
   const d = country.theme.dark;
