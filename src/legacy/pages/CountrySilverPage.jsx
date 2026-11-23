@@ -45,7 +45,7 @@ export default function CountrySilverPage({ code, initialData = null }) {
 
       <section className="cp-section" aria-labelledby="cps-h">
         <h2 id="cps-h" className="cp-h">
-          سعر جرام الفضة بـ{c.currencyName}
+          سعر جرام الفضة {c.inCur}
         </h2>
         {error && !data ? (
           <p className="cp-error">تعذر تحميل الأسعار حاليًا، حاول تاني بعد شوية.</p>
@@ -115,7 +115,7 @@ export default function CountrySilverPage({ code, initialData = null }) {
         </h2>
         <p>
           يتداول الناس في {c.name} الفضة بعيارات مختلفة، وأشهرها فضة 999 (النقية) وفضة 925 (الاسترليني)
-          المستخدمة في المجوهرات، وفضة 900 و800 للقطع والأواني. نعرض لك سعر جرام كل عيار بـ{c.currencyName}{' '}
+          المستخدمة في المجوهرات، وفضة 900 و800 للقطع والأواني. نعرض لك سعر جرام كل عيار {c.inCur}{' '}
           محسوباً من السعر العالمي للأونصة، لتقارنه بسعر المحل قبل الشراء.
         </p>
       </section>

@@ -212,7 +212,7 @@ export default function CountryAlertsPage({ code }: { code: string }) {
 
   return (
     <div className="cp" data-country={code}>
-      <CountryHero code={code} title={`تنبيهات الأسعار في ${c.name}`} subtitle={`الأسعار بـ${c.currencyName} (للجرام)`} live={false} />
+      <CountryHero code={code} title={`تنبيهات الأسعار في ${c.name}`} subtitle={`الأسعار ${c.inCur} (للجرام)`} live={false} />
 
       <div className="page-wrap">
         <p className="alert-settings-intro">

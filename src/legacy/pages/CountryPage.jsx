@@ -74,7 +74,7 @@ export default function CountryPage({ code, initialData = null }) {
 
       <section id="tool-gold-karats" className="cp-section" aria-labelledby="cp-karats-h">
         <h2 id="cp-karats-h" className="cp-h">
-          سعر جرام الذهب بـ{c.currencyName}
+          سعر جرام الذهب {c.inCur}
         </h2>
         {error && !data ? (
           <p className="cp-error">تعذر تحميل الأسعار حاليًا، حاول تاني بعد شوية.</p>

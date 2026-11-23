@@ -60,7 +60,7 @@ export default function CountryKaratPage({ code, karat, initialData = null }) {
 
       <section className="cp-section" aria-labelledby="ck-price-h">
         <h2 id="ck-price-h" className="cp-h">
-          سعر جرام الذهب عيار {karat} بـ{c.currencyName}
+          سعر جرام الذهب عيار {karat} {c.inCur}
         </h2>
         {error && !data ? (
           <p className="cp-error">تعذر تحميل الأسعار حاليًا، حاول تاني بعد شوية.</p>
@@ -184,7 +184,7 @@ export default function CountryKaratPage({ code, karat, initialData = null }) {
             </p>
           </details>
           <details>
-            <summary>كيف يُحسب سعر عيار {karat} بـ{c.currencyName}؟</summary>
+            <summary>كيف يُحسب سعر عيار {karat} {c.inCur}؟</summary>
             <p>
               نقسم سعر الأونصة العالمية بالدولار على {formatMoney(GRAMS_PER_OUNCE, 4)} (جرامات الأونصة)، ونضرب
               في نقاء العيار ({info.percent}%)، ثم في سعر صرف {c.currencyName}.
