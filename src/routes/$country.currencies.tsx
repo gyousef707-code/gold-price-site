@@ -1,7 +1,7 @@
 import { createFileRoute, useLoaderData, useParams } from "@tanstack/react-router";
 import CountryCurrenciesPage from "@/legacy/pages/CountryCurrenciesPage.jsx";
 import { countryLoader, countryMeta } from "@/lib/country-route";
-import { seoMeta } from "@/lib/seo";
+import { seoMeta, countryBreadcrumbSchema } from "@/lib/seo";
 
 function Page() {
   const { country } = useParams({ from: "/$country/currencies" });
@@ -14,13 +14,16 @@ export const Route = createFileRoute("/$country/currencies")({
   head: ({ params }) => {
     const c = countryMeta(params.country);
     if (!c) return {};
-    return seoMeta({
+    return {
+      ...seoMeta({
       title: `أسعار العملات اليوم في ${c.name} مقابل ${c.curName} | ذهبي`,
       description: `أسعار الدولار واليورو والعملات العربية مقابل ${c.curName} في ${c.name} لحظة بلحظة، مع محوّل عملات سريع.`,
       keywords: `سعر الدولار في ${c.name}, أسعار العملات ${c.name}, تحويل العملات ${c.currencyName}`,
       path: `/${c.code}/currencies`,
       type: "article",
-    });
+    }),
+      ...countryBreadcrumbSchema(c, "العملات", "/currencies"),
+    };
   },
   component: Page,
 });
