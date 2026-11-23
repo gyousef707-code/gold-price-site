@@ -1,5 +1,6 @@
 import { SITE_URL } from "./site";
 import { COUNTRY_CODES } from "@/legacy/data/countryCodes.js";
+import { breadcrumbJsonLd } from "./jsonld.js";
 
 // صفحات الذهب والفضة والعملات... ليها نظير في كل دولة وفي مصر.
 // الجزء ده بيقول لجوجل إن النسخ دي لنفس الصفحة بس لكل بلد (hreflang)،
@@ -78,5 +79,22 @@ export function freshnessSchema(updatedAt: string) {
         }),
       },
     ],
+  };
+}
+
+// مسار التنقل (الرئيسية › الدولة › الصفحة) لصفحات الدول، بيتحط في الـ <head> من السيرفر.
+// لو label فاضي يبقى الصفحة هي صفحة الدولة نفسها (الرئيسية › الدولة بس).
+export function countryBreadcrumbSchema(
+  c: { code: string; name: string },
+  label?: string,
+  subPath = "",
+) {
+  const items = [
+    { name: "الرئيسية", path: "/" },
+    { name: c.name, path: `/${c.code}` },
+    ...(label ? [{ name: label, path: `/${c.code}${subPath}` }] : []),
+  ];
+  return {
+    scripts: [{ type: "application/ld+json", children: JSON.stringify(breadcrumbJsonLd(items)) }],
   };
 }
