@@ -51,7 +51,7 @@ export default function CountryToolsPage({ code }) {
     {
       title: 'الأسعار بالتفصيل',
       cards: [
-        { to: `${base}#tool-gold-karats`, icon: 'fa-solid fa-coins', title: 'عيارات الذهب بالتفصيل', desc: `كل العيارات بـ${c.currencyName}`, tone: 'gold' },
+        { to: `${base}#tool-gold-karats`, icon: 'fa-solid fa-coins', title: 'عيارات الذهب بالتفصيل', desc: `كل العيارات ${c.inCur}`, tone: 'gold' },
         { to: `${base}/silver`, icon: 'fa-solid fa-gem', title: 'عيارات الفضة بالتفصيل', desc: 'كل عيارات الفضة', tone: 'silver' },
         { to: `${base}/crypto`, icon: 'fa-solid fa-chart-simple', title: 'العملات الرقمية بالتفصيل', desc: 'كل العملات', tone: 'crypto' },
       ],
@@ -59,7 +59,7 @@ export default function CountryToolsPage({ code }) {
     {
       title: 'المزيد',
       cards: [
-        { to: `${base}/alerts`, icon: 'fa-regular fa-bell', title: 'تنبيهات الأسعار', desc: `اضبط تنبيهك بـ${c.currencyName}`, tone: 'blue' },
+        { to: `${base}/alerts`, icon: 'fa-regular fa-bell', title: 'تنبيهات الأسعار', desc: `اضبط تنبيهك ${c.inCur}`, tone: 'blue' },
         { to: '/blog', icon: 'fa-regular fa-newspaper', title: 'المدونة والمقالات', desc: 'كل المقالات', tone: 'blue' },
         { to: '/contact', icon: 'fa-regular fa-envelope', title: 'اتصل بنا', desc: 'اقتراح أو استفسار', tone: 'silver' },
       ],
@@ -71,7 +71,7 @@ export default function CountryToolsPage({ code }) {
       <CountryHero
         code={code}
         title={`الأدوات في ${c.name}`}
-        subtitle={`حاسبات وأدوات بـ${c.currencyName}`}
+        subtitle={`حاسبات وأدوات ${c.inCur}`}
         live={false}
       />
 
