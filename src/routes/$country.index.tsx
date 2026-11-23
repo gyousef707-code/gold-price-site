@@ -1,7 +1,7 @@
 import { createFileRoute, useLoaderData, useParams } from "@tanstack/react-router";
 import CountryPage from "@/legacy/pages/CountryPage.jsx";
 import { countryLoader, countryMeta } from "@/lib/country-route";
-import { seoMeta } from "@/lib/seo";
+import { seoMeta, countryBreadcrumbSchema } from "@/lib/seo";
 
 function Page() {
   const { country } = useParams({ from: "/$country/" });
@@ -14,13 +14,16 @@ export const Route = createFileRoute("/$country/")({
   head: ({ params }) => {
     const c = countryMeta(params.country);
     if (!c) return {};
-    return seoMeta({
+    return {
+      ...seoMeta({
       title: `سعر الذهب اليوم في ${c.name} ${c.inCur} | ذهبي`,
       description: `سعر جرام الذهب اليوم في ${c.name}: عيار 24 و22 و21 و18 ${c.inCur} لحظة بلحظة، محسوب من السعر العالمي، مع سعر الأونصة وسعر الفضة.`,
       keywords: `سعر الذهب في ${c.name}, سعر الذهب اليوم ${c.name}, سعر جرام الذهب عيار 21 ${c.name}`,
       path: `/${c.code}`,
       type: "article",
-    });
+    }),
+      ...countryBreadcrumbSchema(c),
+    };
   },
   component: Page,
 });
