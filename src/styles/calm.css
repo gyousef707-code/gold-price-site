@@ -393,3 +393,24 @@ body .tools-sub .tools-list-icon { width: 36px; height: 36px; font-size: 15px; }
   line-height: 1;
   cursor: pointer;
 }
+
+/* ---- شرح التثبيت على الآيفون ---- */
+.install-sheet-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; align-items: flex-end; justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+}
+.install-sheet {
+  width: 100%; max-width: 460px;
+  padding: 20px 18px calc(20px + env(safe-area-inset-bottom, 0px));
+  background: var(--card-bg-elevated, var(--card-bg));
+  color: var(--text-color);
+  border: 1px solid var(--border-gold);
+  border-bottom: 0;
+  border-radius: 20px 20px 0 0;
+}
+.install-sheet h3 { margin: 0 0 12px; font-size: 17px; }
+.install-sheet ol { margin: 0; padding-inline-start: 22px; line-height: 2; font-size: 14.5px; }
+.install-sheet-share { display: inline-block; margin-inline: 4px; padding: 0 6px; border: 1px solid var(--border-gold); border-radius: 6px; font-size: 13px; }
+.install-sheet-note { margin: 10px 0 0; font-size: 12.5px; line-height: 1.8; color: var(--text-muted); }
+.install-sheet-close { display: block; width: 100%; margin-top: 16px; padding: 12px; font-size: 15px; }
