@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SplatRouteImport } from './routes/$'
+import { Route as CountryRouteImport } from './routes/$country'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AlertsRouteImport } from './routes/alerts'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -21,12 +22,23 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SilverRouteImport } from './routes/silver'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ToolsRouteImport } from './routes/tools'
+import { Route as CountryIndexRouteImport } from './routes/$country.index'
+import { Route as CountryAlertsRouteImport } from './routes/$country.alerts'
+import { Route as CountryCryptoRouteImport } from './routes/$country.crypto'
+import { Route as CountryCurrenciesRouteImport } from './routes/$country.currencies'
+import { Route as CountrySilverRouteImport } from './routes/$country.silver'
+import { Route as CountryToolsRouteImport } from './routes/$country.tools'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as CryptoIndexRouteImport } from './routes/crypto.index'
 import { Route as CryptoCoinRouteImport } from './routes/crypto.$coin'
 import { Route as CurrencyCodeRouteImport } from './routes/currency.$code'
 import { Route as GoldKaratRouteImport } from './routes/gold.$karat'
+import { Route as ToolsMakingChargesRouteImport } from './routes/tools_.making-charges'
+import { Route as ToolsZakatRouteImport } from './routes/tools_.zakat'
+import { Route as CountryGoldKaratRouteImport } from './routes/$country.gold.$karat'
+import { Route as ApiPublicCountryHistoryRouteImport } from './routes/api/public/country-history'
+import { Route as ApiPublicCountryPricesRouteImport } from './routes/api/public/country-prices'
 import { Route as ApiPublicCryptoPriceRouteImport } from './routes/api/public/crypto-price'
 import { Route as ApiPublicCurrencyPriceRouteImport } from './routes/api/public/currency-price'
 import { Route as ApiPublicGoldHistoryRouteImport } from './routes/api/public/gold-history'
@@ -36,9 +48,13 @@ import { Route as ApiPublicSilverHistoryRouteImport } from './routes/api/public/
 import { Route as ApiPublicSilverPriceRouteImport } from './routes/api/public/silver-price'
 import { Route as ApiPushAlertsRouteImport } from './routes/api/push/alerts'
 import { Route as ApiPushCheckRouteImport } from './routes/api/push/check'
+import { Route as ApiPushCountryAlertsRouteImport } from './routes/api/push/country-alerts'
+import { Route as ApiPushPrefsRouteImport } from './routes/api/push/prefs'
 import { Route as ApiPushSubscribeRouteImport } from './routes/api/push/subscribe'
 import { Route as ApiPushUnsubscribeRouteImport } from './routes/api/push/unsubscribe'
+import { Route as ApiPushVapidKeyRouteImport } from './routes/api/push/vapid-key'
 import { Route as ApiTelegramSummaryRouteImport } from './routes/api/telegram/summary'
+import { Route as ApiTelegramTestRouteImport } from './routes/api/telegram/test'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -48,6 +64,11 @@ const IndexRoute = IndexRouteImport.update({
 const SplatRoute = SplatRouteImport.update({
   id: '/$',
   path: '/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CountryRoute = CountryRouteImport.update({
+  id: '/$country',
+  path: '/$country',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -100,6 +121,36 @@ const ToolsRoute = ToolsRouteImport.update({
   path: '/tools',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CountryIndexRoute = CountryIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CountryRoute,
+} as any)
+const CountryAlertsRoute = CountryAlertsRouteImport.update({
+  id: '/alerts',
+  path: '/alerts',
+  getParentRoute: () => CountryRoute,
+} as any)
+const CountryCryptoRoute = CountryCryptoRouteImport.update({
+  id: '/crypto',
+  path: '/crypto',
+  getParentRoute: () => CountryRoute,
+} as any)
+const CountryCurrenciesRoute = CountryCurrenciesRouteImport.update({
+  id: '/currencies',
+  path: '/currencies',
+  getParentRoute: () => CountryRoute,
+} as any)
+const CountrySilverRoute = CountrySilverRouteImport.update({
+  id: '/silver',
+  path: '/silver',
+  getParentRoute: () => CountryRoute,
+} as any)
+const CountryToolsRoute = CountryToolsRouteImport.update({
+  id: '/tools',
+  path: '/tools',
+  getParentRoute: () => CountryRoute,
+} as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
@@ -128,6 +179,31 @@ const CurrencyCodeRoute = CurrencyCodeRouteImport.update({
 const GoldKaratRoute = GoldKaratRouteImport.update({
   id: '/gold/$karat',
   path: '/gold/$karat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsMakingChargesRoute = ToolsMakingChargesRouteImport.update({
+  id: '/tools_/making-charges',
+  path: '/tools/making-charges',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsZakatRoute = ToolsZakatRouteImport.update({
+  id: '/tools_/zakat',
+  path: '/tools/zakat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CountryGoldKaratRoute = CountryGoldKaratRouteImport.update({
+  id: '/gold/$karat',
+  path: '/gold/$karat',
+  getParentRoute: () => CountryRoute,
+} as any)
+const ApiPublicCountryHistoryRoute = ApiPublicCountryHistoryRouteImport.update({
+  id: '/api/public/country-history',
+  path: '/api/public/country-history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicCountryPricesRoute = ApiPublicCountryPricesRouteImport.update({
+  id: '/api/public/country-prices',
+  path: '/api/public/country-prices',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicCryptoPriceRoute = ApiPublicCryptoPriceRouteImport.update({
@@ -175,6 +251,16 @@ const ApiPushCheckRoute = ApiPushCheckRouteImport.update({
   path: '/api/push/check',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPushCountryAlertsRoute = ApiPushCountryAlertsRouteImport.update({
+  id: '/api/push/country-alerts',
+  path: '/api/push/country-alerts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPushPrefsRoute = ApiPushPrefsRouteImport.update({
+  id: '/api/push/prefs',
+  path: '/api/push/prefs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPushSubscribeRoute = ApiPushSubscribeRouteImport.update({
   id: '/api/push/subscribe',
   path: '/api/push/subscribe',
@@ -185,15 +271,26 @@ const ApiPushUnsubscribeRoute = ApiPushUnsubscribeRouteImport.update({
   path: '/api/push/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPushVapidKeyRoute = ApiPushVapidKeyRouteImport.update({
+  id: '/api/push/vapid-key',
+  path: '/api/push/vapid-key',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiTelegramSummaryRoute = ApiTelegramSummaryRouteImport.update({
   id: '/api/telegram/summary',
   path: '/api/telegram/summary',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTelegramTestRoute = ApiTelegramTestRouteImport.update({
+  id: '/api/telegram/test',
+  path: '/api/telegram/test',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/$country': typeof CountryRouteWithChildren
   '/about': typeof AboutRoute
   '/alerts': typeof AlertsRoute
   '/contact': typeof ContactRoute
@@ -204,12 +301,23 @@ export interface FileRoutesByFullPath {
   '/silver': typeof SilverRoute
   '/terms': typeof TermsRoute
   '/tools': typeof ToolsRoute
+  '/$country/alerts': typeof CountryAlertsRoute
+  '/$country/crypto': typeof CountryCryptoRoute
+  '/$country/currencies': typeof CountryCurrenciesRoute
+  '/$country/silver': typeof CountrySilverRoute
+  '/$country/tools': typeof CountryToolsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/crypto/$coin': typeof CryptoCoinRoute
   '/currency/$code': typeof CurrencyCodeRoute
   '/gold/$karat': typeof GoldKaratRoute
+  '/tools/making-charges': typeof ToolsMakingChargesRoute
+  '/tools/zakat': typeof ToolsZakatRoute
+  '/$country/': typeof CountryIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/crypto/': typeof CryptoIndexRoute
+  '/$country/gold/$karat': typeof CountryGoldKaratRoute
+  '/api/public/country-history': typeof ApiPublicCountryHistoryRoute
+  '/api/public/country-prices': typeof ApiPublicCountryPricesRoute
   '/api/public/crypto-price': typeof ApiPublicCryptoPriceRoute
   '/api/public/currency-price': typeof ApiPublicCurrencyPriceRoute
   '/api/public/gold-history': typeof ApiPublicGoldHistoryRoute
@@ -219,9 +327,13 @@ export interface FileRoutesByFullPath {
   '/api/public/silver-price': typeof ApiPublicSilverPriceRoute
   '/api/push/alerts': typeof ApiPushAlertsRoute
   '/api/push/check': typeof ApiPushCheckRoute
+  '/api/push/country-alerts': typeof ApiPushCountryAlertsRoute
+  '/api/push/prefs': typeof ApiPushPrefsRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
+  '/api/push/vapid-key': typeof ApiPushVapidKeyRoute
   '/api/telegram/summary': typeof ApiTelegramSummaryRoute
+  '/api/telegram/test': typeof ApiTelegramTestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -236,12 +348,23 @@ export interface FileRoutesByTo {
   '/silver': typeof SilverRoute
   '/terms': typeof TermsRoute
   '/tools': typeof ToolsRoute
+  '/$country/alerts': typeof CountryAlertsRoute
+  '/$country/crypto': typeof CountryCryptoRoute
+  '/$country/currencies': typeof CountryCurrenciesRoute
+  '/$country/silver': typeof CountrySilverRoute
+  '/$country/tools': typeof CountryToolsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/crypto/$coin': typeof CryptoCoinRoute
   '/currency/$code': typeof CurrencyCodeRoute
   '/gold/$karat': typeof GoldKaratRoute
+  '/tools/making-charges': typeof ToolsMakingChargesRoute
+  '/tools/zakat': typeof ToolsZakatRoute
+  '/$country': typeof CountryIndexRoute
   '/blog': typeof BlogIndexRoute
   '/crypto': typeof CryptoIndexRoute
+  '/$country/gold/$karat': typeof CountryGoldKaratRoute
+  '/api/public/country-history': typeof ApiPublicCountryHistoryRoute
+  '/api/public/country-prices': typeof ApiPublicCountryPricesRoute
   '/api/public/crypto-price': typeof ApiPublicCryptoPriceRoute
   '/api/public/currency-price': typeof ApiPublicCurrencyPriceRoute
   '/api/public/gold-history': typeof ApiPublicGoldHistoryRoute
@@ -251,14 +374,19 @@ export interface FileRoutesByTo {
   '/api/public/silver-price': typeof ApiPublicSilverPriceRoute
   '/api/push/alerts': typeof ApiPushAlertsRoute
   '/api/push/check': typeof ApiPushCheckRoute
+  '/api/push/country-alerts': typeof ApiPushCountryAlertsRoute
+  '/api/push/prefs': typeof ApiPushPrefsRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
+  '/api/push/vapid-key': typeof ApiPushVapidKeyRoute
   '/api/telegram/summary': typeof ApiTelegramSummaryRoute
+  '/api/telegram/test': typeof ApiTelegramTestRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/$country': typeof CountryRouteWithChildren
   '/about': typeof AboutRoute
   '/alerts': typeof AlertsRoute
   '/contact': typeof ContactRoute
@@ -269,12 +397,23 @@ export interface FileRoutesById {
   '/silver': typeof SilverRoute
   '/terms': typeof TermsRoute
   '/tools': typeof ToolsRoute
+  '/$country/alerts': typeof CountryAlertsRoute
+  '/$country/crypto': typeof CountryCryptoRoute
+  '/$country/currencies': typeof CountryCurrenciesRoute
+  '/$country/silver': typeof CountrySilverRoute
+  '/$country/tools': typeof CountryToolsRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/crypto/$coin': typeof CryptoCoinRoute
   '/currency/$code': typeof CurrencyCodeRoute
   '/gold/$karat': typeof GoldKaratRoute
+  '/tools_/making-charges': typeof ToolsMakingChargesRoute
+  '/tools_/zakat': typeof ToolsZakatRoute
+  '/$country/': typeof CountryIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/crypto/': typeof CryptoIndexRoute
+  '/$country/gold/$karat': typeof CountryGoldKaratRoute
+  '/api/public/country-history': typeof ApiPublicCountryHistoryRoute
+  '/api/public/country-prices': typeof ApiPublicCountryPricesRoute
   '/api/public/crypto-price': typeof ApiPublicCryptoPriceRoute
   '/api/public/currency-price': typeof ApiPublicCurrencyPriceRoute
   '/api/public/gold-history': typeof ApiPublicGoldHistoryRoute
@@ -284,15 +423,20 @@ export interface FileRoutesById {
   '/api/public/silver-price': typeof ApiPublicSilverPriceRoute
   '/api/push/alerts': typeof ApiPushAlertsRoute
   '/api/push/check': typeof ApiPushCheckRoute
+  '/api/push/country-alerts': typeof ApiPushCountryAlertsRoute
+  '/api/push/prefs': typeof ApiPushPrefsRoute
   '/api/push/subscribe': typeof ApiPushSubscribeRoute
   '/api/push/unsubscribe': typeof ApiPushUnsubscribeRoute
+  '/api/push/vapid-key': typeof ApiPushVapidKeyRoute
   '/api/telegram/summary': typeof ApiTelegramSummaryRoute
+  '/api/telegram/test': typeof ApiTelegramTestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/$'
+    | '/$country'
     | '/about'
     | '/alerts'
     | '/contact'
@@ -303,12 +447,23 @@ export interface FileRouteTypes {
     | '/silver'
     | '/terms'
     | '/tools'
+    | '/$country/alerts'
+    | '/$country/crypto'
+    | '/$country/currencies'
+    | '/$country/silver'
+    | '/$country/tools'
     | '/blog/$slug'
     | '/crypto/$coin'
     | '/currency/$code'
     | '/gold/$karat'
+    | '/tools/making-charges'
+    | '/tools/zakat'
+    | '/$country/'
     | '/blog/'
     | '/crypto/'
+    | '/$country/gold/$karat'
+    | '/api/public/country-history'
+    | '/api/public/country-prices'
     | '/api/public/crypto-price'
     | '/api/public/currency-price'
     | '/api/public/gold-history'
@@ -318,9 +473,13 @@ export interface FileRouteTypes {
     | '/api/public/silver-price'
     | '/api/push/alerts'
     | '/api/push/check'
+    | '/api/push/country-alerts'
+    | '/api/push/prefs'
     | '/api/push/subscribe'
     | '/api/push/unsubscribe'
+    | '/api/push/vapid-key'
     | '/api/telegram/summary'
+    | '/api/telegram/test'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -335,12 +494,23 @@ export interface FileRouteTypes {
     | '/silver'
     | '/terms'
     | '/tools'
+    | '/$country/alerts'
+    | '/$country/crypto'
+    | '/$country/currencies'
+    | '/$country/silver'
+    | '/$country/tools'
     | '/blog/$slug'
     | '/crypto/$coin'
     | '/currency/$code'
     | '/gold/$karat'
+    | '/tools/making-charges'
+    | '/tools/zakat'
+    | '/$country'
     | '/blog'
     | '/crypto'
+    | '/$country/gold/$karat'
+    | '/api/public/country-history'
+    | '/api/public/country-prices'
     | '/api/public/crypto-price'
     | '/api/public/currency-price'
     | '/api/public/gold-history'
@@ -350,13 +520,18 @@ export interface FileRouteTypes {
     | '/api/public/silver-price'
     | '/api/push/alerts'
     | '/api/push/check'
+    | '/api/push/country-alerts'
+    | '/api/push/prefs'
     | '/api/push/subscribe'
     | '/api/push/unsubscribe'
+    | '/api/push/vapid-key'
     | '/api/telegram/summary'
+    | '/api/telegram/test'
   id:
     | '__root__'
     | '/'
     | '/$'
+    | '/$country'
     | '/about'
     | '/alerts'
     | '/contact'
@@ -367,12 +542,23 @@ export interface FileRouteTypes {
     | '/silver'
     | '/terms'
     | '/tools'
+    | '/$country/alerts'
+    | '/$country/crypto'
+    | '/$country/currencies'
+    | '/$country/silver'
+    | '/$country/tools'
     | '/blog/$slug'
     | '/crypto/$coin'
     | '/currency/$code'
     | '/gold/$karat'
+    | '/tools_/making-charges'
+    | '/tools_/zakat'
+    | '/$country/'
     | '/blog/'
     | '/crypto/'
+    | '/$country/gold/$karat'
+    | '/api/public/country-history'
+    | '/api/public/country-prices'
     | '/api/public/crypto-price'
     | '/api/public/currency-price'
     | '/api/public/gold-history'
@@ -382,14 +568,19 @@ export interface FileRouteTypes {
     | '/api/public/silver-price'
     | '/api/push/alerts'
     | '/api/push/check'
+    | '/api/push/country-alerts'
+    | '/api/push/prefs'
     | '/api/push/subscribe'
     | '/api/push/unsubscribe'
+    | '/api/push/vapid-key'
     | '/api/telegram/summary'
+    | '/api/telegram/test'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
+  CountryRoute: typeof CountryRouteWithChildren
   AboutRoute: typeof AboutRoute
   AlertsRoute: typeof AlertsRoute
   ContactRoute: typeof ContactRoute
@@ -404,8 +595,12 @@ export interface RootRouteChildren {
   CryptoCoinRoute: typeof CryptoCoinRoute
   CurrencyCodeRoute: typeof CurrencyCodeRoute
   GoldKaratRoute: typeof GoldKaratRoute
+  ToolsMakingChargesRoute: typeof ToolsMakingChargesRoute
+  ToolsZakatRoute: typeof ToolsZakatRoute
   BlogIndexRoute: typeof BlogIndexRoute
   CryptoIndexRoute: typeof CryptoIndexRoute
+  ApiPublicCountryHistoryRoute: typeof ApiPublicCountryHistoryRoute
+  ApiPublicCountryPricesRoute: typeof ApiPublicCountryPricesRoute
   ApiPublicCryptoPriceRoute: typeof ApiPublicCryptoPriceRoute
   ApiPublicCurrencyPriceRoute: typeof ApiPublicCurrencyPriceRoute
   ApiPublicGoldHistoryRoute: typeof ApiPublicGoldHistoryRoute
@@ -415,9 +610,13 @@ export interface RootRouteChildren {
   ApiPublicSilverPriceRoute: typeof ApiPublicSilverPriceRoute
   ApiPushAlertsRoute: typeof ApiPushAlertsRoute
   ApiPushCheckRoute: typeof ApiPushCheckRoute
+  ApiPushCountryAlertsRoute: typeof ApiPushCountryAlertsRoute
+  ApiPushPrefsRoute: typeof ApiPushPrefsRoute
   ApiPushSubscribeRoute: typeof ApiPushSubscribeRoute
   ApiPushUnsubscribeRoute: typeof ApiPushUnsubscribeRoute
+  ApiPushVapidKeyRoute: typeof ApiPushVapidKeyRoute
   ApiTelegramSummaryRoute: typeof ApiTelegramSummaryRoute
+  ApiTelegramTestRoute: typeof ApiTelegramTestRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -434,6 +633,13 @@ declare module '@tanstack/react-router' {
       path: '/$'
       fullPath: '/$'
       preLoaderRoute: typeof SplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$country': {
+      id: '/$country'
+      path: '/$country'
+      fullPath: '/$country'
+      preLoaderRoute: typeof CountryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -506,6 +712,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$country/': {
+      id: '/$country/'
+      path: '/'
+      fullPath: '/$country/'
+      preLoaderRoute: typeof CountryIndexRouteImport
+      parentRoute: typeof CountryRoute
+    }
+    '/$country/alerts': {
+      id: '/$country/alerts'
+      path: '/alerts'
+      fullPath: '/$country/alerts'
+      preLoaderRoute: typeof CountryAlertsRouteImport
+      parentRoute: typeof CountryRoute
+    }
+    '/$country/crypto': {
+      id: '/$country/crypto'
+      path: '/crypto'
+      fullPath: '/$country/crypto'
+      preLoaderRoute: typeof CountryCryptoRouteImport
+      parentRoute: typeof CountryRoute
+    }
+    '/$country/currencies': {
+      id: '/$country/currencies'
+      path: '/currencies'
+      fullPath: '/$country/currencies'
+      preLoaderRoute: typeof CountryCurrenciesRouteImport
+      parentRoute: typeof CountryRoute
+    }
+    '/$country/silver': {
+      id: '/$country/silver'
+      path: '/silver'
+      fullPath: '/$country/silver'
+      preLoaderRoute: typeof CountrySilverRouteImport
+      parentRoute: typeof CountryRoute
+    }
+    '/$country/tools': {
+      id: '/$country/tools'
+      path: '/tools'
+      fullPath: '/$country/tools'
+      preLoaderRoute: typeof CountryToolsRouteImport
+      parentRoute: typeof CountryRoute
+    }
     '/blog/': {
       id: '/blog/'
       path: '/blog'
@@ -546,6 +794,41 @@ declare module '@tanstack/react-router' {
       path: '/gold/$karat'
       fullPath: '/gold/$karat'
       preLoaderRoute: typeof GoldKaratRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools_/making-charges': {
+      id: '/tools_/making-charges'
+      path: '/tools/making-charges'
+      fullPath: '/tools/making-charges'
+      preLoaderRoute: typeof ToolsMakingChargesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools_/zakat': {
+      id: '/tools_/zakat'
+      path: '/tools/zakat'
+      fullPath: '/tools/zakat'
+      preLoaderRoute: typeof ToolsZakatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$country/gold/$karat': {
+      id: '/$country/gold/$karat'
+      path: '/gold/$karat'
+      fullPath: '/$country/gold/$karat'
+      preLoaderRoute: typeof CountryGoldKaratRouteImport
+      parentRoute: typeof CountryRoute
+    }
+    '/api/public/country-history': {
+      id: '/api/public/country-history'
+      path: '/api/public/country-history'
+      fullPath: '/api/public/country-history'
+      preLoaderRoute: typeof ApiPublicCountryHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/country-prices': {
+      id: '/api/public/country-prices'
+      path: '/api/public/country-prices'
+      fullPath: '/api/public/country-prices'
+      preLoaderRoute: typeof ApiPublicCountryPricesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/crypto-price': {
@@ -611,6 +894,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPushCheckRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/push/country-alerts': {
+      id: '/api/push/country-alerts'
+      path: '/api/push/country-alerts'
+      fullPath: '/api/push/country-alerts'
+      preLoaderRoute: typeof ApiPushCountryAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/push/prefs': {
+      id: '/api/push/prefs'
+      path: '/api/push/prefs'
+      fullPath: '/api/push/prefs'
+      preLoaderRoute: typeof ApiPushPrefsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/push/subscribe': {
       id: '/api/push/subscribe'
       path: '/api/push/subscribe'
@@ -625,6 +922,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPushUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/push/vapid-key': {
+      id: '/api/push/vapid-key'
+      path: '/api/push/vapid-key'
+      fullPath: '/api/push/vapid-key'
+      preLoaderRoute: typeof ApiPushVapidKeyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/telegram/summary': {
       id: '/api/telegram/summary'
       path: '/api/telegram/summary'
@@ -632,12 +936,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTelegramSummaryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/telegram/test': {
+      id: '/api/telegram/test'
+      path: '/api/telegram/test'
+      fullPath: '/api/telegram/test'
+      preLoaderRoute: typeof ApiTelegramTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
+
+interface CountryRouteChildren {
+  CountryAlertsRoute: typeof CountryAlertsRoute
+  CountryCryptoRoute: typeof CountryCryptoRoute
+  CountryCurrenciesRoute: typeof CountryCurrenciesRoute
+  CountrySilverRoute: typeof CountrySilverRoute
+  CountryToolsRoute: typeof CountryToolsRoute
+  CountryIndexRoute: typeof CountryIndexRoute
+  CountryGoldKaratRoute: typeof CountryGoldKaratRoute
+}
+
+const CountryRouteChildren: CountryRouteChildren = {
+  CountryAlertsRoute: CountryAlertsRoute,
+  CountryCryptoRoute: CountryCryptoRoute,
+  CountryCurrenciesRoute: CountryCurrenciesRoute,
+  CountrySilverRoute: CountrySilverRoute,
+  CountryToolsRoute: CountryToolsRoute,
+  CountryIndexRoute: CountryIndexRoute,
+  CountryGoldKaratRoute: CountryGoldKaratRoute,
+}
+
+const CountryRouteWithChildren =
+  CountryRoute._addFileChildren(CountryRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
+  CountryRoute: CountryRouteWithChildren,
   AboutRoute: AboutRoute,
   AlertsRoute: AlertsRoute,
   ContactRoute: ContactRoute,
@@ -652,8 +987,12 @@ const rootRouteChildren: RootRouteChildren = {
   CryptoCoinRoute: CryptoCoinRoute,
   CurrencyCodeRoute: CurrencyCodeRoute,
   GoldKaratRoute: GoldKaratRoute,
+  ToolsMakingChargesRoute: ToolsMakingChargesRoute,
+  ToolsZakatRoute: ToolsZakatRoute,
   BlogIndexRoute: BlogIndexRoute,
   CryptoIndexRoute: CryptoIndexRoute,
+  ApiPublicCountryHistoryRoute: ApiPublicCountryHistoryRoute,
+  ApiPublicCountryPricesRoute: ApiPublicCountryPricesRoute,
   ApiPublicCryptoPriceRoute: ApiPublicCryptoPriceRoute,
   ApiPublicCurrencyPriceRoute: ApiPublicCurrencyPriceRoute,
   ApiPublicGoldHistoryRoute: ApiPublicGoldHistoryRoute,
@@ -663,9 +1002,13 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicSilverPriceRoute: ApiPublicSilverPriceRoute,
   ApiPushAlertsRoute: ApiPushAlertsRoute,
   ApiPushCheckRoute: ApiPushCheckRoute,
+  ApiPushCountryAlertsRoute: ApiPushCountryAlertsRoute,
+  ApiPushPrefsRoute: ApiPushPrefsRoute,
   ApiPushSubscribeRoute: ApiPushSubscribeRoute,
   ApiPushUnsubscribeRoute: ApiPushUnsubscribeRoute,
+  ApiPushVapidKeyRoute: ApiPushVapidKeyRoute,
   ApiTelegramSummaryRoute: ApiTelegramSummaryRoute,
+  ApiTelegramTestRoute: ApiTelegramTestRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

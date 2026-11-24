@@ -8,7 +8,8 @@ const CALCULATORS = [
   { to: '/#tool-gold-calc', icon: 'fa-solid fa-calculator', ar: 'حاسبة الذهب', en: 'Gold calculator', arDesc: 'قيمة الذهب بالوزن والعيار', enDesc: 'Value by weight & karat', tone: 'gold' },
   { to: '/silver#tool-silver-calc', icon: 'fa-solid fa-gem', ar: 'حاسبة الفضة', en: 'Silver calculator', arDesc: 'قيمة الفضة بالوزن والعيار', enDesc: 'Value by weight & purity', tone: 'silver' },
   { to: '/currencies', icon: 'fa-solid fa-right-left', ar: 'محول العملات', en: 'Currency converter', arDesc: 'التحويل بين العملات', enDesc: 'Convert any currency', tone: 'blue' },
-  { to: '/#tool-zakat-calc', icon: 'fa-solid fa-hand-holding-dollar', ar: 'حاسبة زكاة الذهب', en: 'Gold zakat calculator', arDesc: 'زكاة الذهب 2.5%', enDesc: '2.5% zakat', tone: 'gold' },
+  { to: '/tools/zakat', icon: 'fa-solid fa-hand-holding-dollar', ar: 'حاسبة زكاة الذهب', en: 'Gold zakat calculator', arDesc: 'زكاة الذهب 2.5%', enDesc: '2.5% zakat', tone: 'gold' },
+  { to: '/tools/making-charges', icon: 'fa-solid fa-ring', ar: 'حاسبة المصنعية', en: 'Making charges calculator', arDesc: 'سعر الذهب بالمصنعية', enDesc: 'Gold price with making charges', tone: 'gold' },
 ];
 
 const SECTIONS = [

@@ -61,6 +61,16 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://zahaby1.com/tools/zakat</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://zahaby1.com/tools/making-charges</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://zahaby1.com/blog</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
