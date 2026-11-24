@@ -15,8 +15,8 @@ export function organizationJsonLd() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: SITE_NAME,
-    alternateName: "Zahaby",
-    url: SITE_URL,
+    alternateName: ["Zahaby", "zahaby1", "ذهبي لأسعار الذهب"],
+    url: `${SITE_URL}/`,
     logo: LOGO_URL,
     sameAs: ["https://t.me/zahaby1"],
   };
@@ -28,7 +28,8 @@ export function websiteJsonLd() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: SITE_NAME,
-    url: SITE_URL,
+    alternateName: ["Zahaby", "zahaby1", "ذهبي لأسعار الذهب"],
+    url: `${SITE_URL}/`,
     inLanguage: "ar-EG",
   };
 }

@@ -85,13 +85,13 @@ export function freshnessSchema(updatedAt: string) {
 // مسار التنقل (الرئيسية › الدولة › الصفحة) لصفحات الدول، بيتحط في الـ <head> من السيرفر.
 // لو label فاضي يبقى الصفحة هي صفحة الدولة نفسها (الرئيسية › الدولة بس).
 export function countryBreadcrumbSchema(
-  c: { code: string; name: string },
+  c: { code: string; name?: string | undefined },
   label?: string,
   subPath = "",
 ) {
   const items = [
     { name: "الرئيسية", path: "/" },
-    { name: c.name, path: `/${c.code}` },
+    { name: c.name ?? c.code.toUpperCase(), path: `/${c.code}` },
     ...(label ? [{ name: label, path: `/${c.code}${subPath}` }] : []),
   ];
   return {
