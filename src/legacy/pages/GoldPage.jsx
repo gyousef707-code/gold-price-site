@@ -18,6 +18,7 @@ import { shareCard } from '../lib/shareCard.js';
 // الشكل والمحتوى النهائي بيفضلوا زي ما هم بالظبط.
 import CalcTabs from '../components/CalcTabs.jsx';
 import SeoH1 from '../components/SeoH1.jsx';
+import HomeIntro from '../components/HomeIntro.jsx';
 const RelatedArticles = lazy(() => import('../components/RelatedArticles.jsx'));
 const GoldCalculator = lazy(() => import('../components/calculators/GoldCalculator.jsx'));
 const ZakatCalculator = lazy(() => import('../components/calculators/ZakatCalculator.jsx'));
@@ -234,6 +235,8 @@ export default function GoldPage({ initialGoldData = null } = {}) {
           <Link to="/gold/pound">{t('gold.pound')}</Link>
         </div>
       </section>
+
+      <HomeIntro />
 
       <Suspense fallback={null}>
         <RelatedArticles slugs={['gold-price-today-egypt', 'difference-21-24-karat', 'gold-zakat-calculation']} />
