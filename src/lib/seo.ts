@@ -98,3 +98,14 @@ export function countryBreadcrumbSchema(
     scripts: [{ type: "application/ld+json", children: JSON.stringify(breadcrumbJsonLd(items)) }],
   };
 }
+
+// مسار التنقل لصفحات القوائم الرئيسية (الرئيسية › الفضة مثلًا).
+export function listBreadcrumbSchema(label: string, path: string) {
+  const items = [
+    { name: "الرئيسية", path: "/" },
+    { name: label, path },
+  ];
+  return {
+    scripts: [{ type: "application/ld+json", children: JSON.stringify(breadcrumbJsonLd(items)) }],
+  };
+}
