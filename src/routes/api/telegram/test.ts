@@ -13,7 +13,8 @@ export const Route = createFileRoute("/api/telegram/test")({
         try {
           const requiredSecret = process.env["CRON_SECRET"];
           const url = new URL(request.url);
-          if (requiredSecret && url.searchParams.get("secret") !== requiredSecret) {
+          // صفحة تشخيص يدوية (مش بتتنادى من cron): لو CRON_SECRET مش متظبط بنرفض بدل ما نفتحها لأي حد.
+          if (!requiredSecret || url.searchParams.get("secret") !== requiredSecret) {
             return jsonErr(new Error("غير مصرح"), 401);
           }
           // ?send=gold أو ?send=currency: يبعت بوستر حقيقي للقناة الآن (للمعاينة فقط)
@@ -31,7 +32,6 @@ export const Route = createFileRoute("/api/telegram/test")({
             accountIdLength: (process.env["CF_ACCOUNT_ID"] ?? "").length,
             hasToken: Boolean(process.env["CF_BROWSER_TOKEN"]),
             tokenLength: (process.env["CF_BROWSER_TOKEN"] ?? "").length,
-            tokenStart: (process.env["CF_BROWSER_TOKEN"] ?? "").slice(0, 5),
             tokenHasBadChars: /[^\x21-\x7e]/.test(process.env["CF_BROWSER_TOKEN"]?.trim() ?? ""),
           };
           // هل التوكن نفسه صالح؟ (بيرجّع الحالة فقط، مش التوكن)
