@@ -123,6 +123,7 @@ function RootShell({ children }: { children: ReactNode }) {
             __html: `
               #splash-screen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 42%,#1c1810 0%,#0b0b0c 70%);transition:opacity .6s ease,visibility .6s ease}
               #splash-screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
+              html:not(.is-app) #splash-screen{display:none !important}
               .splash-bg{position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 50% 50%,rgba(227,179,65,0.1) 0%,transparent 50%);animation:splashPulse 3s ease-in-out infinite}
               @keyframes splashPulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.1);opacity:1}}
               .splash-content{position:relative;z-index:1;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
@@ -149,6 +150,13 @@ function RootShell({ children }: { children: ReactNode }) {
         <link
           rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"
+        />
+        {/* شاشة الفتح (splash) بتظهر بس لو الموقع مفتوح كتطبيق متثبّت (أندرويد/آيفون/كمبيوتر).
+            زوار المتصفح العادي (من جوجل مثلًا) بيشوفوا الصفحة على طول من غير ما تتغطى. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var m=window.matchMedia;if((m&&(m('(display-mode: standalone)').matches||m('(display-mode: fullscreen)').matches||m('(display-mode: minimal-ui)').matches))||window.navigator.standalone===true){document.documentElement.classList.add('is-app')}}catch(e){}})();`,
+          }}
         />
         {/* Google Tag Manager */}
         <script
