@@ -70,3 +70,16 @@ export function articleJsonLd({ title, description, path, datePublished, dateMod
     mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE_URL}${path}` },
   };
 }
+
+// أسئلة شائعة (FAQPage). items: [[سؤال, إجابة], ...] — لازم تكون نفس الأسئلة الظاهرة في الصفحة.
+export function faqJsonLd(items) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map(([q, a]) => ({
+      "@type": "Question",
+      name: q,
+      acceptedAnswer: { "@type": "Answer", text: a },
+    })),
+  };
+}

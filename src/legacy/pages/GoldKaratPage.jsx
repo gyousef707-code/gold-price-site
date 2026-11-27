@@ -5,7 +5,8 @@ import JsonLd from '../components/JsonLd.jsx';
 import RelatedArticles from '../components/RelatedArticles.jsx';
 import useApiData from '../hooks/useApiData.js';
 import { goldKarats, goldKaratsDesc } from '../data/gold.js';
-import { breadcrumbJsonLd } from '@/lib/jsonld.js';
+import { karatFaqs } from '../data/karatFaqs.js';
+import { breadcrumbJsonLd, faqJsonLd } from '@/lib/jsonld.js';
 
 const PriceHistoryChart = lazy(() => import('../components/PriceHistoryChart.jsx'));
 
@@ -30,6 +31,7 @@ export default function GoldKaratPage() {
   if (!info) return <Navigate to="/tools" replace />;
 
   const price = data?.caratPrices?.[karat];
+  const faqs = karatFaqs[karat] || [];
   const otherKarats = goldKaratsDesc.filter((g) => g.karat !== karat);
 
   return (
@@ -109,6 +111,19 @@ export default function GoldKaratPage() {
             ))}
           </tbody>
         </table>
+      )}
+
+      {faqs.length > 0 && (
+        <section aria-labelledby="faq-h" style={{ margin: '18px 0' }}>
+          <JsonLd data={faqJsonLd(faqs)} />
+          <h2 id="faq-h">أسئلة شائعة عن عيار {karat}</h2>
+          {faqs.map(([q, a]) => (
+            <details key={q} style={{ marginBottom: 8 }}>
+              <summary style={{ fontWeight: 700, cursor: 'pointer' }}>{q}</summary>
+              <p>{a}</p>
+            </details>
+          ))}
+        </section>
       )}
 
       <RelatedArticles slugs={RELATED_BY_KARAT[karat]} />
