@@ -1,7 +1,7 @@
 import { Link } from '@/lib/router-compat.jsx';
 import JsonLd from '../components/JsonLd.jsx';
 import ZakatCalculator from '../components/calculators/ZakatCalculator.jsx';
-import { breadcrumbJsonLd } from '@/lib/jsonld.js';
+import { breadcrumbJsonLd, faqJsonLd } from '@/lib/jsonld.js';
 
 const FAQ = [
   {
@@ -89,6 +89,7 @@ export default function ZakatPage() {
       </section>
 
       <section className="cp-section cp-about" aria-labelledby="zk-faq-h">
+        <JsonLd data={faqJsonLd(FAQ.map((f) => [f.q, f.a]))} />
         <h2 id="zk-faq-h">أسئلة شائعة عن زكاة الذهب</h2>
         <div className="cp-faq">
           {FAQ.map((f) => (

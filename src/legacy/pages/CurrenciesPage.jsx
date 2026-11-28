@@ -10,6 +10,15 @@ import useApiData from '../hooks/useApiData.js';
 import { useLang } from '../context/LangContext.jsx';
 import { CURRENCY_META, CURRENCY_ORDER } from '../data/currencies.js';
 import SeoH1 from '../components/SeoH1.jsx';
+import FaqSection from '../components/FaqSection.jsx';
+
+const CURRENCY_FAQS = [
+  ['إزاي بتتحدد أسعار العملات مقابل الجنيه المصري؟', 'أسعار العملات بتتأثر بالعرض والطلب في السوق وبسياسة البنك المركزي وبحركة الدولار عالميًا. الموقع بيعرض الأسعار بالجنيه وبيحدّثها تلقائيًا طول اليوم عشان تتابعها وتقارن.'],
+  ['إيه الفرق بين سعر البيع وسعر الشراء للعملة؟', 'سعر البيع هو اللي بتشتري بيه العملة من البنك أو مكتب الصرافة، وسعر الشراء هو اللي بيدفعه لك لو بعت له عملتك. سعر الشراء بيبقى أقل، والفرق بينهم هو هامش الجهة.'],
+  ['هل السعر هنا هو سعر البنك بالظبط؟', 'لأ، الأسعار استرشادية للمتابعة، وممكن تختلف شوية عن سعر البنك أو مكتب الصرافة وقت التنفيذ. اسأل عن السعر النهائي قبل أي عملية تحويل.'],
+  ['إزاي أحسب مبلغ بعملة أجنبية بالجنيه؟', 'استخدم محول العملات في الصفحة: اختار العملة واكتب المبلغ وهيظهرلك المقابل بالجنيه على السعر الحالي.'],
+  ['ليه سعر العملة بيختلف من مكان لمكان؟', 'لأن كل بنك أو مكتب صرافة بيحدد هامشه الخاص ويتأثر بحجم الطلب عنده، فبتلاقي فروق بسيطة بين الجهات حتى في نفس اللحظة.'],
+];
 
 export default function CurrenciesPage() {
   const { data, loading, error } = useApiData('/api/public/currency-price', { intervalMs: 2 * 60000 });
@@ -98,7 +107,9 @@ export default function CurrenciesPage() {
         </div>
       </section>
 
-      <RelatedArticles slugs={['gold-price-forecast-2026', 'why-gold-price-differs-shops', 'gold-price-today-egypt']} />
+      <FaqSection id="cur-faq" title="أسئلة شائعة عن أسعار العملات" items={CURRENCY_FAQS} />
+
+      <RelatedArticles slugs={['sagha-dollar-gold-price-egypt', 'gold-price-today-egypt', 'why-gold-price-differs-shops']} />
 
     </div>
   );

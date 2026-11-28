@@ -1,4 +1,6 @@
 import { Link } from '@/lib/router-compat.jsx';
+import JsonLd from './JsonLd.jsx';
+import { faqJsonLd } from '@/lib/jsonld.js';
 import { useLang } from '../context/LangContext.jsx';
 
 // نص تعريفي وأسئلة شائعة للصفحة الرئيسية (عربي بس). مفيهوش أي أسعار ثابتة،
@@ -74,6 +76,7 @@ export default function HomeIntro() {
       </section>
 
       <section className="cp-section cp-about" aria-labelledby="home-faq-h">
+        <JsonLd data={faqJsonLd(FAQ.map((f) => [f.q, f.a]))} />
         <h2 id="home-faq-h">أسئلة شائعة عن سعر الذهب</h2>
         <div className="cp-faq">
           {FAQ.map((f) => (

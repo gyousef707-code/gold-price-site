@@ -14,8 +14,17 @@ import useApiData from '../hooks/useApiData.js';
 import { useLang } from '../context/LangContext.jsx';
 import { shareCard } from '../lib/shareCard.js';
 import SeoH1 from '../components/SeoH1.jsx';
+import FaqSection from '../components/FaqSection.jsx';
 
 const CARAT_ORDER = ['999', '925', '900', '800', '720', '500'];
+
+const SILVER_FAQS = [
+  ['كام نسبة الفضة الخالصة في عيار 925؟', 'عيار 925 معناه 92.5% فضة خالصة والباقي معادن تانية (غالبًا نحاس) بتخلي القطعة أصلب وتتحمل الاستخدام. وده من أشهر العيارات في المشغولات.'],
+  ['إيه عيارات الفضة المتداولة؟', 'من أشهرها عيار 999 (فضة نقية تقريبًا وبتتباع غالبًا كسبائك)، وعيار 925 (للمشغولات)، وعيار 800. كل ما العيار أعلى بقى النقاء أكبر والقطعة ألين.'],
+  ['ليه سعر الفضة أقل بكتير من الذهب؟', 'لأن المعروض منها أكبر، وطلبها موزع بين الاستثمار والاستخدام الصناعي والمجوهرات، فسعر الجرام بيبقى أقل بكتير من الذهب.'],
+  ['هل الفضة مناسبة للادخار؟', 'ممكن، لكن سعرها بيتحرك بشكل أسرع من الذهب غالبًا، ولو اشتريت مشغولات فالمصنعية بتتخصم منك عند البيع. اقرا مقارنة الذهب والفضة قبل ما تقرر، والأسعار هنا للمتابعة مش نصيحة مالية.'],
+  ['هل سعر الفضة المعروض يشمل المصنعية؟', 'لأ، ده سعر جرام الفضة نفسه. المصنعية بتتضاف على القطعة حسب التصميم ومن محل لمحل، فاسأل عن السعر النهائي قبل الشراء.'],
+];
 
 export default function SilverPage() {
   const { data, loading, error } = useApiData('/api/public/silver-price', { intervalMs: 5 * 60000 });
@@ -134,6 +143,8 @@ export default function SilverPage() {
           ]}
         />
       </section>
+
+      <FaqSection id="silver-faq" title="أسئلة شائعة عن سعر الفضة" items={SILVER_FAQS} />
 
       <RelatedArticles slugs={['gold-vs-silver-investment', 'gold-price-today-egypt', 'best-time-to-buy-gold']} />
 

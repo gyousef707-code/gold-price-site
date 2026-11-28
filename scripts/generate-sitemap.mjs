@@ -31,6 +31,7 @@ for (const p of ["/about", "/contact", "/privacy", "/terms", "/disclaimer"]) add
 // العيارات + الجنيه الذهب
 for (const k of goldKarats) add(`/gold/${k.karat}`, "hourly", "0.8");
 add("/gold/pound", "hourly", "0.8");
+add("/gold/bars", "hourly", "0.8");
 
 for (const c of CURRENCY_ORDER) add(`/currency/${c}`, "hourly", "0.7");
 for (const c of cryptoDetails) add(`/crypto/${coinId(c)}`, "hourly", "0.7");

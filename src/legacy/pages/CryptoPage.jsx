@@ -10,8 +10,16 @@ import { useLang } from '../context/LangContext.jsx';
 import { cryptoDetails } from '../data/crypto.js';
 import { SYMBOL_TO_ID } from '../data/cryptoSymbols.js';
 import SeoH1 from '../components/SeoH1.jsx';
+import FaqSection from '../components/FaqSection.jsx';
 
 const FALLBACK_ICON = (id) => `https://assets.coincap.io/assets/icons/${id}@2x.png`;
+
+const CRYPTO_FAQS = [
+  ['هل أسعار العملات الرقمية على الموقع لحظية؟', 'الأسعار بتتحدث تلقائيًا طول اليوم للمتابعة والمقارنة، لكن السعر الفعلي وقت التنفيذ ممكن يختلف شوية على منصة التداول اللي بتستخدمها.'],
+  ['ليه أسعار العملات الرقمية بتتحرك بسرعة؟', 'لأنها بتتداول 24 ساعة في اليوم طول الأسبوع، وبتتأثر بالأخبار وحجم السيولة والمضاربة، فتقلباتها أعلى بكتير من الذهب والعملات التقليدية.'],
+  ['هل الاستثمار في العملات الرقمية مضمون؟', 'لأ، هو عالي المخاطر وممكن تخسر جزء كبير من المبلغ. لو قررت تدخل، استثمر بس مبلغ تقدر تتحمل خسارته، والمعلومات هنا للمتابعة مش نصيحة مالية.'],
+  ['إزاي أحسب قيمة عملاتي الرقمية؟', 'استخدم الحاسبة في الصفحة: اختار العملة واكتب الكمية وهتشوف قيمتها على السعر الحالي.'],
+];
 
 export default function CryptoPage() {
   const { data, loading, error } = useApiData('/api/public/crypto-price', { intervalMs: 60000 });
@@ -160,6 +168,8 @@ export default function CryptoPage() {
           ))}
         </div>
       </section>
+
+      <FaqSection id="crypto-faq" title="أسئلة شائعة عن العملات الرقمية" items={CRYPTO_FAQS} />
 
       <RelatedArticles slugs={['gold-vs-silver-investment', 'gold-price-forecast-2026', 'beginners-guide-gold-investment']} />
 

@@ -151,6 +151,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://zahaby1.com/gold/bars</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://zahaby1.com/currency/usd</loc>
     <changefreq>hourly</changefreq>
     <priority>0.7</priority>

@@ -1,7 +1,7 @@
 import { Link } from '@/lib/router-compat.jsx';
 import JsonLd from '../components/JsonLd.jsx';
 import GoldCalculator from '../components/calculators/GoldCalculator.jsx';
-import { breadcrumbJsonLd } from '@/lib/jsonld.js';
+import { breadcrumbJsonLd, faqJsonLd } from '@/lib/jsonld.js';
 
 const FAQ = [
   {
@@ -79,6 +79,7 @@ export default function MakingChargesPage() {
       </section>
 
       <section className="cp-section cp-about" aria-labelledby="mc-faq-h">
+        <JsonLd data={faqJsonLd(FAQ.map((f) => [f.q, f.a]))} />
         <h2 id="mc-faq-h">أسئلة شائعة عن مصنعية الذهب</h2>
         <div className="cp-faq">
           {FAQ.map((f) => (

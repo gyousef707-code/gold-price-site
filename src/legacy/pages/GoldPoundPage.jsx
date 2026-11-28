@@ -5,11 +5,19 @@ import RelatedArticles from '../components/RelatedArticles.jsx';
 import useApiData from '../hooks/useApiData.js';
 import { goldKaratsDesc } from '../data/gold.js';
 import { breadcrumbJsonLd } from '@/lib/jsonld.js';
+import FaqSection from '../components/FaqSection.jsx';
 
 const PriceHistoryChart = lazy(() => import('../components/PriceHistoryChart.jsx'));
 
 // صفحة الجنيه الذهب (/gold/pound) — نفس شكل صفحات العيارات.
 // الجنيه = 8 جرام ذهب عيار 21، وأرشيف سعره (pound_sell) بيتسجل يوميًا أصلًا.
+const POUND_FAQS = [
+  ['كام وزن الجنيه الذهب وعياره؟', 'الجنيه الذهب وزنه 8 جرام وعياره 21، يعني فيه حوالي 7 جرام ذهب خالص.'],
+  ['ليه سعر الجنيه بيتحرك مع سعر عيار 21؟', 'لأن الجنيه ببساطة 8 جرامات من عيار 21، فأي تغيير في سعر الجرام بيظهر مضروبًا في 8 على سعر الجنيه.'],
+  ['هل الجنيه الذهب عليه مصنعية؟', 'الجنيه بيتباع في العادة بفرق بسيط عن سعر الذهب الخام مقارنة بالمشغولات، لكن الفرق بيختلف من جهة لجهة، فاسأل عن السعر النهائي قبل الشراء.'],
+  ['إيه الفرق بين الجنيه الذهب والسبيكة؟', 'الجنيه وزنه ثابت وعياره 21 وسهل البيع، والسبيكة عيارها 24 وبأوزان متنوعة. فيه مقال بيقارن بينهم بالتفصيل في المقالات ذات الصلة.'],
+];
+
 export default function GoldPoundPage() {
   const { data } = useApiData('/api/public/gold-price', { intervalMs: 60000 });
 
@@ -79,7 +87,9 @@ export default function GoldPoundPage() {
         بينهم هو هامش التاجر.
       </p>
 
-      <RelatedArticles slugs={['gold-price-today-egypt', 'difference-21-24-karat']} />
+      <FaqSection id="pound-faq" title="أسئلة شائعة عن الجنيه الذهب" items={POUND_FAQS} alwaysShow />
+
+      <RelatedArticles slugs={['gold-bar-vs-gold-pound', 'gold-price-today-egypt', 'difference-21-24-karat']} />
 
       <div className="related-box">
         <h3>اقرأ أيضًا - أسعار العيارات</h3>
